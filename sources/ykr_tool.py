@@ -33,7 +33,7 @@ from qgis.gui import QgsFileWidget
 from functools import partial
 
 # Initialize Qt resources from file resources.py
-from .resources import *
+from ..resources import *
 # Import the code for the dialog
 import processing
 import uuid
@@ -41,6 +41,7 @@ import os.path
 import psycopg2
 import datetime, getpass
 from configparser import ConfigParser
+from .ykr_tool_admin_areas import YKRToolAdminAreas
 from .ykr_tool_tasks import QueryTask
 from .createdbconnection import createDbConnection
 
@@ -58,7 +59,7 @@ class YKRTool:
         # Save reference to the QGIS interface
         self.iface = iface
         # initialize plugin directory
-        self.plugin_dir = os.path.dirname(__file__)
+        self.plugin_dir = os.path.split(os.path.dirname(__file__))[0]
         # initialize locale
         locale = QSettings().value('locale/userLocale')[0:2]
         locale_path = os.path.join(
@@ -85,9 +86,9 @@ class YKRTool:
         # Must be set in initGui() to survive plugin reloads
         self.first_start = None
 
-        self.mainDialog = uic.loadUi(os.path.join(self.plugin_dir, 'ykr_tool_main.ui'))
-        self.settingsDialog = uic.loadUi(os.path.join(self.plugin_dir, 'ykr_tool_db_settings.ui'))
-        self.infoDialog = uic.loadUi(os.path.join(self.plugin_dir, 'ykr_tool_info.ui'))
+        self.mainDialog = uic.loadUi(os.path.join(self.plugin_dir, 'ui', 'ykr_tool_main.ui'))
+        self.settingsDialog = uic.loadUi(os.path.join(self.plugin_dir, 'ui', 'ykr_tool_db_settings.ui'))
+        self.infoDialog = uic.loadUi(os.path.join(self.plugin_dir, 'ui', 'ykr_tool_info.ui'))
 
         self.targetYear = None
         self.ykrPopLayer = None
@@ -96,6 +97,9 @@ class YKRTool:
         self.futureAreasLayer = None
         self.futureNetworkLayer = None
         self.futureStopsLayer = None
+
+        self.ykrToolAdminAreas = YKRToolAdminAreas()
+
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -243,16 +247,21 @@ class YKRTool:
         self.cur = self.conn.cursor()
         self.sessionParams = self.generateSessionParameters()
         self.readProcessingInput()
-        self.checkLayerValidity()
-        self.uploadInputLayers()
+        # self.checkLayerValidity()
+        # self.uploadInputLayers()
+        self.runCalculation()
 
     def setupMainDialog(self):
         '''Sets up the main dialog'''
         md = self.mainDialog
-        md.geomArea.addItem("Tampere")
-        md.adminArea.addItem("Pirkanmaa")
-        md.pitkoScenario.addItems(["wem", "eu80", "kasvu", "muutos", "saasto",
-            "pysahdys", "static"])
+
+        md.radioButtonGeomArea.clicked.connect(self.handleRadioButtonGeomAreaToggle)
+        md.radioButtonAdminArea.clicked.connect(self.handleRadioButtonAdminAreaToggle)
+
+        names = self.ykrToolAdminAreas.getAdminAreaNames()
+        md.adminArea.addItems(names)
+        md.pitkoScenario.addItems(["static", "wem", "eu80", "kasvu", "muutos", "saasto",
+            "pysahdys"])
         md.emissionsAllocation.addItems(["hjm", "em"])
         md.elecEmissionType.addItems(["hankinta", "tuotanto"])
 
@@ -277,6 +286,44 @@ class YKRTool:
         md.futureStopsLoadLayer.clicked.connect(self.handleLayerToggle)
 
         md.calculateFuture.clicked.connect(self.handleLayerToggle)
+
+    def handleRadioButtonGeomAreaToggle(self, checked):
+        md = self.mainDialog
+
+        if checked:
+            md.ykrGeomAreaFile.setEnabled(True)
+            md.ykrGeomAreaLayerList.setEnabled(True)
+            md.ykrGeomAreaLoadLayer.setEnabled(True)
+            md.geomAreaLabel.setEnabled(True)
+            md.adminArea.setEnabled(False)
+            md.adminAreaLabel.setEnabled(False)
+        else:
+            md.ykrGeomAreaFile.setEnabled(False)
+            md.ykrGeomAreaLayerList.setEnabled(False)
+            md.ykrGeomAreaLoadLayer.setEnabled(False)
+            md.geomAreaLabel.setEnabled(False)
+            md.adminArea.setEnabled(True)
+            md.adminAreaLabel.setEnabled(True)
+
+
+    def handleRadioButtonAdminAreaToggle(self, checked):
+        md = self.mainDialog
+
+        if checked:
+            md.ykrGeomAreaFile.setEnabled(False)
+            md.ykrGeomAreaLayerList.setEnabled(False)
+            md.ykrGeomAreaLoadLayer.setEnabled(False)
+            md.geomAreaLabel.setEnabled(False)
+            md.adminArea.setEnabled(True)
+            md.adminAreaLabel.setEnabled(True)
+        else:
+            md.ykrGeomAreaFile.setEnabled(True)
+            md.ykrGeomAreaLayerList.setEnabled(True)
+            md.ykrGeomAreaLoadLayer.setEnabled(True)
+            md.geomAreaLabel.setEnabled(True)
+            md.adminArea.setEnabled(False)
+            md.adminAreaLabel.setEnabled(False)
+
 
     def displaySettingsDialog(self):
         '''Sets up and displays the settings dialog'''
@@ -408,28 +455,29 @@ class YKRTool:
     def readProcessingInput(self):
         '''Read user input from main dialog'''
         md = self.mainDialog
-        self.inputLayers = []
-        if md.ykrPopLoadLayer.isChecked():
-            self.ykrPopLayer = md.ykrPopLayerList.currentLayer()
-        else:
-            self.ykrPopLayer = QgsVectorLayer(md.ykrPopFile.filePath(),
-                "ykr_vaesto", "ogr")
-        if md.ykrBuildingsLoadLayer.isChecked():
-            self.ykrBuildingsLayer = md.ykrBuildingsLayerList.currentLayer()
-        else:
-            self.ykrBuildingsLayer = QgsVectorLayer(
-                md.ykrBuildingsFile.filePath(), "rakennukset_piste", "ogr")
-        if md.ykrJobsLoadLayer.isChecked():
-            self.ykrJobsLayer = md.ykrJobsLayerList.currentLayer()
-        else:
-            self.ykrJobsLayer = QgsVectorLayer(
-                md.ykrJobsFile.filePath(), "ykr_tyopaikat", "ogr")
-        self.inputLayers.extend([self.ykrPopLayer,
-            self.ykrJobsLayer, self.ykrBuildingsLayer])
+        # self.inputLayers = []
+        # if md.ykrPopLoadLayer.isChecked():
+        #     self.ykrPopLayer = md.ykrPopLayerList.currentLayer()
+        # else:
+        #     self.ykrPopLayer = QgsVectorLayer(md.ykrPopFile.filePath(),
+        #         "ykr_vaesto", "ogr")
+        # if md.ykrBuildingsLoadLayer.isChecked():
+        #     self.ykrBuildingsLayer = md.ykrBuildingsLayerList.currentLayer()
+        # else:
+        #     self.ykrBuildingsLayer = QgsVectorLayer(
+        #         md.ykrBuildingsFile.filePath(), "rakennukset_piste", "ogr")
+        # if md.ykrJobsLoadLayer.isChecked():
+        #     self.ykrJobsLayer = md.ykrJobsLayerList.currentLayer()
+        # else:
+        #     self.ykrJobsLayer = QgsVectorLayer(
+        #         md.ykrJobsFile.filePath(), "ykr_tyopaikat", "ogr")
+        # self.inputLayers.extend([self.ykrPopLayer,
+        #     self.ykrJobsLayer, self.ykrBuildingsLayer])
 
-        self.geomArea = md.geomArea.currentText()
-        self.adminArea = md.adminArea.currentText()
-        self.onlySelectedFeats = md.onlySelectedFeats.isChecked()
+        # self.geomArea = md.geomArea.currentText()
+
+        self.adminArea = self.ykrToolAdminAreas.getAdminAreaNameMatchingAdminDatabaseTable(md.adminArea.currentText())
+        # self.onlySelectedFeats = md.onlySelectedFeats.isChecked()
         self.pitkoScenario = md.pitkoScenario.currentText()
         self.emissionsAllocation = md.emissionsAllocation.currentText()
         self.elecEmissionType = md.elecEmissionType.currentText()
@@ -438,6 +486,7 @@ class YKRTool:
             self.calculateFuture = False
         else:
             self.readFutureProcessingInput()
+
 
     def readFutureProcessingInput(self):
         '''Reads user input for future processing from main dialog'''
@@ -566,12 +615,12 @@ class YKRTool:
         vals = {
             'uuid': self.sessionParams['uuid'],
             'aoi': self.adminArea,
-            'geomArea': self.geomArea,
-            'popTable': (self.tableNames[self.ykrPopLayer]).lower(),
-            'jobTable': (self.tableNames[self.ykrJobsLayer]).lower(),
-            'buildingTable': (self.tableNames[self.ykrBuildingsLayer]).lower(),
+            # 'geomArea': self.geomArea,
+            # 'popTable': (self.tableNames[self.ykrPopLayer]).lower(),
+            # 'jobTable': (self.tableNames[self.ykrJobsLayer]).lower(),
+            # 'buildingTable': (self.tableNames[self.ykrBuildingsLayer]).lower(),
             'calcYear': self.sessionParams['baseYear'],
-            'baseYear': self.sessionParams['baseYear'],
+            # 'baseYear': self.sessionParams['baseYear'],
             'pitkoScenario': self.pitkoScenario,
             'emissionsAllocation': self.emissionsAllocation,
             'elecEmissionType': self.elecEmissionType
@@ -579,10 +628,13 @@ class YKRTool:
         queries = []
         if not self.calculateFuture:
             queries.append('''CREATE TABLE user_output."output_{uuid}" AS
-            SELECT * FROM il_calculate_emissions('{popTable}', '{jobTable}',
-            '{buildingTable}', '{aoi}', '{calcYear}', '{pitkoScenario}',
-            '{emissionsAllocation}', '{elecEmissionType}', '{geomArea}',
-            '{baseYear}')'''.format(**vals))
+            SELECT * FROM CO2_CalculateEmissions('{aoi}', '{calcYear}', '{pitkoScenario}',
+            '{emissionsAllocation}', '{elecEmissionType}')'''.format(**vals))
+            # queries.append('''CREATE TABLE user_output."output_{uuid}" AS
+            # SELECT * FROM il_calculate_emissions('{popTable}', '{jobTable}',
+            # '{buildingTable}', '{aoi}', '{calcYear}', '{pitkoScenario}',
+            # '{emissionsAllocation}', '{elecEmissionType}', '{geomArea}',
+            # '{baseYear}')'''.format(**vals))
         else:
             futureQuery = self.generateFutureQuery(vals)
             queries.append(futureQuery)
@@ -635,7 +687,7 @@ class YKRTool:
         '''Writes session info to user_output.sessions table'''
         uuid = self.sessionParams['uuid']
         user = self.sessionParams['user']
-        geomArea = self.geomArea
+        adminArea = self.ykrToolAdminAreas.getAdminAreaNameFromDatabaseTableName(self.adminArea)
         startTime = self.sessionParams['startTime']
         baseYear = self.sessionParams['baseYear']
         targetYear = self.targetYear
@@ -645,7 +697,7 @@ class YKRTool:
 
         self.cur.execute('''INSERT INTO user_output.sessions VALUES (%s, %s, %s, %s, %s,
         %s, %s, %s, %s)''', (uuid, user, startTime, baseYear, targetYear,\
-            pitkoScenario, emissionsAllocation, elecEmissionType, geomArea))
+            pitkoScenario, emissionsAllocation, elecEmissionType, adminArea))
         self.conn.commit()
 
     def addResultAsLayers(self):

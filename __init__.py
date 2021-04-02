@@ -32,5 +32,5 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :type iface: QgsInterface
     """
     #
-    from .ykr_tool import YKRTool
+    from .sources.ykr_tool import YKRTool
     return YKRTool(iface)
