@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Ilmastotyökalu</string>
+   <string>Urban Infrastructure CHG Emission Estimation Tool for Tampere City Region</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_8">
    <item>
@@ -25,10 +25,10 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>Rajaa aluetta, jolla laskenta suoritetaan</string>
+        <string/>
        </property>
        <property name="title">
-        <string>Tarkastelualueen rajaus</string>
+        <string>Investigated Area</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
@@ -39,7 +39,7 @@
              <bool>false</bool>
             </property>
             <property name="text">
-             <string>Käytä geometrista aluetta</string>
+             <string>Use Spatial Area</string>
             </property>
             <attribute name="buttonGroup">
              <string notr="true">buttonGroupAreaOfInterest</string>
@@ -52,14 +52,14 @@
              <bool>false</bool>
             </property>
             <property name="text">
-             <string>Geometrinen alue:</string>
+             <string>Spatial Area:</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="3" column="0">
            <widget class="QRadioButton" name="radioButtonAdminArea">
             <property name="text">
-             <string>Käytä hallinnollista aluetta</string>
+             <string>Use Administrative Area</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -69,14 +69,14 @@
             </attribute>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="adminAreaLabel">
             <property name="text">
-             <string>Hallinnollinen alue:</string>
+             <string>Administrative Area:</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="4" column="1">
            <widget class="QComboBox" name="adminArea">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -123,211 +123,21 @@
                <bool>false</bool>
               </property>
               <property name="text">
-               <string>Lataa tasosta</string>
+               <string>Load from a map layer</string>
               </property>
              </widget>
             </item>
            </layout>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="onlySelectedFeats">
-          <property name="text">
-           <string>Käytä vain valittuja kohteita</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
-      <widget class="QgsCollapsibleGroupBox" name="currentScenarioBox">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="toolTip">
-        <string>Syötä nykytilan laskennassa käytetyt lähtötiedot</string>
-       </property>
-       <property name="title">
-        <string>Nykytilanne (pakollinen)</string>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
-         <layout class="QFormLayout" name="formLayout">
-          <item row="0" column="0">
-           <widget class="QLabel" name="ykrPopsLabel">
-            <property name="text">
-             <string>YKR-Väestö:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <layout class="QHBoxLayout" name="ykrPopLayout">
-            <item>
-             <widget class="QgsFileWidget" name="ykrPopFile">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>23</height>
-               </size>
-              </property>
-              <property name="toolTip">
-               <string>Valitse Shape-tiedosto joka sisältää YKR-väestötiedot</string>
-              </property>
-              <property name="filter">
-               <string>Shape-tiedosto (*.shp)</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QgsMapLayerComboBox" name="ykrPopLayerList">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="toolTip">
-               <string>Valitse karttataso joka sisältää YKR-väestötiedot</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="ykrPopLoadLayer">
-              <property name="toolTip">
-               <string>Aineiston voi ladata joko Shape-tiedostosta tai QGIS-karttatasosta</string>
-              </property>
-              <property name="text">
-               <string>Lataa tasosta</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="ykrJobsLabel">
-            <property name="text">
-             <string>YKR-Työpaikat:</string>
-            </property>
-           </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QLabel" name="ykrBuildingsLabel">
+           <widget class="QCheckBox" name="onlySelectedFeats">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
-             <string>YKR-Rakennukset:</string>
+             <string>Use Only Selected Features</string>
             </property>
            </widget>
-          </item>
-          <item row="1" column="1">
-           <layout class="QHBoxLayout" name="ykrJobsLayout">
-            <item>
-             <widget class="QgsFileWidget" name="ykrJobsFile">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>23</height>
-               </size>
-              </property>
-              <property name="toolTip">
-               <string>Valitse Shape-tiedosto joka sisältää YKR-työpaikkatiedot</string>
-              </property>
-              <property name="filter">
-               <string>Shape-tiedosto (*.shp)</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QgsMapLayerComboBox" name="ykrJobsLayerList">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="toolTip">
-               <string>Valitse karttataso joka sisältää YKR-työpaikkatiedot</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="ykrJobsLoadLayer">
-              <property name="toolTip">
-               <string>Aineiston voi ladata joko Shape-tiedostosta tai QGIS-karttatasosta</string>
-              </property>
-              <property name="text">
-               <string>Lataa tasosta</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="2" column="1">
-           <layout class="QHBoxLayout" name="ykrBuildingsLayout">
-            <item>
-             <widget class="QgsFileWidget" name="ykrBuildingsFile">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>23</height>
-               </size>
-              </property>
-              <property name="toolTip">
-               <string>Valitse Shape-tiedosto joka sisältää YKR-rakennustiedot</string>
-              </property>
-              <property name="filter">
-               <string>Shape-tiedosto (*.shp)</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QgsMapLayerComboBox" name="ykrBuildingsLayerList">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="toolTip">
-               <string>Valitse karttataso joka sisältää YKR-rakennustiedot</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="ykrBuildingsLoadLayer">
-              <property name="toolTip">
-               <string>Aineiston voi ladata joko Shape-tiedostosta tai QGIS-karttatasosta</string>
-              </property>
-              <property name="text">
-               <string>Lataa tasosta</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
           </item>
          </layout>
         </item>
@@ -440,7 +250,7 @@
                <item>
                 <widget class="QCheckBox" name="futureAreasLoadLayer">
                  <property name="text">
-                  <string>Lataa tasosta</string>
+                  <string>Load from a map layer</string>
                  </property>
                 </widget>
                </item>
@@ -510,7 +320,7 @@
                <item>
                 <widget class="QCheckBox" name="futureNetworkLoadLayer">
                  <property name="text">
-                  <string>Lataa tasosta</string>
+                  <string>Load from a map layer</string>
                  </property>
                 </widget>
                </item>
@@ -550,7 +360,7 @@
                <item>
                 <widget class="QCheckBox" name="futureStopsLoadLayer">
                  <property name="text">
-                  <string>Lataa tasosta</string>
+                  <string>Load from a map layer</string>
                  </property>
                 </widget>
                </item>
@@ -567,7 +377,7 @@
      <item>
       <widget class="QgsCollapsibleGroupBox" name="advancedBox">
        <property name="title">
-        <string>Lisäasetukset (valinnainen)</string>
+        <string>Advanced Settings (optional)</string>
        </property>
        <property name="collapsed">
         <bool>false</bool>
@@ -581,7 +391,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="label_5">
             <property name="text">
-             <string>PITKO-skenaario:</string>
+             <string>PITKO Scenario:</string>
             </property>
            </widget>
           </item>
@@ -601,7 +411,7 @@
           <item row="1" column="0">
            <widget class="QLabel" name="label_6">
             <property name="text">
-             <string>Päästöjen allokointimenetelmä:</string>
+             <string>Allocation Method for Emissions:</string>
             </property>
            </widget>
           </item>
@@ -621,7 +431,7 @@
           <item row="2" column="0">
            <widget class="QLabel" name="label_12">
             <property name="text">
-             <string>Sähköpäästölaji:</string>
+             <string>Electricity Emission Class:</string>
             </property>
            </widget>
           </item>
@@ -641,7 +451,7 @@
           <item row="3" column="0">
            <widget class="QCheckBox" name="checkBoxNokianMyllyCO2Zeroed">
             <property name="text">
-             <string>Nokian myllyn ruutu hiilineutraaliksi</string>
+             <string>Allocate Zero Emissions for Nokian Mylly Square</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -651,7 +461,7 @@
           <item row="4" column="0">
            <widget class="QCheckBox" name="checkBoxCalculateEmissionsPerPerson">
             <property name="text">
-             <string>Laske päästöt / asukas</string>
+             <string>Calculate Emissions Per Capita</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -663,7 +473,7 @@
             <item row="0" column="0">
              <widget class="QLabel" name="label">
               <property name="text">
-               <string>YKR-väestö:</string>
+               <string>YKR Population:</string>
               </property>
              </widget>
             </item>
@@ -687,7 +497,7 @@
             <item>
              <widget class="QCheckBox" name="checkBox">
               <property name="text">
-               <string>Lataa tasosta</string>
+               <string>Load from a map layer</string>
               </property>
              </widget>
             </item>
@@ -696,7 +506,7 @@
           <item row="6" column="0">
            <widget class="QCheckBox" name="checkBoxCalculateEmissionsPerJob">
             <property name="text">
-             <string>Laske päästöt / työpaikka</string>
+             <string>Calculate Emissions Per Worker</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -706,7 +516,7 @@
           <item row="7" column="0">
            <widget class="QLabel" name="label_2">
             <property name="text">
-             <string>YKR-työpaikat:</string>
+             <string>YKR Workplaces:</string>
             </property>
            </widget>
           </item>
@@ -721,7 +531,7 @@
             <item>
              <widget class="QCheckBox" name="checkBox_2">
               <property name="text">
-               <string>Lataa tasosta</string>
+               <string>Load from a map layer</string>
               </property>
              </widget>
             </item>
@@ -730,7 +540,7 @@
           <item row="8" column="0">
            <widget class="QCheckBox" name="checkBoxCalculateEmissionsPerFloorSpaceSquares">
             <property name="text">
-             <string>Laske päästöt / kerrosneliöt</string>
+             <string>Calculate Emissions Per Floor Squares (m2)</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -760,7 +570,7 @@
        <item>
         <widget class="QPushButton" name="settingsButton">
          <property name="text">
-          <string>Asetukset...</string>
+          <string>Database connection settings...</string>
          </property>
         </widget>
        </item>

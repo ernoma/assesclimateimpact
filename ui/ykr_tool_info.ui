@@ -24,7 +24,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Ilmastovaikutusten arviointityökalu - v0.1</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Urban Infrastructure CHG Emission Estimation Tool&lt;/p&gt;&lt;p&gt;for Tampere City Region - v2.0&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -37,7 +37,7 @@
      <item>
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lisätietoa: &lt;a href=&quot;https://github.com/GispoCoding/assesclimateimpact&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;github.com/GispoCoding/assesclimateimpact&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Further information: &lt;a href=&quot;https://github.com/GispoCoding/assesclimateimpact&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;github.com/GispoCoding/assesclimateimpact&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="textFormat">
         <enum>Qt::RichText</enum>
