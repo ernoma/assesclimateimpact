@@ -28,7 +28,7 @@ from PyQt5.QtWidgets import QAction
 
 from qgis.core import (Qgis, QgsVectorLayer, QgsCoordinateReferenceSystem,
     QgsApplication, QgsDataSourceUri, QgsProject, QgsTaskManager,
-    QgsProcessingAlgRunnerTask, QgsProcessingContext, QgsProcessingFeedback)
+    QgsProcessingAlgRunnerTask, QgsProcessingContext, QgsProcessingFeedback, QgsMessageLog)
 from qgis.gui import QgsFileWidget
 from functools import partial
 
@@ -41,7 +41,7 @@ import os.path
 import psycopg2
 import datetime, getpass
 from configparser import ConfigParser
-from .ykr_tool_admin_areas import YKRToolAdminAreas
+from .ykr_tool_dictionaries import YKRToolDictionaries
 from .ykr_tool_tasks import QueryTask
 from .createdbconnection import createDbConnection
 
@@ -98,7 +98,7 @@ class YKRTool:
         self.futureNetworkLayer = None
         self.futureStopsLayer = None
 
-        self.ykrToolAdminAreas = YKRToolAdminAreas()
+        self.ykrToolDictionaries = YKRToolDictionaries()
 
 
     # noinspection PyMethodMayBeStatic
@@ -229,13 +229,23 @@ class YKRTool:
         result = self.mainDialog.exec_()
         # See if OK was pressed
         if result:
-            try:
-                self.preProcess()
-            except Exception as e:
+            self.runProcess()
+
+    def runProcess(self, retriesLeft=3):
+        try:
+            self.preProcess()
+            self.runCalculation()
+        except Exception as e:
+            if retriesLeft > 0:
+                return self.runProcess(retriesLeft - 1)
+            else:
                 self.iface.messageBar().pushMessage('Virhe esikäsittelyssä',
                     str(e), Qgis.Critical, duration=0)
                 self.cleanUpSession()
                 return False
+
+        return True
+
 
     def preProcess(self):
         '''Starts calculation'''
@@ -249,7 +259,7 @@ class YKRTool:
         self.readProcessingInput()
         # self.checkLayerValidity()
         # self.uploadInputLayers()
-        self.runCalculation()
+        
 
     def setupMainDialog(self):
         '''Sets up the main dialog'''
@@ -258,7 +268,7 @@ class YKRTool:
         md.radioButtonGeomArea.clicked.connect(self.handleRadioButtonGeomAreaToggle)
         md.radioButtonAdminArea.clicked.connect(self.handleRadioButtonAdminAreaToggle)
 
-        names = self.ykrToolAdminAreas.getAdminAreaNames()
+        names = self.ykrToolDictionaries.getAdminAreaNames()
         md.adminArea.addItems(names)
         md.pitkoScenario.addItems(["static", "wem", "eu80", "kasvu", "muutos", "saasto",
             "pysahdys"])
@@ -267,6 +277,11 @@ class YKRTool:
 
         md.onlySelectedFeats.setEnabled(False)
         md.futureBox.setEnabled(False)
+
+        names = self.ykrToolDictionaries.getYkrPopUserFriendlyNames()
+        md.comboBoxYkrPop.addItems(names)
+        names = self.ykrToolDictionaries.getYkrJobUserFriendlyNames()
+        md.comboBoxYkrJob.addItems(names)
 
         md.settingsButton.clicked.connect(self.displaySettingsDialog)
         md.infoButton.clicked.connect(lambda: self.infoDialog.show())
@@ -476,7 +491,7 @@ class YKRTool:
 
         # self.geomArea = md.geomArea.currentText()
 
-        self.adminArea = self.ykrToolAdminAreas.getAdminAreaNameMatchingAdminDatabaseTable(md.adminArea.currentText())
+        self.adminArea = self.ykrToolDictionaries.getAdminAreaDatabaseTableName(md.adminArea.currentText())
         # self.onlySelectedFeats = md.onlySelectedFeats.isChecked()
         self.pitkoScenario = md.pitkoScenario.currentText()
         self.emissionsAllocation = md.emissionsAllocation.currentText()
@@ -640,6 +655,7 @@ class YKRTool:
             queries.append(futureQuery)
         return queries
 
+
     def generateFutureQuery(self, vals):
         '''Constructs a query for future calculation'''
         futureVals = {
@@ -664,6 +680,7 @@ class YKRTool:
         query += ')'
         return query
 
+
     def postCalculation(self):
         '''Called after QueryTask finishes. Writes session info to sessions table and closes session'''
         try:
@@ -683,11 +700,12 @@ class YKRTool:
         except Exception as e:
             self.iface.messageBar().pushMessage('Virhe session sulkemisessa:', str(e), Qgis.Warning, duration=0)
 
+
     def writeSessionInfo(self):
         '''Writes session info to user_output.sessions table'''
         uuid = self.sessionParams['uuid']
         user = self.sessionParams['user']
-        adminArea = self.ykrToolAdminAreas.getAdminAreaNameFromDatabaseTableName(self.adminArea)
+        adminArea = self.ykrToolDictionaries.getAdminAreaNameFromDatabaseTableName(self.adminArea)
         startTime = self.sessionParams['startTime']
         baseYear = self.sessionParams['baseYear']
         targetYear = self.targetYear
@@ -701,6 +719,14 @@ class YKRTool:
         self.conn.commit()
 
     def addResultAsLayers(self):
+        outputSchemaName = 'user_output'
+        outputTableName = 'output_' + self.sessionParams['uuid']
+
+        if self.mainDialog.checkBoxNokianMyllyCO2Zeroed.isChecked():
+            self.zeroCO2inNokianMyllySquare(outputSchemaName, outputTableName)
+
+        self.calculateRelativeEmissions(outputSchemaName, outputTableName)
+
         layers, layerNames = [], []
         uid = self.sessionParams['uuid']
         layerNames.append(('CO2 sources {}'.format(uid),
@@ -711,7 +737,7 @@ class YKRTool:
         uri = QgsDataSourceUri()
         uri.setConnection(self.connParams['host'], self.connParams['port'],\
             self.connParams['database'], self.connParams['user'], self.connParams['password'])
-        uri.setDataSource('user_output', 'output_' + self.sessionParams['uuid'], 'geom')
+        uri.setDataSource(outputSchemaName, outputTableName, 'geom')
 
         for name in layerNames:
             layer = QgsVectorLayer(uri.uri(False), name[0], 'postgres')
@@ -721,6 +747,265 @@ class YKRTool:
                 renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
             layers.append(layer)
         QgsProject.instance().addMapLayers(layers)
+
+
+    def calculateRelativeEmissions(self, outputSchemaName, outputTableName):
+        if self.mainDialog.checkBoxCalculateEmissionsPerPerson.isChecked():
+            self.calculateEmissionsPerPerson(outputSchemaName, outputTableName)
+        if self.mainDialog.checkBoxCalculateEmissionsPerJob.isChecked():
+            self.calculateEmissionsPerJob(outputSchemaName, outputTableName)
+        if self.mainDialog.checkBoxCalculateEmissionsPerPerson.isChecked() and self.mainDialog.checkBoxCalculateEmissionsPerJob.isChecked():
+            self.calculateEmissionsPerPersonJob(outputSchemaName, outputTableName)
+        if self.mainDialog.checkBoxCalculateEmissionsPerFloorSpaceSquares.isChecked():
+            self.calculateEmissionsPerFloorSpaceSquares(outputSchemaName, outputTableName)
+
+
+    def calculateEmissionsPerFloorSpaceSquares(self, outputSchemaName, outputTableName):
+        md = self.mainDialog
+        ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
+
+        queries = []
+
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_yhteensa_tco2_per_kem real"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_kem = (sum_yhteensa_tco2 / NULLIF(floorspace, 0))"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        conn = None
+
+        try:
+            conn = createDbConnection(self.connParams)
+        except Exception as e:
+            if retriesLeft > 0:
+                return self.calculateEmissionsPerFloorSpaceSquares(outputSchemaName, outputTableName, retriesLeft - 1)
+            else:
+                self.iface.messageBar().pushMessage(
+                    'Virhe tietokantayhteyden muodostamisessa',
+                    str(e), Qgis.Warning, duration=0)
+                return False
+
+        try:
+            cur = conn.cursor()
+            for query in queries:
+                cur.execute(query)
+                conn.commit()
+        except Exception as e:
+            self.iface.messageBar().pushMessage(
+                'Virhe taulun kohdetta muokatessa',
+                str(e), Qgis.Warning, duration=0)
+            conn.rollback()
+            conn.close()
+
+            return False
+
+        return True
+
+
+    def calculateEmissionsPerPersonJob(self, outputSchemaName, outputTableName):
+        queries = []
+
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_yhteensa_tco2_per_as_tp real"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        md = self.mainDialog
+        ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
+        if ykrPopTableName == '-':
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_as_tp = (sum_yhteensa_tco2 / NULLIF(pop + tp_yht, 0))"
+            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+        else:
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_as_tp = (sum_yhteensa_tco2 / NULLIF(v_yht + tp_yht, 0))"
+            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+        
+        conn = None
+
+        try:
+            conn = createDbConnection(self.connParams)
+        except Exception as e:
+            if retriesLeft > 0:
+                return self.calculateEmissionsPerPersonJob(outputSchemaName, outputTableName, retriesLeft - 1)
+            else:
+                self.iface.messageBar().pushMessage(
+                    'Virhe tietokantayhteyden muodostamisessa',
+                    str(e), Qgis.Warning, duration=0)
+                return False
+
+        try:
+            cur = conn.cursor()
+            for query in queries:
+                cur.execute(query)
+                conn.commit()
+        except Exception as e:
+            self.iface.messageBar().pushMessage(
+                'Virhe taulun kohdetta muokatessa',
+                str(e), Qgis.Warning, duration=0)
+            conn.rollback()
+            conn.close()
+
+            return False
+
+        return True
+
+    def calculateEmissionsPerPerson(self, outputSchemaName, outputTableName, retriesLeft=3):
+        md = self.mainDialog
+        ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
+
+        queries = []
+
+        if ykrPopTableName == '-':
+            query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_yhteensa_tco2_per_asukas real"
+            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_asukas = (sum_yhteensa_tco2 / NULLIF(pop, 0))"
+            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+
+        elif ykrPopTableName != None:
+            ykrPopTableNameParts = ykrPopTableName.split('.')
+
+            query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN v_yht integer"
+            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET v_yht = (SELECT v_yht FROM \"" + ykrPopTableNameParts[0] + "\".\"" + ykrPopTableNameParts[1] + "\" AS ykr WHERE ykr.xyind = out_grid.xyind)"
+            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+
+            query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_yhteensa_tco2_per_asukas real"
+            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_asukas = (sum_yhteensa_tco2 / v_yht)"
+            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+
+        conn = None
+
+        try:
+            conn = createDbConnection(self.connParams)
+        except Exception as e:
+            if retriesLeft > 0:
+                return self.calculateEmissionsPerPerson(outputSchemaName, outputTableName, retriesLeft - 1)
+            else:
+                self.iface.messageBar().pushMessage(
+                    'Virhe tietokantayhteyden muodostamisessa',
+                    str(e), Qgis.Warning, duration=0)
+                return False
+
+        try:
+            cur = conn.cursor()
+            for query in queries:
+                cur.execute(query)
+                conn.commit()
+        except Exception as e:
+            self.iface.messageBar().pushMessage(
+                'Virhe taulun kohdetta muokatessa',
+                str(e), Qgis.Warning, duration=0)
+            conn.rollback()
+            conn.close()
+
+            return False
+
+        return True
+
+
+    def calculateEmissionsPerJob(self, outputSchemaName, outputTableName, retriesLeft=3):
+        md = self.mainDialog
+        ykrJobTableName = self.ykrToolDictionaries.getYkrJobTableDatabaseTableName(md.comboBoxYkrJob.currentText())
+        ykrJobTableNameParts = ykrJobTableName.split('.')
+
+        queries = []
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN tp_yht integer"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET tp_yht = (SELECT tp_yht FROM \"" + ykrJobTableNameParts[0] + "\".\"" + ykrJobTableNameParts[1] + "\" AS ykr WHERE ykr.xyind = out_grid.xyind)"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_yhteensa_tco2_per_tp real"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_tp = (sum_yhteensa_tco2 / tp_yht)"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        conn = None
+
+        try:
+            conn = createDbConnection(self.connParams)
+        except Exception as e:
+            if retriesLeft > 0:
+                return self.calculateEmissionsPerJob(outputSchemaName, outputTableName, retriesLeft - 1)
+            else:
+                self.iface.messageBar().pushMessage(
+                    'Virhe tietokantayhteyden muodostamisessa',
+                    str(e), Qgis.Warning, duration=0)
+                return False
+
+        try:
+            cur = conn.cursor()
+            for query in queries:
+                cur.execute(query)
+                conn.commit()
+        except Exception as e:
+            self.iface.messageBar().pushMessage(
+                'Virhe taulun kohdetta muokatessa',
+                str(e), Qgis.Warning, duration=0)
+            conn.rollback()
+            conn.close()
+
+            return False
+
+        conn.commit()
+
+        return True
+
+
+    def zeroCO2inNokianMyllySquare(self, outputSchemaName, outputTableName, retriesLeft=3):
+        # name = str(uuid.uuid4())
+        # layer = QgsVectorLayer(uri.uri(False), name, 'postgres')
+
+        queries = []
+
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET sum_yhteensa_tco2 = 0 WHERE xyind = '3141256822125'"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        conn = None
+
+        try:
+            conn = createDbConnection(self.connParams)
+        except Exception as e:
+            if retriesLeft > 0:
+                return self.zeroCO2inNokianMyllySquare(outputSchemaName, outputTableName, retriesLeft - 1)
+            else:
+                self.iface.messageBar().pushMessage(
+                    'Virhe tietokantayhteyden muodostamisessa',
+                    str(e), Qgis.Warning, duration=0)
+                return False
+
+        try:
+            cur = conn.cursor()
+            for query in queries:
+                cur.execute(query)
+        except Exception as e:
+            self.iface.messageBar().pushMessage(
+                'Virhe taulun kohdetta muokatessa',
+                str(e), Qgis.Warning, duration=0)
+            conn.rollback()
+            conn.close()
+
+            return False
+
+        conn.commit()
+
+        return True
+
 
     def cleanUpSession(self):
         '''Delete temporary data and close db connection'''
@@ -734,7 +1019,9 @@ class YKRTool:
                     'Virhe poistettaessa taulua {}'.format(table),
                     str(e), Qgis.Warning, duration=0)
                 self.conn.rollback()
-        self.conn.close()
+
+        if self.conn != None:
+            self.conn.close()
 
     def postError(self):
         '''Called after querytask is terminated. Closes session'''

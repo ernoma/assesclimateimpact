@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>573</width>
-    <height>720</height>
+    <height>849</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -585,13 +585,6 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_6">
-            <property name="text">
-             <string>Päästöjen allokointimenetelmä:</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="1">
            <widget class="QComboBox" name="pitkoScenario">
             <property name="minimumSize">
@@ -602,6 +595,13 @@
             </property>
             <property name="toolTip">
              <string>Valitse PITKO-skenaario. Oletus: wem</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>Päästöjen allokointimenetelmä:</string>
             </property>
            </widget>
           </item>
@@ -618,6 +618,13 @@
             </property>
            </widget>
           </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>Sähköpäästölaji:</string>
+            </property>
+           </widget>
+          </item>
           <item row="2" column="1">
            <widget class="QComboBox" name="elecEmissionType">
             <property name="minimumSize">
@@ -631,10 +638,102 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_12">
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="checkBoxNokianMyllyCO2Zeroed">
             <property name="text">
-             <string>Sähköpäästölaji:</string>
+             <string>Nokian myllyn ruutu hiilineutraaliksi</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QCheckBox" name="checkBoxCalculateEmissionsPerPerson">
+            <property name="text">
+             <string>Laske päästöt / asukas</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <layout class="QFormLayout" name="formLayout_6">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>YKR-väestö:</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="5" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QComboBox" name="comboBoxYkrPop"/>
+            </item>
+            <item>
+             <widget class="QgsMapLayerComboBox" name="mMapLayerComboBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBox">
+              <property name="text">
+               <string>Lataa tasosta</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="6" column="0">
+           <widget class="QCheckBox" name="checkBoxCalculateEmissionsPerJob">
+            <property name="text">
+             <string>Laske päästöt / työpaikka</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>YKR-työpaikat:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QComboBox" name="comboBoxYkrJob"/>
+            </item>
+            <item>
+             <widget class="QgsMapLayerComboBox" name="mMapLayerComboBox_2"/>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBox_2">
+              <property name="text">
+               <string>Lataa tasosta</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="8" column="0">
+           <widget class="QCheckBox" name="checkBoxCalculateEmissionsPerFloorSpaceSquares">
+            <property name="text">
+             <string>Laske päästöt / kerrosneliöt</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
