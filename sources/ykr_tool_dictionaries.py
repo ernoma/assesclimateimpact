@@ -49,7 +49,10 @@ class YKRToolDictionaries:
         key_list = list(self.PredefinedAreas.keys())
         val_list = list(self.PredefinedAreas.values())
 
-        position = val_list.index(PredefinedAreaTableName)
+        try:
+            position = val_list.index(PredefinedAreaTableName)
+        except ValueError as e:
+            return PredefinedAreaTableName
 
         return key_list[position]
 

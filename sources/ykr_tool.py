@@ -44,9 +44,12 @@ from configparser import ConfigParser
 from .ykr_tool_dictionaries import YKRToolDictionaries
 from .ykr_tool_tasks import QueryTask
 from .createdbconnection import createDbConnection
+from .ykr_tool_upload_layer import YKRToolUploadLayer
 
 class YKRTool:
     """QGIS Plugin Implementation."""
+
+    MAX_TABLE_NAME_LENGTH = 62
 
     def __init__(self, iface):
         """Constructor.
@@ -80,6 +83,11 @@ class YKRTool:
 
         self.conn = None
         self.connParams = None
+
+        configFilePath = QSettings().value("/YKRTool/configFilePath", "", type=str)
+        if configFilePath != "":
+            self.connParams = self.parseConfigFile(configFilePath)
+
         self.tableNames = {}
 
         # Check if plugin was started the first time in current QGIS session
@@ -99,8 +107,12 @@ class YKRTool:
         self.futureStopsLayer = None
 
         self.ykrToolDictionaries = YKRToolDictionaries()
+        self.ykrToolUploadLayer = YKRToolUploadLayer(self.iface)
 
+        self.investigatedAreaMapLayer = None
         self.predefinedAreaDBTableName = None
+
+        self.calculateFuture = False
 
 
     # noinspection PyMethodMayBeStatic
@@ -233,10 +245,9 @@ class YKRTool:
         if result:
             self.runProcess()
 
-    def runProcess(self, retriesLeft=3):
+    def runProcess(self, retriesLeft=0):
         try:
             self.preProcess()
-            self.runCalculation()
         except Exception as e:
             if retriesLeft > 0:
                 return self.runProcess(retriesLeft - 1)
@@ -252,16 +263,13 @@ class YKRTool:
     def preProcess(self):
         '''Starts calculation'''
         if not self.connParams:
-            configFilePath = QSettings().value("/YKRTool/configFilePath",\
-                "", type=str)
+            configFilePath = QSettings().value("/YKRTool/configFilePath", "", type=str)
             self.connParams = self.parseConfigFile(configFilePath)
         self.conn = createDbConnection(self.connParams)
         self.cur = self.conn.cursor()
         self.sessionParams = self.generateSessionParameters()
         self.readProcessingInput()
-        # self.checkLayerValidity()
-        # self.uploadInputLayers()
-        
+
 
     def setupMainDialog(self):
         '''Sets up the main dialog'''
@@ -278,7 +286,7 @@ class YKRTool:
         md.emissionsAllocation.addItems(names)
         md.elecEmissionType.addItems(["hankinta", "tuotanto"])
 
-        md.onlySelectedFeats.setEnabled(False)
+        #md.checkBoxOnlySelectedFeats.setEnabled(False)
         md.futureBox.setEnabled(False)
 
         names = self.ykrToolDictionaries.getYkrPopUserFriendlyNames()
@@ -341,11 +349,15 @@ class YKRTool:
         if checked:
             md.comboBoxMapLayer.setEnabled(True)
             md.mapLayerLabel.setEnabled(True)
+            md.checkBoxAllowOtherUsersToUseUploadedMapLayer.setEnabled(True)
+            md.checkBoxUploadOnlySelectedFeatures.setEnabled(True)
             md.comboBoxPredefinedArea.setEnabled(False)
             md.predefinedAreaLabel.setEnabled(False)
         else:
             md.comboBoxMapLayer.setEnabled(False)
             md.mapLayerLabel.setEnabled(False)
+            md.checkBoxAllowOtherUsersToUseUploadedMapLayer.setEnabled(False)
+            md.checkBoxUploadOnlySelectedFeatures.setEnabled(False)
             md.comboBoxPredefinedArea.setEnabled(True)
             md.predefinedAreaLabel.setEnabled(True)
 
@@ -356,11 +368,15 @@ class YKRTool:
         if checked:
             md.comboBoxMapLayer.setEnabled(False)
             md.mapLayerLabel.setEnabled(False)
+            md.checkBoxAllowOtherUsersToUseUploadedMapLayer.setEnabled(False)
+            md.checkBoxUploadOnlySelectedFeatures.setEnabled(False)
             md.comboBoxPredefinedArea.setEnabled(True)
             md.predefinedAreaLabel.setEnabled(True)
         else:
             md.comboBoxMapLayer.setEnabled(True)
             md.mapLayerLabel.setEnabled(True)
+            md.checkBoxAllowOtherUsersToUseUploadedMapLayer.setEnabled(True)
+            md.checkBoxUploadOnlySelectedFeatures.setEnabled(True)
             md.comboBoxPredefinedArea.setEnabled(False)
             md.predefinedAreaLabel.setEnabled(False)
 
@@ -479,6 +495,7 @@ class YKRTool:
         else:
             self.mainDialog.futureBox.setEnabled(False)
 
+
     def generateSessionParameters(self):
         '''Get necessary values for processing session'''
         sessionParams = {}
@@ -491,6 +508,7 @@ class YKRTool:
         sessionParams["uuid"] = str(uuid.uuid4())
 
         return sessionParams
+
 
     def readProcessingInput(self):
         '''Read user input from main dialog'''
@@ -514,10 +532,42 @@ class YKRTool:
         # self.inputLayers.extend([self.ykrPopLayer,
         #     self.ykrJobsLayer, self.ykrBuildingsLayer])
 
-        # self.geomArea = md.geomArea.currentText()
+        if md.radioButtonUseMapLayer.isChecked():
+            self.predefinedAreaDBTableName = None
+            self.investigatedAreaMapLayer = md.comboBoxMapLayer.currentLayer()
+            if self.investigatedAreaMapLayer == None or not self.investigatedAreaMapLayer.isValid():
+                raise Exception("Virhe ladattaessa tarkastelualueen karttatasoa tietokantaan")
+            dataProvider = self.investigatedAreaMapLayer.dataProvider()
+            dataSourceUri = dataProvider.dataSourceUri()
+            # QgsMessageLog.logMessage("dataSourceUri: {}".format(dataProvider.dataSourceUri()), 'YKRTool', Qgis.Info)
+            uri = dataProvider.uri()
+            # QgsMessageLog.logMessage("dataSourceUri: {}".format(dataProvider.dataSourceUri()), 'YKRTool', Qgis.Info)
+            # QgsMessageLog.logMessage("host: {}".format(uri.host()) , 'YKRTool', Qgis.Info)
+            # if uri.host() == "":
+                # QgsMessageLog.logMessage("host = \"\"", 'YKRTool', Qgis.Info)
+            # QgsMessageLog.logMessage("database: {}".format(uri.database()) , 'YKRTool', Qgis.Info)
+            # if uri.database() == "":
+                # QgsMessageLog.logMessage("database = \"\"", 'YKRTool', Qgis.Info)
+            if uri.host() == "" or uri.host() != self.connParams['host'] or uri.database() == "" or uri.database() != self.connParams['database']:
+                self.predefinedAreaDBTableName = 'user_input.' + '"' + self.investigatedAreaMapLayer.name()[:YKRTool.MAX_TABLE_NAME_LENGTH] + '"'
+                self.ykrToolUploadLayer.copySourceLayerFeaturesToTargetTable(self.connParams, self.investigatedAreaMapLayer, self.predefinedAreaDBTableName, md.checkBoxAllowOtherUsersToUseUploadedMapLayer.isChecked(), md.checkBoxUploadOnlySelectedFeatures.isChecked())
+            else:
+                self.investigatedAreaMapLayer = None
+                QgsMessageLog.logMessage("schema: {}".format(uri.schema()) , 'YKRTool', Qgis.Info)
+                QgsMessageLog.logMessage("quotedTablename: {}".format(uri.quotedTablename()) , 'YKRTool', Qgis.Info)
+                self.predefinedAreaDBTableName = uri.quotedTablename()
+        else:
+            self.investigatedAreaMapLayer = None
+            self.predefinedAreaDBTableName = self.ykrToolDictionaries.getPredefinedAreaDatabaseTableName(md.comboBoxPredefinedArea.currentText())
 
-        self.predefinedAreaDBTableName = self.ykrToolDictionaries.getPredefinedAreaDatabaseTableName(md.comboBoxPredefinedArea.currentText())
-        # self.onlySelectedFeats = md.onlySelectedFeats.isChecked()
+        self.finishReadingProcessingInput()
+
+
+    def finishReadingProcessingInput(self):
+        md = self.mainDialog
+        # self.uploadInputLayers()
+
+        # self.onlySelectedFeats = md.checkBoxUploadOnlySelectedFeatures.isChecked()
         self.pitkoScenario = md.pitkoScenario.currentText()
         self.emissionsAllocation = self.ykrToolDictionaries.getEmissionAllocationMethodShortName(md.emissionsAllocation.currentText())
         self.elecEmissionType = md.elecEmissionType.currentText()
@@ -526,6 +576,10 @@ class YKRTool:
             self.calculateFuture = False
         else:
             self.readFutureProcessingInput()
+
+        QgsMessageLog.logMessage("predefinedAreaDBTableName: {}".format(self.predefinedAreaDBTableName), 'YKRTool', Qgis.Info)
+
+        self.runCalculation()
 
 
     def readFutureProcessingInput(self):
@@ -555,16 +609,18 @@ class YKRTool:
         self.inputLayers.extend([self.futureAreasLayer,
             self.futureNetworkLayer, self.futureStopsLayer])
 
+
     def checkLayerValidity(self):
         '''Checks that necessary layers are valid and raise an exception if needed'''
-        if not self.ykrPopLayer.isValid():
-            raise Exception("Virhe ladattaessa nykytilanteen YKR-väestötasoa")
-        if not self.ykrBuildingsLayer.isValid():
-            raise Exception("Virhe ladattaessa nykytilanteen YKR-rakennustasoa")
-        if not self.ykrJobsLayer.isValid():
-            raise Exception("Virhe ladattaessa nykytilanteen YKR-työpaikkatasoa")
+        # if not self.ykrPopLayer.isValid():
+        #     raise Exception("Virhe ladattaessa nykytilanteen YKR-väestötasoa")
+        # if not self.ykrBuildingsLayer.isValid():
+        #     raise Exception("Virhe ladattaessa nykytilanteen YKR-rakennustasoa")
+        # if not self.ykrJobsLayer.isValid():
+        #     raise Exception("Virhe ladattaessa nykytilanteen YKR-työpaikkatasoa")
         if self.calculateFuture:
             self.checkFutureLayerValidity()
+
 
     def checkFutureLayerValidity(self):
         '''Checks if future calculation input layers are valid'''
@@ -577,13 +633,57 @@ class YKRTool:
             if not self.futureStopsLayer.isValid():
                 raise Exception("Virhe ladattaessa joukkoliikennepysäkkitietoja")
 
+
+    def uploadSingleMapLayer(self, layer):
+        '''Uploads a single input layer to database'''
+        alg = QgsApplication.processingRegistry().algorithmById(
+            'gdal:importvectorintopostgisdatabasenewconnection')
+        params = {
+            'A_SRS': QgsCoordinateReferenceSystem('EPSG:3067'),
+            'T_SRS': None,
+            'S_SRS': None,
+            'HOST': self.connParams['host'],
+            'PORT': self.connParams['port'],
+            'USER': self.connParams['user'],
+            'DBNAME': self.connParams['database'],
+            'PASSWORD': self.connParams['password'],
+            'SCHEMA': 'user_input',
+            'PK': 'fid',
+            'PRIMARY_KEY': None,
+            'PROMOTETOMULTI': False
+        }
+        context = QgsProcessingContext()
+        feedback = QgsProcessingFeedback()
+        params['INPUT'] = layer
+        tableName = layer.name()
+        params['TABLE'] = tableName[:YKRTool.MAX_TABLE_NAME_LENGTH] # truncate tablename to under 63c
+        self.tableNames[layer] = params['TABLE']
+        if int(str(layer.wkbType())[:1]) == 3: # polygon
+            params['GTYPE'] = 5
+        elif int(str(layer.wkbType())[:1]) == 6: # MultiPolygon
+            params['GTYPE'] = 8
+        task = QgsProcessingAlgRunnerTask(alg, params, context, feedback)
+        task.executed.connect(partial(self.uploadSingleMapLayerFinished, context))
+        QgsApplication.taskManager().addTask(task)
+        self.iface.messageBar().pushMessage('Ladataan tasoa tietokantaan',
+            layer.name(), Qgis.Info, duration=3)
+
+
+    def uploadSingleMapLayerFinished(self, context, successful, results):
+        if not successful:
+            self.iface.messageBar().pushMessage('Virhe',
+            'Virhe ladattaessa tasoa tietokantaan', Qgis.Warning, duration=0)
+        else:
+            self.finishReadingProcessingInput()
+
+    
     def uploadInputLayers(self):
         '''Write layers to database'''
         self.layerUploadIndex = 0
-        self.uploadSingleLayer()
+        self.uploadInputLayer()
 
-    def uploadSingleLayer(self):
-        '''Uploads a single input layer to database'''
+    def uploadInputLayer(self):
+        '''Uploads an input layer to database'''
         alg = QgsApplication.processingRegistry().algorithmById(
             'gdal:importvectorintopostgisdatabasenewconnection')
         params = {
@@ -609,7 +709,7 @@ class YKRTool:
         params['INPUT'] = layer
         tableName = self.sessionParams['uuid'] + '_' + layer.name()
         tableName = tableName.replace('-', '_')
-        params['TABLE'] = tableName [:49] # truncate tablename to under 63c
+        params['TABLE'] = tableName[:49] # truncate tablename to under 63c
         self.tableNames[layer] = params['TABLE']
         if layer.geometryType() == 0: # point
             params['GTYPE'] = 3
@@ -631,7 +731,7 @@ class YKRTool:
         '''Uploads the next layer in the input layer list'''
         self.layerUploadIndex += 1
         if self.layerUploadIndex < len(self.inputLayers):
-            self.uploadSingleLayer()
+            self.uploadInputLayer()
         else:
             self.runCalculation()
 
