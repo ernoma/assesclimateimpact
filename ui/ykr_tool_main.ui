@@ -34,12 +34,12 @@
         <item>
          <layout class="QFormLayout" name="formLayout_3">
           <item row="0" column="0">
-           <widget class="QRadioButton" name="radioButtonGeomArea">
+           <widget class="QRadioButton" name="radioButtonUseMapLayer">
             <property name="enabled">
              <bool>false</bool>
             </property>
             <property name="text">
-             <string>Use Spatial Area</string>
+             <string>Use a Map Layer</string>
             </property>
             <attribute name="buttonGroup">
              <string notr="true">buttonGroupAreaOfInterest</string>
@@ -47,19 +47,19 @@
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="geomAreaLabel">
+           <widget class="QLabel" name="mapLayerLabel">
             <property name="enabled">
              <bool>false</bool>
             </property>
             <property name="text">
-             <string>Spatial Area:</string>
+             <string>Map Layer:</string>
             </property>
            </widget>
           </item>
           <item row="3" column="0">
-           <widget class="QRadioButton" name="radioButtonAdminArea">
+           <widget class="QRadioButton" name="radioButtonUsePredefinedArea">
             <property name="text">
-             <string>Use Administrative Area</string>
+             <string>Use Predefined Area</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -70,14 +70,14 @@
            </widget>
           </item>
           <item row="4" column="0">
-           <widget class="QLabel" name="adminAreaLabel">
+           <widget class="QLabel" name="predefinedAreaLabel">
             <property name="text">
-             <string>Administrative Area:</string>
+             <string>Predefined Area:</string>
             </property>
            </widget>
           </item>
           <item row="4" column="1">
-           <widget class="QComboBox" name="adminArea">
+           <widget class="QComboBox" name="comboBoxPredefinedArea">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -98,32 +98,15 @@
           <item row="1" column="1">
            <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
-             <widget class="QgsFileWidget" name="ykrGeomAreaFile">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QgsMapLayerComboBox" name="ykrGeomAreaLayerList">
+             <widget class="QgsMapLayerComboBox" name="comboBoxMapLayer">
               <property name="enabled">
                <bool>false</bool>
               </property>
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="ykrGeomAreaLoadLayer">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>Load from a map layer</string>
               </property>
              </widget>
             </item>
@@ -147,7 +130,7 @@
      <item>
       <widget class="QCheckBox" name="calculateFuture">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="toolTip">
         <string>Laske tulevaisuusskenaario</string>
@@ -219,20 +202,7 @@
              <item row="0" column="1">
               <layout class="QHBoxLayout" name="futureAreasLayout">
                <item>
-                <widget class="QgsFileWidget" name="futureAreasFile">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>23</height>
-                  </size>
-                 </property>
-                 <property name="filter">
-                  <string>Shape-tiedosto (*.shp)</string>
-                 </property>
-                </widget>
+                <widget class="QComboBox" name="comboBoxPredefinedFutureAreas"/>
                </item>
                <item>
                 <widget class="QgsMapLayerComboBox" name="futureAreasLayerList">
@@ -240,7 +210,7 @@
                   <bool>false</bool>
                  </property>
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
@@ -289,20 +259,7 @@
              <item row="0" column="1">
               <layout class="QHBoxLayout" name="futureNetworkLayout">
                <item>
-                <widget class="QgsFileWidget" name="futureNetworkFile">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>23</height>
-                  </size>
-                 </property>
-                 <property name="filter">
-                  <string>Shape-tiedosto (*.shp)</string>
-                 </property>
-                </widget>
+                <widget class="QComboBox" name="comboBoxPredefinedFutureNetwork"/>
                </item>
                <item>
                 <widget class="QgsMapLayerComboBox" name="futureNetworkLayerList">
@@ -310,7 +267,7 @@
                   <bool>false</bool>
                  </property>
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
@@ -329,20 +286,7 @@
              <item row="1" column="1">
               <layout class="QHBoxLayout" name="futureStopsLayout">
                <item>
-                <widget class="QgsFileWidget" name="futureStopsFile">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>23</height>
-                  </size>
-                 </property>
-                 <property name="filter">
-                  <string>Shape-tiedosto (*.shp)</string>
-                 </property>
-                </widget>
+                <widget class="QComboBox" name="comboBoxPredefinedFutureStops"/>
                </item>
                <item>
                 <widget class="QgsMapLayerComboBox" name="futureStopsLayerList">
@@ -350,7 +294,7 @@
                   <bool>false</bool>
                  </property>
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
@@ -485,7 +429,10 @@
              <widget class="QComboBox" name="comboBoxYkrPop"/>
             </item>
             <item>
-             <widget class="QgsMapLayerComboBox" name="mMapLayerComboBox">
+             <widget class="QgsMapLayerComboBox" name="mapLayerComboBoxYkrPop">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -495,7 +442,10 @@
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBox">
+             <widget class="QCheckBox" name="checkBoxLoadYkrPopFromMapLayer">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>Load from a map layer</string>
               </property>
@@ -526,10 +476,17 @@
              <widget class="QComboBox" name="comboBoxYkrJob"/>
             </item>
             <item>
-             <widget class="QgsMapLayerComboBox" name="mMapLayerComboBox_2"/>
+             <widget class="QgsMapLayerComboBox" name="mapLayerComboBoxYkrJob">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="checkBox_2">
+             <widget class="QCheckBox" name="checkBoxLoadYkrJobFromMapLayer">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>Load from a map layer</string>
               </property>
@@ -603,11 +560,6 @@
    <extends>QGroupBox</extends>
    <header>qgscollapsiblegroupbox.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QgsFileWidget</class>
-   <extends>QWidget</extends>
-   <header>qgsfilewidget.h</header>
   </customwidget>
   <customwidget>
    <class>QgsMapLayerComboBox</class>

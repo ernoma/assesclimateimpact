@@ -3,7 +3,7 @@
 
 class YKRToolDictionaries:
     def __init__(self):
-        self.AdminAreas = {
+        self.PredefinedAreas = {
             'Tampereen kaupunkiseutu': 'user_input.tre_seutu_kunnat',
             'Tampereen kaupunkiseudun rakennesuunnitelma 2040': 'tests.rasu',
             'Kangasala (2.4.2021)': 'user_input.tre_seutu_kunta_kangasala',
@@ -26,20 +26,30 @@ class YKRToolDictionaries:
             'YKR työpaikat Pirkanmaa 2017': 'user_input.YKR_tyopaikat_2017_Pirkanmaa'
         }
 
+        self.emissionAllocationMethod = {
+            'Hyödynjakomenetelmä': 'hjm',
+            'Energiamenetelmä': 'em'
+        }
 
-    def getAdminAreaNames(self):
-        return self.AdminAreas.keys()
+        # self.electricityEmissionClass = {
+        #     'Tuotanto': 'tuotanto',
+        #     'Hankinta': 'hankinta'
+        # }
 
 
-    def getAdminAreaDatabaseTableName(self, adminArea):
-        return self.AdminAreas[adminArea]
+    def getPredefinedAreaNames(self):
+        return self.PredefinedAreas.keys()
+
+
+    def getPredefinedAreaDatabaseTableName(self, PredefinedArea):
+        return self.PredefinedAreas[PredefinedArea]
 
     
-    def getAdminAreaNameFromDatabaseTableName(self, adminAreaTableName):
-        key_list = list(self.AdminAreas.keys())
-        val_list = list(self.AdminAreas.values())
+    def getPredefinedAreaNameFromDatabaseTableName(self, PredefinedAreaTableName):
+        key_list = list(self.PredefinedAreas.keys())
+        val_list = list(self.PredefinedAreas.values())
 
-        position = val_list.index(adminAreaTableName)
+        position = val_list.index(PredefinedAreaTableName)
 
         return key_list[position]
 
@@ -58,3 +68,11 @@ class YKRToolDictionaries:
 
     def getYkrJobTableDatabaseTableName(self, ykrJobUserFriendlyName):
         return self.ykrJobTables[ykrJobUserFriendlyName]
+
+    
+    def getEmissionAllocationMethodNames(self):
+        return self.emissionAllocationMethod.keys()
+
+
+    def getEmissionAllocationMethodShortName(self, emissionAllocationMethodUserFriendlyName):
+        return self.emissionAllocationMethod[emissionAllocationMethodUserFriendlyName]

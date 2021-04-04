@@ -100,6 +100,8 @@ class YKRTool:
 
         self.ykrToolDictionaries = YKRToolDictionaries()
 
+        self.predefinedAreaDBTableName = None
+
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -265,14 +267,15 @@ class YKRTool:
         '''Sets up the main dialog'''
         md = self.mainDialog
 
-        md.radioButtonGeomArea.clicked.connect(self.handleRadioButtonGeomAreaToggle)
-        md.radioButtonAdminArea.clicked.connect(self.handleRadioButtonAdminAreaToggle)
+        md.radioButtonUseMapLayer.clicked.connect(self.handleRadioButtonUseMapLayerToggle)
+        md.radioButtonUsePredefinedArea.clicked.connect(self.handleRadioButtonUsePredefinedAreaToggle)
 
-        names = self.ykrToolDictionaries.getAdminAreaNames()
-        md.adminArea.addItems(names)
+        names = self.ykrToolDictionaries.getPredefinedAreaNames()
+        md.comboBoxPredefinedArea.addItems(names)
         md.pitkoScenario.addItems(["static", "wem", "eu80", "kasvu", "muutos", "saasto",
             "pysahdys"])
-        md.emissionsAllocation.addItems(["hjm", "em"])
+        names = self.ykrToolDictionaries.getEmissionAllocationMethodNames()
+        md.emissionsAllocation.addItems(names)
         md.elecEmissionType.addItems(["hankinta", "tuotanto"])
 
         md.onlySelectedFeats.setEnabled(False)
@@ -302,42 +305,64 @@ class YKRTool:
 
         md.calculateFuture.clicked.connect(self.handleLayerToggle)
 
-    def handleRadioButtonGeomAreaToggle(self, checked):
+        md.checkBoxCalculateEmissionsPerPerson.clicked.connect(self.handleCalculateEmissionsPerPersonToggle)
+        md.checkBoxCalculateEmissionsPerJob.clicked.connect(self.handleCalculateEmissionsPerJobToggle)
+
+
+    def handleCalculateEmissionsPerPersonToggle(self, checked):
         md = self.mainDialog
 
         if checked:
-            md.ykrGeomAreaFile.setEnabled(True)
-            md.ykrGeomAreaLayerList.setEnabled(True)
-            md.ykrGeomAreaLoadLayer.setEnabled(True)
-            md.geomAreaLabel.setEnabled(True)
-            md.adminArea.setEnabled(False)
-            md.adminAreaLabel.setEnabled(False)
+            md.comboBoxYkrPop.setEnabled(True)
+            # mapLayerComboBoxYkrPop.setEnabled(True)
+            # checkBoxLoadYkrPopFromMapLayer.setEnabled(True)
         else:
-            md.ykrGeomAreaFile.setEnabled(False)
-            md.ykrGeomAreaLayerList.setEnabled(False)
-            md.ykrGeomAreaLoadLayer.setEnabled(False)
-            md.geomAreaLabel.setEnabled(False)
-            md.adminArea.setEnabled(True)
-            md.adminAreaLabel.setEnabled(True)
+            md.comboBoxYkrPop.setEnabled(False)
+            # mapLayerComboBoxYkrPop.setEnabled(False)
+            # checkBoxLoadYkrPopFromMapLayer.setEnabled(False)
 
 
-    def handleRadioButtonAdminAreaToggle(self, checked):
+    def handleCalculateEmissionsPerJobToggle(self, checked):
         md = self.mainDialog
 
         if checked:
-            md.ykrGeomAreaFile.setEnabled(False)
-            md.ykrGeomAreaLayerList.setEnabled(False)
-            md.ykrGeomAreaLoadLayer.setEnabled(False)
-            md.geomAreaLabel.setEnabled(False)
-            md.adminArea.setEnabled(True)
-            md.adminAreaLabel.setEnabled(True)
+            md.comboBoxYkrJob.setEnabled(True)
+            # mapLayerComboBoxYkrJob.setEnabled(True)
+            # checkBoxLoadYkrJobFromMapLayer.setEnabled(True)
         else:
-            md.ykrGeomAreaFile.setEnabled(True)
-            md.ykrGeomAreaLayerList.setEnabled(True)
-            md.ykrGeomAreaLoadLayer.setEnabled(True)
-            md.geomAreaLabel.setEnabled(True)
-            md.adminArea.setEnabled(False)
-            md.adminAreaLabel.setEnabled(False)
+            md.comboBoxYkrJob.setEnabled(False)
+            # mapLayerComboBoxYkrJob.setEnabled(False)
+            # checkBoxLoadYkrJobFromMapLayer.setEnabled(False)
+
+
+    def handleRadioButtonUseMapLayerToggle(self, checked):
+        md = self.mainDialog
+
+        if checked:
+            md.comboBoxMapLayer.setEnabled(True)
+            md.mapLayerLabel.setEnabled(True)
+            md.comboBoxPredefinedArea.setEnabled(False)
+            md.predefinedAreaLabel.setEnabled(False)
+        else:
+            md.comboBoxMapLayer.setEnabled(False)
+            md.mapLayerLabel.setEnabled(False)
+            md.comboBoxPredefinedArea.setEnabled(True)
+            md.predefinedAreaLabel.setEnabled(True)
+
+
+    def handleRadioButtonUsePredefinedAreaToggle(self, checked):
+        md = self.mainDialog
+
+        if checked:
+            md.comboBoxMapLayer.setEnabled(False)
+            md.mapLayerLabel.setEnabled(False)
+            md.comboBoxPredefinedArea.setEnabled(True)
+            md.predefinedAreaLabel.setEnabled(True)
+        else:
+            md.comboBoxMapLayer.setEnabled(True)
+            md.mapLayerLabel.setEnabled(True)
+            md.comboBoxPredefinedArea.setEnabled(False)
+            md.predefinedAreaLabel.setEnabled(False)
 
 
     def displaySettingsDialog(self):
@@ -491,10 +516,10 @@ class YKRTool:
 
         # self.geomArea = md.geomArea.currentText()
 
-        self.adminArea = self.ykrToolDictionaries.getAdminAreaDatabaseTableName(md.adminArea.currentText())
+        self.predefinedAreaDBTableName = self.ykrToolDictionaries.getPredefinedAreaDatabaseTableName(md.comboBoxPredefinedArea.currentText())
         # self.onlySelectedFeats = md.onlySelectedFeats.isChecked()
         self.pitkoScenario = md.pitkoScenario.currentText()
-        self.emissionsAllocation = md.emissionsAllocation.currentText()
+        self.emissionsAllocation = self.ykrToolDictionaries.getEmissionAllocationMethodShortName(md.emissionsAllocation.currentText())
         self.elecEmissionType = md.elecEmissionType.currentText()
 
         if not md.calculateFuture.isChecked():
@@ -510,22 +535,22 @@ class YKRTool:
         if md.futureAreasLoadLayer.isChecked():
             self.futureAreasLayer = md.futureAreasLayerList.currentLayer()
         else:
-            self.futureAreasLayer = QgsVectorLayer(md.futureAreasFile.\
-                filePath(), "aluevaraus_tulevaisuus", "ogr")
+            pass#self.futureAreasLayer = QgsVectorLayer(md.futureAreasFile.\
+                #filePath(), "aluevaraus_tulevaisuus", "ogr")
         if md.futureNetworkLoadLayer.isChecked():
             self.futureNetworkLayer = md.futureNetworkLayerList.currentLayer()
         else:
-            if md.futureNetworkFile.filePath():
-                self.futureNetworkLayer = QgsVectorLayer(
-                    md.futureNetworkFile.filePath(),
-                    "keskusverkko_tulevaisuus", "ogr")
+            pass#if md.futureNetworkFile.filePath():
+                #self.futureNetworkLayer = QgsVectorLayer(
+                #    md.futureNetworkFile.filePath(),
+                #    "keskusverkko_tulevaisuus", "ogr")
         if md.futureStopsLoadLayer.isChecked():
             self.futureStopsLayer = md.futureStopsLayerList.currentLayer()
         else:
-            if md.futureStopsFile.filePath():
-                self.futureStopsLayer = QgsVectorLayer(
-                    md.futureStopsFile.filePath(),
-                    "joukkoliikenne_tulevaisuus", "ogr")
+            pass#if md.futureStopsFile.filePath():
+                #self.futureStopsLayer = QgsVectorLayer(
+                #    md.futureStopsFile.filePath(),
+                #    "joukkoliikenne_tulevaisuus", "ogr")
         self.targetYear = md.targetYear.value()
         self.inputLayers.extend([self.futureAreasLayer,
             self.futureNetworkLayer, self.futureStopsLayer])
@@ -629,7 +654,7 @@ class YKRTool:
         '''Generate queries to call processing functions in database'''
         vals = {
             'uuid': self.sessionParams['uuid'],
-            'aoi': self.adminArea,
+            'aoi': self.predefinedAreaDBTableName,
             # 'geomArea': self.geomArea,
             # 'popTable': (self.tableNames[self.ykrPopLayer]).lower(),
             # 'jobTable': (self.tableNames[self.ykrJobsLayer]).lower(),
@@ -705,18 +730,19 @@ class YKRTool:
         '''Writes session info to user_output.sessions table'''
         uuid = self.sessionParams['uuid']
         user = self.sessionParams['user']
-        adminArea = self.ykrToolDictionaries.getAdminAreaNameFromDatabaseTableName(self.adminArea)
+        predefinedAreaName = self.ykrToolDictionaries.getPredefinedAreaNameFromDatabaseTableName(self.predefinedAreaDBTableName)
         startTime = self.sessionParams['startTime']
         baseYear = self.sessionParams['baseYear']
         targetYear = self.targetYear
-        pitkoScenario = self.pitkoScenario
+        pitkoScenario = self.pitkoScenario[:6]
         emissionsAllocation = self.emissionsAllocation
         elecEmissionType = self.elecEmissionType
 
         self.cur.execute('''INSERT INTO user_output.sessions VALUES (%s, %s, %s, %s, %s,
         %s, %s, %s, %s)''', (uuid, user, startTime, baseYear, targetYear,\
-            pitkoScenario, emissionsAllocation, elecEmissionType, adminArea))
+            pitkoScenario, emissionsAllocation, elecEmissionType, predefinedAreaName))
         self.conn.commit()
+
 
     def addResultAsLayers(self):
         outputSchemaName = 'user_output'
