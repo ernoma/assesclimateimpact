@@ -144,7 +144,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="calculateFuture">
+      <widget class="QCheckBox" name="checkBoxCalculateFuture">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -152,7 +152,7 @@
         <string>Laske tulevaisuusskenaario</string>
        </property>
        <property name="text">
-        <string>Laske tulevaisuustiedot</string>
+        <string>Estimate Future Emissions</string>
        </property>
        <property name="checkable">
         <bool>true</bool>
@@ -275,7 +275,11 @@
              <item row="0" column="1">
               <layout class="QHBoxLayout" name="futureNetworkLayout">
                <item>
-                <widget class="QComboBox" name="comboBoxPredefinedFutureNetwork"/>
+                <widget class="QComboBox" name="comboBoxPredefinedFutureNetwork">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                </widget>
                </item>
                <item>
                 <widget class="QgsMapLayerComboBox" name="futureNetworkLayerList">

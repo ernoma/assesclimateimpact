@@ -288,6 +288,8 @@ class YKRTool:
 
         #md.checkBoxOnlySelectedFeats.setEnabled(False)
         md.futureBox.setEnabled(False)
+        names = self.ykrToolDictionaries.getPredefinedFutureZoningAreasUserFriendlyNames()
+        md.comboBoxPredefinedFutureAreas.addItems(names)
 
         names = self.ykrToolDictionaries.getYkrPopUserFriendlyNames()
         md.comboBoxYkrPop.addItems(names)
@@ -311,7 +313,7 @@ class YKRTool:
         md.futureNetworkLoadLayer.clicked.connect(self.handleLayerToggle)
         md.futureStopsLoadLayer.clicked.connect(self.handleLayerToggle)
 
-        md.calculateFuture.clicked.connect(self.handleLayerToggle)
+        md.checkBoxCalculateFuture.clicked.connect(self.handleLayerToggle)
 
         md.checkBoxCalculateEmissionsPerPerson.clicked.connect(self.handleCalculateEmissionsPerPersonToggle)
         md.checkBoxCalculateEmissionsPerJob.clicked.connect(self.handleCalculateEmissionsPerJobToggle)
@@ -473,27 +475,45 @@ class YKRTool:
         #     self.mainDialog.ykrBuildingsFile.show()
         if self.mainDialog.futureAreasLoadLayer.isChecked():
             self.mainDialog.futureAreasLayerList.show()
-            self.mainDialog.futureAreasFile.hide()
+            self.mainDialog.comboBoxPredefinedFutureAreas.hide()
         else:
             self.mainDialog.futureAreasLayerList.hide()
-            self.mainDialog.futureAreasFile.show()
+            self.mainDialog.comboBoxPredefinedFutureAreas.show()
+
         if self.mainDialog.futureNetworkLoadLayer.isChecked():
             self.mainDialog.futureNetworkLayerList.show()
-            self.mainDialog.futureNetworkFile.hide()
+            self.mainDialog.comboBoxPredefinedFutureNetwork.hide()
         else:
             self.mainDialog.futureNetworkLayerList.hide()
-            self.mainDialog.futureNetworkFile.show()
+            self.mainDialog.comboBoxPredefinedFutureNetwork.show()
+
         if self.mainDialog.futureStopsLoadLayer.isChecked():
             self.mainDialog.futureStopsLayerList.show()
-            self.mainDialog.futureStopsFile.hide()
+            self.mainDialog.comboBoxPredefinedFutureStops.hide()
         else:
             self.mainDialog.futureStopsLayerList.hide()
-            self.mainDialog.futureStopsFile.show()
+            self.mainDialog.comboBoxPredefinedFutureStops.show()
 
-        if self.mainDialog.calculateFuture.isChecked():
+        if self.mainDialog.checkBoxCalculateFuture.isChecked():
             self.mainDialog.futureBox.setEnabled(True)
+            self.mainDialog.futureRequired.setEnabled(True)
+            self.mainDialog.futureOptional.setEnabled(True)
+            self.mainDialog.comboBoxPredefinedFutureAreas.setEnabled(True)
+            self.mainDialog.futureAreasLayerList.setEnabled(True)
+            self.mainDialog.comboBoxPredefinedFutureNetwork.setEnabled(True)
+            self.mainDialog.futureNetworkLayerList.setEnabled(True)
+            self.mainDialog.comboBoxPredefinedFutureStops.setEnabled(True)
+            self.mainDialog.futureStopsLayerList.setEnabled(True)
         else:
             self.mainDialog.futureBox.setEnabled(False)
+            self.mainDialog.futureRequired.setEnabled(False)
+            self.mainDialog.futureOptional.setEnabled(False)
+            self.mainDialog.comboBoxPredefinedFutureAreas.setEnabled(False)
+            self.mainDialog.futureAreasLayerList.setEnabled(False)
+            self.mainDialog.comboBoxPredefinedFutureNetwork.setEnabled(False)
+            self.mainDialog.futureNetworkLayerList.setEnabled(False)
+            self.mainDialog.comboBoxPredefinedFutureStops.setEnabled(False)
+            self.mainDialog.futureStopsLayerList.setEnabled(False)
 
 
     def generateSessionParameters(self):
@@ -513,7 +533,7 @@ class YKRTool:
     def readProcessingInput(self):
         '''Read user input from main dialog'''
         md = self.mainDialog
-        # self.inputLayers = []
+        self.inputLayers = []
         # if md.ykrPopLoadLayer.isChecked():
         #     self.ykrPopLayer = md.ykrPopLayerList.currentLayer()
         # else:
@@ -565,19 +585,19 @@ class YKRTool:
 
     def finishReadingProcessingInput(self):
         md = self.mainDialog
-        # self.uploadInputLayers()
 
         # self.onlySelectedFeats = md.checkBoxUploadOnlySelectedFeatures.isChecked()
         self.pitkoScenario = md.pitkoScenario.currentText()
         self.emissionsAllocation = self.ykrToolDictionaries.getEmissionAllocationMethodShortName(md.emissionsAllocation.currentText())
         self.elecEmissionType = md.elecEmissionType.currentText()
 
-        if not md.calculateFuture.isChecked():
+        if not md.checkBoxCalculateFuture.isChecked():
             self.calculateFuture = False
         else:
             self.readFutureProcessingInput()
 
-        QgsMessageLog.logMessage("predefinedAreaDBTableName: {}".format(self.predefinedAreaDBTableName), 'YKRTool', Qgis.Info)
+        # self.uploadInputLayers()
+        # QgsMessageLog.logMessage("predefinedAreaDBTableName: {}".format(self.predefinedAreaDBTableName), 'YKRTool', Qgis.Info)
 
         self.runCalculation()
 
@@ -586,28 +606,40 @@ class YKRTool:
         '''Reads user input for future processing from main dialog'''
         self.calculateFuture = True
         md = self.mainDialog
+
         if md.futureAreasLoadLayer.isChecked():
             self.futureAreasLayer = md.futureAreasLayerList.currentLayer()
         else:
-            pass#self.futureAreasLayer = QgsVectorLayer(md.futureAreasFile.\
-                #filePath(), "aluevaraus_tulevaisuus", "ogr")
+            futureZoningAreasTableName = self.ykrToolDictionaries.getPredefinedFutureZoningAreasDatabaseTableName(md.comboBoxPredefinedFutureAreas.currentText())
+            schemaName, tableName = futureZoningAreasTableName.split('.')
+            uri = QgsDataSourceUri()
+            uri.setConnection(self.connParams['host'], self.connParams['port'],\
+            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+            uri.setDataSource(schemaName, tableName, 'geom')
+            self.futureAreasLayer = QgsVectorLayer(uri.uri(False), "aluevaraus_tulevaisuus", 'postgres')
+            # QgsMessageLog.logMessage("futureAreasLayer: " +  str(self.futureAreasLayer), 'YKRTool', Qgis.Info)
+
+        self.inputLayers.append(self.futureAreasLayer)
+
         if md.futureNetworkLoadLayer.isChecked():
             self.futureNetworkLayer = md.futureNetworkLayerList.currentLayer()
+            self.inputLayers.append(self.futureNetworkLayer)
         else:
             pass#if md.futureNetworkFile.filePath():
                 #self.futureNetworkLayer = QgsVectorLayer(
                 #    md.futureNetworkFile.filePath(),
                 #    "keskusverkko_tulevaisuus", "ogr")
+
         if md.futureStopsLoadLayer.isChecked():
             self.futureStopsLayer = md.futureStopsLayerList.currentLayer()
+            self.inputLayers.append(self.futureStopsLayer)
         else:
             pass#if md.futureStopsFile.filePath():
                 #self.futureStopsLayer = QgsVectorLayer(
                 #    md.futureStopsFile.filePath(),
                 #    "joukkoliikenne_tulevaisuus", "ogr")
+
         self.targetYear = md.targetYear.value()
-        self.inputLayers.extend([self.futureAreasLayer,
-            self.futureNetworkLayer, self.futureStopsLayer])
 
 
     def checkLayerValidity(self):
@@ -634,39 +666,39 @@ class YKRTool:
                 raise Exception("Virhe ladattaessa joukkoliikennepysäkkitietoja")
 
 
-    def uploadSingleMapLayer(self, layer):
-        '''Uploads a single input layer to database'''
-        alg = QgsApplication.processingRegistry().algorithmById(
-            'gdal:importvectorintopostgisdatabasenewconnection')
-        params = {
-            'A_SRS': QgsCoordinateReferenceSystem('EPSG:3067'),
-            'T_SRS': None,
-            'S_SRS': None,
-            'HOST': self.connParams['host'],
-            'PORT': self.connParams['port'],
-            'USER': self.connParams['user'],
-            'DBNAME': self.connParams['database'],
-            'PASSWORD': self.connParams['password'],
-            'SCHEMA': 'user_input',
-            'PK': 'fid',
-            'PRIMARY_KEY': None,
-            'PROMOTETOMULTI': False
-        }
-        context = QgsProcessingContext()
-        feedback = QgsProcessingFeedback()
-        params['INPUT'] = layer
-        tableName = layer.name()
-        params['TABLE'] = tableName[:YKRTool.MAX_TABLE_NAME_LENGTH] # truncate tablename to under 63c
-        self.tableNames[layer] = params['TABLE']
-        if int(str(layer.wkbType())[:1]) == 3: # polygon
-            params['GTYPE'] = 5
-        elif int(str(layer.wkbType())[:1]) == 6: # MultiPolygon
-            params['GTYPE'] = 8
-        task = QgsProcessingAlgRunnerTask(alg, params, context, feedback)
-        task.executed.connect(partial(self.uploadSingleMapLayerFinished, context))
-        QgsApplication.taskManager().addTask(task)
-        self.iface.messageBar().pushMessage('Ladataan tasoa tietokantaan',
-            layer.name(), Qgis.Info, duration=3)
+    # def uploadSingleMapLayer(self, layer):
+    #     '''Uploads a single input layer to database'''
+    #     alg = QgsApplication.processingRegistry().algorithmById(
+    #         'gdal:importvectorintopostgisdatabasenewconnection')
+    #     params = {
+    #         'A_SRS': QgsCoordinateReferenceSystem('EPSG:3067'),
+    #         'T_SRS': None,
+    #         'S_SRS': None,
+    #         'HOST': self.connParams['host'],
+    #         'PORT': self.connParams['port'],
+    #         'USER': self.connParams['user'],
+    #         'DBNAME': self.connParams['database'],
+    #         'PASSWORD': self.connParams['password'],
+    #         'SCHEMA': 'user_input',
+    #         'PK': 'fid',
+    #         'PRIMARY_KEY': None,
+    #         'PROMOTETOMULTI': False
+    #     }
+    #     context = QgsProcessingContext()
+    #     feedback = QgsProcessingFeedback()
+    #     params['INPUT'] = layer
+    #     tableName = layer.name()
+    #     params['TABLE'] = tableName[:YKRTool.MAX_TABLE_NAME_LENGTH] # truncate tablename to under 63c
+    #     self.tableNames[layer] = params['TABLE']
+    #     if int(str(layer.wkbType())[:1]) == 3: # polygon
+    #         params['GTYPE'] = 5
+    #     elif int(str(layer.wkbType())[:1]) == 6: # MultiPolygon
+    #         params['GTYPE'] = 8
+    #     task = QgsProcessingAlgRunnerTask(alg, params, context, feedback)
+    #     task.executed.connect(partial(self.uploadSingleMapLayerFinished, context))
+    #     QgsApplication.taskManager().addTask(task)
+    #     self.iface.messageBar().pushMessage('Ladataan tasoa tietokantaan',
+    #         layer.name(), Qgis.Info, duration=3)
 
 
     def uploadSingleMapLayerFinished(self, context, successful, results):
@@ -760,7 +792,7 @@ class YKRTool:
             # 'jobTable': (self.tableNames[self.ykrJobsLayer]).lower(),
             # 'buildingTable': (self.tableNames[self.ykrBuildingsLayer]).lower(),
             'calcYear': self.sessionParams['baseYear'],
-            # 'baseYear': self.sessionParams['baseYear'],
+            'baseYear': self.sessionParams['baseYear'],
             'pitkoScenario': self.pitkoScenario,
             'emissionsAllocation': self.emissionsAllocation,
             'elecEmissionType': self.elecEmissionType
@@ -775,6 +807,7 @@ class YKRTool:
             # '{buildingTable}', '{aoi}', '{calcYear}', '{pitkoScenario}',
             # '{emissionsAllocation}', '{elecEmissionType}', '{geomArea}',
             # '{baseYear}')'''.format(**vals))
+            QgsMessageLog.logMessage("getCalculationQueries, not self.calculateFuture", 'YKRTool', Qgis.Info)
         else:
             futureQuery = self.generateFutureQuery(vals)
             queries.append(futureQuery)
@@ -783,26 +816,26 @@ class YKRTool:
 
     def generateFutureQuery(self, vals):
         '''Constructs a query for future calculation'''
+        futureZoningAreasTableName = self.ykrToolDictionaries.getPredefinedFutureZoningAreasDatabaseTableName(self.mainDialog.comboBoxPredefinedFutureAreas.currentText())
         futureVals = {
-            'fAreas': (self.tableNames[self.futureAreasLayer]).lower(),
+            #'fAreas': (self.tableNames[self.futureAreasLayer]).lower(),
+            'fAreas': futureZoningAreasTableName,
             'targetYear': self.targetYear
         }
         vals.update(futureVals)
         query = """CREATE TABLE user_output."output_{uuid}" AS
-        SELECT * FROM il_calculate_emissions_loop('{popTable}', '{jobTable}',
-        '{buildingTable}', '{aoi}', '{pitkoScenario}',
-        '{emissionsAllocation}', '{elecEmissionType}', '{geomArea}',
-        '{baseYear}', '{targetYear}', '{fAreas}'""".format(**vals)
+        SELECT * FROM CO2_CalculateEmissions('{aoi}', '{calcYear}', '{pitkoScenario}', '{emissionsAllocation}', '{elecEmissionType}', '{baseYear}', '{targetYear}', '{fAreas}'""".format(**vals)
 
-        futureNetworkTableName = (self.tableNames[self.futureNetworkLayer]).lower()
-        if futureNetworkTableName:
-            query += ", '{}'".format(futureNetworkTableName)
-        else:
-            query += ", NULL"
-        futureStopsTableName = (self.tableNames[self.futureStopsLayer]).lower()
-        if futureStopsTableName:
-            query += ", '{}'".format(futureStopsTableName)
+        # futureNetworkTableName = (self.tableNames[self.futureNetworkLayer]).lower()
+        # if futureNetworkTableName:
+        #     query += ", '{}'".format(futureNetworkTableName)
+        # else:
+        #     query += ", NULL"
+        # futureStopsTableName = (self.tableNames[self.futureStopsLayer]).lower()
+        # if futureStopsTableName:
+        #     query += ", '{}'".format(futureStopsTableName)
         query += ')'
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         return query
 
 
@@ -850,6 +883,9 @@ class YKRTool:
 
         if self.mainDialog.checkBoxNokianMyllyCO2Zeroed.isChecked():
             self.zeroCO2inNokianMyllySquare(outputSchemaName, outputTableName)
+
+        if self.calculateFuture:
+            self.updateYearToResultTable(outputSchemaName, outputTableName)
 
         layers, layerNames = [], []
         uid = self.sessionParams['uuid']
@@ -1130,6 +1166,40 @@ class YKRTool:
             cur = conn.cursor()
             for query in queries:
                 cur.execute(query)
+        except Exception as e:
+            self.iface.messageBar().pushMessage(
+                'Virhe taulun kohdetta muokatessa "{}"'.format(query),
+                str(e), Qgis.Warning, duration=0)
+            conn.rollback()
+            conn.close()
+
+            return False
+
+        conn.commit()
+
+        return True
+
+
+    def updateYearToResultTable(self, outputSchemaName, outputTableName, retriesLeft=3):
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET year = to_date('{}-01-01', 'YYYY-MM-DD')".format(self.targetYear)
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+
+        conn = None
+
+        try:
+            conn = createDbConnection(self.connParams)
+        except Exception as e:
+            if retriesLeft > 0:
+                return self.updateYearToResultTable(outputSchemaName, outputTableName, retriesLeft - 1)
+            else:
+                self.iface.messageBar().pushMessage(
+                    'Virhe tietokantayhteyden muodostamisessa',
+                    str(e), Qgis.Warning, duration=0)
+                return False
+
+        try:
+            cur = conn.cursor()
+            cur.execute(query)
         except Exception as e:
             self.iface.messageBar().pushMessage(
                 'Virhe taulun kohdetta muokatessa "{}"'.format(query),

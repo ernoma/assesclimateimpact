@@ -26,6 +26,12 @@ class YKRToolDictionaries:
             'YKR työpaikat Pirkanmaa 2017': 'user_input.YKR_tyopaikat_2017_Pirkanmaa'
         }
 
+
+        self.PredefinedFutureZoningAreas = {
+            'Kantakaupunki, yk049 - ehdotus': 'user_input.kt_bau_kaavaehdotus',
+            'Nurmi-Sorila, yk049 - luonnos': 'user_input.kt_nurmi_sorila'
+        }
+
         self.emissionAllocationMethod = {
             'Hyödynjakomenetelmä': 'hjm',
             'Energiamenetelmä': 'em'
@@ -73,6 +79,14 @@ class YKRToolDictionaries:
         return self.ykrJobTables[ykrJobUserFriendlyName]
 
     
+    def getPredefinedFutureZoningAreasUserFriendlyNames(self):
+        return self.PredefinedFutureZoningAreas.keys()
+
+
+    def getPredefinedFutureZoningAreasDatabaseTableName(self, predefinedFutureZoningAreasUserFriendlyName):
+        return self.PredefinedFutureZoningAreas[predefinedFutureZoningAreasUserFriendlyName]
+
+
     def getEmissionAllocationMethodNames(self):
         return self.emissionAllocationMethod.keys()
 
