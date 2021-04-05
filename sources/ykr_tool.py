@@ -102,15 +102,18 @@ class YKRTool:
         self.ykrPopLayer = None
         self.ykrBuildingsLayer = None
         self.ykrJobsLayer = None
-        self.futureAreasLayer = None
-        self.futureNetworkLayer = None
-        self.futureStopsLayer = None
 
         self.ykrToolDictionaries = YKRToolDictionaries(self.iface, locale)
         self.ykrToolUploadLayer = YKRToolUploadLayer(self.iface)
 
+        self.futureAreasLayer = None
         self.investigatedAreaMapLayer = None
         self.predefinedAreaDBTableName = None
+
+        self.futureNetworkLayer = None
+        self.futureStopsLayer = None
+        self.futureNetworkLayerDBTableName = None
+        self.futureStopsLayerDBTableName = None
 
         self.calculateFuture = False
 
@@ -294,6 +297,9 @@ class YKRTool:
         md.futureBox.setEnabled(False)
         names = self.ykrToolDictionaries.getPredefinedFutureZoningAreasUserFriendlyNames()
         md.comboBoxPredefinedFutureAreas.addItems(names)
+
+        # names = self.ykrToolDictionaries.getPredefinedUrbanCenterLayersUserFriendlyNames()
+        # md.comboBoxPredefinedFutureNetwork.addItems(names)
 
         names = self.ykrToolDictionaries.getYkrPopUserFriendlyNames()
         md.comboBoxYkrPop.addItems(names)
@@ -628,21 +634,65 @@ class YKRTool:
 
         if md.futureNetworkLoadLayer.isChecked():
             self.futureNetworkLayer = md.futureNetworkLayerList.currentLayer()
-            self.inputLayers.append(self.futureNetworkLayer)
+            if self.futureNetworkLayer == None:
+                raise Exception(self.tr("Future urban center map layer has not been selected"))
+            elif not self.futureNetworkLayer.isValid():
+                raise Exception(self.tr("Future urban center map layer is not valid"))
+            else:
+                dataProvider = self.futureNetworkLayer.dataProvider()
+                dataSourceUri = dataProvider.dataSourceUri()
+                # QgsMessageLog.logMessage("dataSourceUri: {}".format(dataProvider.dataSourceUri()), 'YKRTool', Qgis.Info)
+                uri = dataProvider.uri()
+                # QgsMessageLog.logMessage("dataSourceUri: {}".format(dataProvider.dataSourceUri()), 'YKRTool', Qgis.Info)
+                # QgsMessageLog.logMessage("host: {}".format(uri.host()) , 'YKRTool', Qgis.Info)
+                # if uri.host() == "":
+                    # QgsMessageLog.logMessage("host = \"\"", 'YKRTool', Qgis.Info)
+                # QgsMessageLog.logMessage("database: {}".format(uri.database()) , 'YKRTool', Qgis.Info)
+                # if uri.database() == "":
+                # QgsMessageLog.logMessage("database = \"\"", 'YKRTool', Qgis.Info)
+                if uri.host() == "" or uri.host() != self.connParams['host'] or uri.database() == "" or uri.database() != self.connParams['database']:
+                    self.futureNetworkLayerDBTableName = 'user_input.' + '"' + self.futureNetworkLayer.name()[:YKRTool.MAX_TABLE_NAME_LENGTH] + '"'
+                    self.ykrToolUploadLayer.copyFutureNetworkSourceLayerFeaturesToTargetTable(self.connParams, self.futureNetworkLayer, self.futureNetworkLayerDBTableName)
+                else:
+                    self.futureNetworkLayer = None
+                    QgsMessageLog.logMessage("schema: {}".format(uri.schema()) , 'YKRTool', Qgis.Info)
+                    QgsMessageLog.logMessage("quotedTablename: {}".format(uri.quotedTablename()) , 'YKRTool', Qgis.Info)
+                    self.futureNetworkLayerDBTableName = uri.quotedTablename()
+            # self.inputLayers.append(self.futureNetworkLayer)
         else:
-            pass#if md.futureNetworkFile.filePath():
-                #self.futureNetworkLayer = QgsVectorLayer(
-                #    md.futureNetworkFile.filePath(),
-                #    "keskusverkko_tulevaisuus", "ogr")
+            self.futureNetworkLayer = None
+            self.futureNetworkLayerDBTableName = None
 
         if md.futureStopsLoadLayer.isChecked():
             self.futureStopsLayer = md.futureStopsLayerList.currentLayer()
-            self.inputLayers.append(self.futureStopsLayer)
+            # self.inputLayers.append(self.futureStopsLayer)
+            if self.futureStopsLayer == None:
+                raise Exception(self.tr("Future public transit stops map layer has not been selected"))
+            elif not self.futureStopsLayer.isValid():
+                raise Exception(self.tr("Future public transit stops map layer is not valid"))
+            else:
+                dataProvider = self.futureStopsLayer.dataProvider()
+                dataSourceUri = dataProvider.dataSourceUri()
+                # QgsMessageLog.logMessage("dataSourceUri: {}".format(dataProvider.dataSourceUri()), 'YKRTool', Qgis.Info)
+                uri = dataProvider.uri()
+                # QgsMessageLog.logMessage("dataSourceUri: {}".format(dataProvider.dataSourceUri()), 'YKRTool', Qgis.Info)
+                # QgsMessageLog.logMessage("host: {}".format(uri.host()) , 'YKRTool', Qgis.Info)
+                # if uri.host() == "":
+                    # QgsMessageLog.logMessage("host = \"\"", 'YKRTool', Qgis.Info)
+                # QgsMessageLog.logMessage("database: {}".format(uri.database()) , 'YKRTool', Qgis.Info)
+                # if uri.database() == "":
+                # QgsMessageLog.logMessage("database = \"\"", 'YKRTool', Qgis.Info)
+                if uri.host() == "" or uri.host() != self.connParams['host'] or uri.database() == "" or uri.database() != self.connParams['database']:
+                    self.futureStopsLayerDBTableName = 'user_input.' + '"' + self.futureStopsLayer.name()[:YKRTool.MAX_TABLE_NAME_LENGTH] + '"'
+                    self.ykrToolUploadLayer.copyFutureStopsSourceLayerFeaturesToTargetTable(self.connParams, self.futureStopsLayer, self.futureStopsLayerDBTableName)
+                else:
+                    self.futureStopsLayer = None
+                    QgsMessageLog.logMessage("schema: {}".format(uri.schema()) , 'YKRTool', Qgis.Info)
+                    QgsMessageLog.logMessage("quotedTablename: {}".format(uri.quotedTablename()) , 'YKRTool', Qgis.Info)
+                    self.futureStopsLayerDBTableName = uri.quotedTablename()
         else:
-            pass#if md.futureStopsFile.filePath():
-                #self.futureStopsLayer = QgsVectorLayer(
-                #    md.futureStopsFile.filePath(),
-                #    "joukkoliikenne_tulevaisuus", "ogr")
+             self.futureStopsLayer = None
+             self.futureStopsLayerDBTableName = None
 
         self.targetYear = md.targetYear.value()
 
@@ -664,10 +714,10 @@ class YKRTool:
         if not self.futureAreasLayer.isValid():
             raise Exception(self.tr("Future zoning areas layer is not valid"))
         if self.futureNetworkLayer:
-            if not self.futureNetworkLayer.isValid():
+            if self.futureNetworkLayer != None and not self.futureNetworkLayer.isValid():
                 raise Exception(self.tr("Urban center layer is not valid"))
         if self.futureStopsLayer:
-            if not self.futureStopsLayer.isValid():
+            if self.futureStopsLayer != None and not self.futureStopsLayer.isValid():
                 raise Exception(self.tr("Public transit stops layer is not valid"))
 
 
@@ -832,13 +882,13 @@ class YKRTool:
         SELECT * FROM CO2_CalculateEmissions('{aoi}', '{calcYear}', '{pitkoScenario}', '{emissionsAllocation}', '{elecEmissionType}', '{baseYear}', '{targetYear}', '{fAreas}'""".format(**vals)
 
         # futureNetworkTableName = (self.tableNames[self.futureNetworkLayer]).lower()
-        # if futureNetworkTableName:
-        #     query += ", '{}'".format(futureNetworkTableName)
-        # else:
-        #     query += ", NULL"
+        if self.futureNetworkLayerDBTableName:
+            query += ", '{}'".format(self.futureNetworkLayerDBTableName)
+        else:
+            query += ", NULL"
         # futureStopsTableName = (self.tableNames[self.futureStopsLayer]).lower()
-        # if futureStopsTableName:
-        #     query += ", '{}'".format(futureStopsTableName)
+        if self.futureStopsLayerDBTableName:
+            query += ", '{}'".format(self.futureStopsLayerDBTableName)
         query += ')'
         QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         return query

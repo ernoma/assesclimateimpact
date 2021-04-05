@@ -118,6 +118,18 @@ class YKRToolDictionaries:
         # }
 
 
+        
+        self.PredefinedUrbanCenterLayers = {
+            "fi": {
+                'Keskusverkko kaupunkiseutu ja kantakaupunki (yk049, valtuustokausi 2017-2021) - ehdotus': 'user_input.keskusverkko_tre_seutu_ve_yk049_vaihekaava_ehdotus'
+            },
+            "en": {
+                'Urban centers of Tampere city region and downtown (Local master plan, City Council’s term 2017-2021) - proposal': 'user_input.keskusverkko_tre_seutu_ve_yk049_vaihekaava_ehdotus'
+            }
+        }
+
+
+
     def getPITKOScenarioNames(self):
         if self.locale not in self.PITKOScenarios:
             return self.PITKOScenarios["en"].keys()
@@ -230,3 +242,19 @@ class YKRToolDictionaries:
             return self.emissionAllocationMethod["en"][emissionAllocationMethodUserFriendlyName]
         else:
             return self.emissionAllocationMethod[self.locale][emissionAllocationMethodUserFriendlyName]
+
+
+    def getPredefinedUrbanCenterLayersUserFriendlyNames(self):
+        if self.locale not in self.PredefinedUrbanCenterLayers:
+            return self.PredefinedUrbanCenterLayers["en"].keys()
+        else:
+            return self.PredefinedUrbanCenterLayers[self.locale].keys()
+
+
+    def getPredefinedUrbanCenterLayersDatabaseTableName(self, predefinedUrbanCenterLayersUserFriendlyName):
+        if self.locale not in self.PredefinedUrbanCenterLayers:
+            return self.PredefinedUrbanCenterLayers["en"][predefinedUrbanCenterLayersUserFriendlyName]
+        else:
+            return self.PredefinedUrbanCenterLayers[self.locale][predefinedUrbanCenterLayersUserFriendlyName]
+
+            
