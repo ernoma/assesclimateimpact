@@ -182,7 +182,7 @@ class YKRToolUploadLayer:
                 conn.commit()
             except Exception as e:
                 self.iface.messageBar().pushMessage(
-                    self.tr('Could not give access on table ' + outputSchemaName + '.' + outputTableName + self.tr(' to public.')),
+                    self.tr('Could not give access on table ') + outputSchemaName + '.' + outputTableName + self.tr(' to public.'),
                     str(e), Qgis.Warning, duration=0)
                 
         conn.close()
@@ -343,7 +343,7 @@ class YKRToolUploadLayer:
             conn.commit()
         except Exception as e:
             self.iface.messageBar().pushMessage(
-                self.tr('Could not give access on table ' + '"' + outputSchemaName + '"."' + outputTableName + '"' + self.tr(' to public.')),
+                self.tr('Could not give access on table ') + '"' + outputSchemaName + '"."' + outputTableName + '"' + self.tr(' to public.'),
                 str(e), Qgis.Warning, duration=0)
                 
         conn.close()
@@ -496,7 +496,7 @@ class YKRToolUploadLayer:
             conn.commit()
         except Exception as e:
             self.iface.messageBar().pushMessage(
-                self.tr('Could not give access on table ' + '"' + outputSchemaName + '"."' + outputTableName + '"' + self.tr(' to public.')),
+                self.tr('Could not give access on table ') + '"' + outputSchemaName + '"."' + outputTableName + '"' + self.tr(' to public.'),
                 str(e), Qgis.Warning, duration=0)
                 
         conn.close()
