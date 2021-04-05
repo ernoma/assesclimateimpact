@@ -59,12 +59,12 @@ class YKRToolDictionaries:
 
         self.PredefinedFutureZoningAreas = {
             "fi": {
-                'Kantakaupunki, yk049 - proposal': 'user_input.kt_bau_kaavaehdotus',
-                'Nurmi-Sorila, yk049 - draft': 'user_input.kt_nurmi_sorila'
+                'Kantakaupunki (yk049, valtuustokausi 2017-2021) - ehdotus': 'user_input.kt_bau_kaavaehdotus',
+                'Nurmi-Sorila (yk049, valtuustokausi 2017-2021) - luonnos': 'user_input.kt_nurmi_sorila'
             },
             "en": {
-                'Tampere downtown, yk049 - ehdotus': 'user_input.kt_bau_kaavaehdotus',
-                'Tampere Nurmi-Sorila, yk049 - luonnos': 'user_input.kt_nurmi_sorila'
+                'Tampere downtown (Local master plan, City Council’s term 2017-2021) - proposal': 'user_input.kt_bau_kaavaehdotus',
+                'Tampere Nurmi-Sorila (Local master plan, City Council’s term 2017-2021) - draft': 'user_input.kt_nurmi_sorila'
             }
         }
 

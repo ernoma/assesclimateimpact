@@ -921,7 +921,7 @@ class YKRTool:
                 layerNames.append(('CO2 / pop grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_grid.qml')))
 
         if self.mainDialog.checkBoxCalculateEmissionsPerJob.isChecked():
-            success = self.calculateEmissionsPerJob(outputSchemaName, outputTableName)
+            success = self.calculateEmissionsPerJob(uid, outputSchemaName, outputTableName)
             if success:
                 layerNames.append(('CO2 / job grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_job_grid.qml')))
 
@@ -1047,7 +1047,7 @@ class YKRTool:
         elif ykrPopTableName != None:
             ykrPopTableNameParts = ykrPopTableName.split('.')
 
-            query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN v_yht integer"
+            query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN v_yht integer DEFAULT 0"
             QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
 
@@ -1093,13 +1093,13 @@ class YKRTool:
         return True
 
 
-    def calculateEmissionsPerJob(self, outputSchemaName, outputTableName, retriesLeft=3):
+    def calculateEmissionsPerJob(self, uid, outputSchemaName, outputTableName, retriesLeft=3):
         md = self.mainDialog
         ykrJobTableName = self.ykrToolDictionaries.getYkrJobTableDatabaseTableName(md.comboBoxYkrJob.currentText())
         ykrJobTableNameParts = ykrJobTableName.split('.')
 
         queries = []
-        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN tp_yht integer"
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN tp_yht integer DEFAULT 0"
         QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET tp_yht = (SELECT tp_yht FROM \"" + ykrJobTableNameParts[0] + "\".\"" + ykrJobTableNameParts[1] + "\" AS ykr WHERE ykr.xyind = out_grid.xyind AND out_grid.mun = NULLIF(ykr.kunta, '')::int)"
@@ -1108,7 +1108,12 @@ class YKRTool:
         query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_yhteensa_tco2_per_tp real"
         QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
-        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_tp = (sum_yhteensa_tco2 / tp_yht)"
+
+        if self.calculateFuture:
+            # calculate change in workplaces for each square and update tp_yht accordingly
+            queries.extend(self.createCalculateFutureJobsQueries(uid, outputSchemaName, outputTableName))
+        
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_tp = (sum_yhteensa_tco2 / NULLIF(tp_yht, 0))"
         QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
@@ -1142,6 +1147,98 @@ class YKRTool:
         conn.commit()
 
         return True
+
+
+    def createCalculateFutureJobsQueries(self, uid, outputSchemaName, outputTableName):
+        '''calculate change in workplaces for each square and update tp_yht accordingly'''
+        # TODO should include municipality code in the future zoning areas and take into account in the future jobs calculation
+        # TODO take into note that there can be difference between the calculation year (now) and
+        #  - the YKR workplace data (old) and
+        #  - future zoning data (a zone starting earlier than the calculation year (now))
+
+        md = self.mainDialog
+
+        queries = []
+
+        futureZoningAreasSchemaTableName = self.ykrToolDictionaries.getPredefinedFutureZoningAreasDatabaseTableName(md.comboBoxPredefinedFutureAreas.currentText())
+        futureZoningAreasSchemaName, futureZoningAreasTableName = futureZoningAreasSchemaTableName.replace('"', '').split('.')
+
+        # Tee taulu työpaikkojen määrän laskemisen avuksi
+        query = """CREATE TABLE user_output.\"{}_job_temp\"(
+            id serial PRIMARY KEY,
+            geom geometry(MultiPolygon, 3067) NOT NULL,
+            xyind varchar NOT NULL,
+            mun int4 NOT NULL,
+            vuosi date NOT NULL,
+            tp_vali_muutos integer DEFAULT 0,
+            tp_vuosi_muutos real DEFAULT 0)
+            """.format(uid)
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        # query = "ALTER TABLE user_output.\"" + uid + "_job_temp\" ADD COLUMN tp_vali_muutos integer"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # queries.append(query)
+
+        years = range(self.sessionParams['baseYear'], self.targetYear + 1)
+
+        # Lisää kullekin vuodelle oma rivinsä
+        for year in years:
+            query = """INSERT INTO user_output.\"{}_job_temp\"(geom, xyind, mun, vuosi)
+                (SELECT geom, xyind, mun, to_date('{}-01-01', 'YYYY-MM-DD') FROM {})""".format(uid, year, "\"" + outputSchemaName.replace('"', '') + "\".\"" + outputTableName.replace('"', '') + "\"")
+            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+            # query = "ALTER TABLE user_output.\"" + uid + "_job_temp\" ADD COLUMN tp_vuosi_muutos_{} integer".format(year)
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            # queries.append(query)
+        
+        # Laske kullekin vuodelle tuleva työpaikkojen muutos
+        for year in years:
+            query = """UPDATE user_output.\"{}_job_temp\" AS output_bau 
+                SET tp_vuosi_muutos = (
+                    SELECT COALESCE(SUM((ST_Area(
+                        ST_Intersection(
+                            output_bau.geom, kt_bau.geom
+                        )
+                    ) / ST_Area(kt_bau.geom)) *
+		            ( 1.0 / (kt_bau.k_valmisv - kt_bau.k_aloitusv + 1)) *
+                    kt_bau.k_tp_yht), 0)
+                    FROM 
+                    {} AS kt_bau 
+                    WHERE
+                        kt_bau.k_tp_yht > 0 AND 
+                        date_part('year', output_bau.vuosi) >= kt_bau.k_aloitusv AND 
+                        date_part('year', output_bau.vuosi) <= kt_bau.k_valmisv AND 
+                        ST_Intersects(output_bau.geom, kt_bau.geom)
+                )""".format(uid, "\"" + futureZoningAreasSchemaName + "\".\"" + futureZoningAreasTableName + "\"")
+            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+                    
+        # summaa työpaikkamuutokset yhteen ja tallenna summa kullekin ruudulle omaan sarakkeeseensa kohdevuodelle
+        query = """UPDATE user_output.\"{}_job_temp\" AS output_bau SET tp_vali_muutos = (
+            SELECT SUM(tp_vuosi_muutos)
+            FROM user_output.\"{}_job_temp\" AS b
+            WHERE (date_part('year', output_bau.vuosi) = {})
+            AND output_bau.xyind = b.xyind
+            AND b.vuosi <= output_bau.vuosi
+            )""".format(uid, uid, self.targetYear)
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        ## päivitä työpaikat kohdevuodelle alkuhetken työpaikoista ja työpaikkojen muutossummasta
+        query = """UPDATE {} AS result_table SET tp_yht = (
+	        SELECT output_bau.tp_vali_muutos + COALESCE(result_table.tp_yht, 0)
+            FROM user_output.\"{}_job_temp\" AS output_bau
+            WHERE (date_part('year', output_bau.vuosi) = {} AND result_table.xyind = output_bau.xyind AND result_table.mun = output_bau.mun)
+            )""".format("\"" + outputSchemaName.replace('"', '') + "\".\"" + outputTableName.replace('"', '') + "\"", uid, self.targetYear)
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        # DROP temp TABLE
+        query = "DROP TABLE user_output.\"{}_job_temp\"".format(uid)
+        queries.append(query)
+
+        return queries
 
 
     def zeroCO2inNokianMyllySquare(self, outputSchemaName, outputTableName, retriesLeft=3):
