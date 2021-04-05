@@ -49,7 +49,7 @@ class YKRToolUploadLayer:
                 return self.copySourceLayerFeaturesToTargetTable(connParams, sourceLayer, targetTableName, checkBoxAllowOtherUsersToUseUploadedMapLayer, copyOnlySelectedFeatures, retriesLeft - 1)
             else:
                 self.iface.messageBar().pushMessage(
-                    'Virhe tietokantayhteyden muodostamisessa',
+                    self.tr('Error in connecting to the database'),
                     str(e), Qgis.Warning, duration=0)
                 return False
 
@@ -182,7 +182,7 @@ class YKRToolUploadLayer:
                 conn.commit()
             except Exception as e:
                 self.iface.messageBar().pushMessage(
-                    self.tr('Could not give access on table ' + outputSchemaName + '.' + outputTableName + ' to public.'),
+                    self.tr('Could not give access on table ' + outputSchemaName + '.' + outputTableName + self.tr(' to public.')),
                     str(e), Qgis.Warning, duration=0)
                 
         conn.close()

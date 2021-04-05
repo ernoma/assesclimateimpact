@@ -2,39 +2,114 @@
 
 
 class YKRToolDictionaries:
-    def __init__(self):
+    def __init__(self, iface, locale):
+
+        self.iface = iface
+        self.locale = locale
+
         self.PredefinedAreas = {
-            'Tampereen kaupunkiseutu': 'user_input.tre_seutu_kunnat',
-            'Tampereen kaupunkiseudun rakennesuunnitelma 2040': 'tests.rasu',
-            'Kangasala (2.4.2021)': 'user_input.tre_seutu_kunta_kangasala',
-            'Lempäälä (2.4.2021)': 'user_input.tre_seutu_kunta_lempaala',
-            'Nokia (2.4.2021)': 'user_input.tre_seutu_kunta_nokia',
-            'Orivesi (2.4.2021)': 'user_input.tre_seutu_kunta_orivesi',
-            'Pirkkala (2.4.2021)': 'user_input.tre_seutu_kunta_pirkkala',
-            'Tampere (2.4.2021)': 'user_input.tre_seutu_kunta_tampere',
-            'Vesilahti (2.4.2021)': 'user_input.tre_seutu_kunta_vesilahti',
-            'Ylöjärvi (2.4.2021)': 'user_input.tre_seutu_kunta_ylojarvi',
-            'Tampere (Tampereen yhdyskuntarakenteen ilmastovaikutukset -projekti)': 'aluejaot.kuntaraja_Tampere'
+            "fi": {
+                'Tampereen kaupunkiseutu': 'user_input.tre_seutu_kunnat',
+                'Tampereen kaupunkiseudun rakennesuunnitelma 2040': 'tests.rasu',
+                'Kangasala (2.4.2021)': 'user_input.tre_seutu_kunta_kangasala',
+                'Lempäälä (2.4.2021)': 'user_input.tre_seutu_kunta_lempaala',
+                'Nokia (2.4.2021)': 'user_input.tre_seutu_kunta_nokia',
+                'Orivesi (2.4.2021)': 'user_input.tre_seutu_kunta_orivesi',
+                'Pirkkala (2.4.2021)': 'user_input.tre_seutu_kunta_pirkkala',
+                'Tampere (2.4.2021)': 'user_input.tre_seutu_kunta_tampere',
+                'Vesilahti (2.4.2021)': 'user_input.tre_seutu_kunta_vesilahti',
+                'Ylöjärvi (2.4.2021)': 'user_input.tre_seutu_kunta_ylojarvi',
+                'Tampere (Tampereen yhdyskuntarakenteen ilmastovaikutukset -projekti)': 'aluejaot.kuntaraja_Tampere'
+            },
+            "en": {
+                'Tampere City Region': 'user_input.tre_seutu_kunnat',
+                'Tampere City Region Structural Plan 2040': 'tests.rasu',
+                'Kangasala (2.4.2021)': 'user_input.tre_seutu_kunta_kangasala',
+                'Lempäälä (2.4.2021)': 'user_input.tre_seutu_kunta_lempaala',
+                'Nokia (2.4.2021)': 'user_input.tre_seutu_kunta_nokia',
+                'Orivesi (2.4.2021)': 'user_input.tre_seutu_kunta_orivesi',
+                'Pirkkala (2.4.2021)': 'user_input.tre_seutu_kunta_pirkkala',
+                'Tampere (2.4.2021)': 'user_input.tre_seutu_kunta_tampere',
+                'Vesilahti (2.4.2021)': 'user_input.tre_seutu_kunta_vesilahti',
+                'Ylöjärvi (2.4.2021)': 'user_input.tre_seutu_kunta_ylojarvi',
+                'Tampere (Urban Structure Emissions Estimation City of Tampere Project)': 'aluejaot.kuntaraja_Tampere'
+            }
         }
 
         self.ykrPopTables = {
-            'Kaupunkiseudun väestö 1/2021': '-',
-            'YKR väestö Pirkanmaa 2019': 'user_input.ykr_vaesto_2019_pirkanmaa'
+            "fi": {
+                'Kaupunkiseudun väestö 1/2021': '-',
+                'SYKE YKR väestö Pirkanmaa 2019': 'user_input.ykr_vaesto_2019_pirkanmaa'
+            },
+            "en": {
+                'Tampere City Region Population 1/2021': '-',
+                'SYKE YKR Population Pirkanmaa 2019': 'user_input.ykr_vaesto_2019_pirkanmaa'
+            }
         }
 
         self.ykrJobTables = {
-            'YKR työpaikat Pirkanmaa 2017': 'user_input.YKR_tyopaikat_2017_Pirkanmaa'
+            "fi": {
+                'SYKE YKR työpaikat Pirkanmaa 2017': 'user_input.YKR_tyopaikat_2017_Pirkanmaa'
+            },
+            "en": {
+                'SYKE YKR workplaces Pirkanmaa 2017': 'user_input.YKR_tyopaikat_2017_Pirkanmaa'
+            }
         }
 
 
         self.PredefinedFutureZoningAreas = {
-            'Kantakaupunki, yk049 - ehdotus': 'user_input.kt_bau_kaavaehdotus',
-            'Nurmi-Sorila, yk049 - luonnos': 'user_input.kt_nurmi_sorila'
+            "fi": {
+                'Kantakaupunki, yk049 - proposal': 'user_input.kt_bau_kaavaehdotus',
+                'Nurmi-Sorila, yk049 - draft': 'user_input.kt_nurmi_sorila'
+            },
+            "en": {
+                'Tampere downtown, yk049 - ehdotus': 'user_input.kt_bau_kaavaehdotus',
+                'Tampere Nurmi-Sorila, yk049 - luonnos': 'user_input.kt_nurmi_sorila'
+            }
+        }
+
+        self.PITKOScenarios = {
+            "fi": {
+                "kasvu": "kasvu",
+                "wem": "wem",
+                "eu80": "eu80",
+                "muutos": "muutos",
+                "saasto": "saasto",
+                "pysahdys": "pysahdys",
+                "static": "static"
+            },
+            "en": {
+                "growth": "kasvu",
+                "wem": "wem", 
+                "eu80": "eu80", 
+                "change": "muutos", 
+                "saving": "saasto", 
+                "stagnation": "pysahdys", 
+                "static": "static"
+            }
+        }
+
+
+        self.electricityEmissionClasses = {
+            "fi": {
+                "hankinta": "hankinta",
+                "tuotanto": "tuotanto"
+            },
+            "en": {
+                "purchase": "hankinta",
+                "production": "tuotanto"
+            }
         }
 
         self.emissionAllocationMethod = {
-            'Hyödynjakomenetelmä': 'hjm',
-            'Energiamenetelmä': 'em'
+            "fi": {
+                'Hyödynjakomenetelmä': 'hjm',
+                'Energiamenetelmä': 'em'
+            },
+            "en": {
+                'Benefits division method': 'hjm',
+                'Energy method': 'em'
+            },
         }
 
         # self.electricityEmissionClass = {
@@ -43,17 +118,55 @@ class YKRToolDictionaries:
         # }
 
 
+    def getPITKOScenarioNames(self):
+        if self.locale not in self.PITKOScenarios:
+            return self.PITKOScenarios["en"].keys()
+        else:
+            return self.PITKOScenarios[self.locale].keys()
+
+
+    def getPITKOScenarioShortName(self, userFriendlyName):
+        if self.locale not in self.PITKOScenarios:
+            return self.PITKOScenarios["en"][userFriendlyName]
+        else:
+            return self.PITKOScenarios[self.locale][userFriendlyName]
+
+
+    def getElectricityTypeNames(self):
+        if self.locale not in self.electricityEmissionClasses:
+            return self.electricityEmissionClasses["en"].keys()
+        else:
+            return self.electricityEmissionClasses[self.locale].keys()
+
+    def getElectricityTypeShortName(self, userFriendlyName):
+        if self.locale not in self.electricityEmissionClasses:
+            return self.electricityEmissionClasses["en"][userFriendlyName]
+        else:
+            return self.electricityEmissionClasses[self.locale][userFriendlyName]
+
+
     def getPredefinedAreaNames(self):
-        return self.PredefinedAreas.keys()
+        if self.locale not in self.PredefinedAreas:
+            return self.PredefinedAreas["en"].keys()
+        else:
+            return self.PredefinedAreas[self.locale].keys()
 
 
     def getPredefinedAreaDatabaseTableName(self, PredefinedArea):
-        return self.PredefinedAreas[PredefinedArea]
+        if self.locale not in self.PredefinedAreas:
+            return self.PredefinedAreas["en"][PredefinedArea]
+        else:
+            return self.PredefinedAreas[self.locale][PredefinedArea]
+        
 
     
     def getPredefinedAreaNameFromDatabaseTableName(self, PredefinedAreaTableName):
-        key_list = list(self.PredefinedAreas.keys())
-        val_list = list(self.PredefinedAreas.values())
+        if self.locale not in self.PredefinedAreas:
+            key_list = list(self.PredefinedAreas["en"].keys())
+            val_list = list(self.PredefinedAreas["en"].values())
+        else:
+            key_list = list(self.PredefinedAreas[self.locale].keys())
+            val_list = list(self.PredefinedAreas[self.locale].values())
 
         try:
             position = val_list.index(PredefinedAreaTableName)
@@ -64,32 +177,56 @@ class YKRToolDictionaries:
 
 
     def getYkrPopUserFriendlyNames(self):
-        return self.ykrPopTables.keys()
+        if self.locale not in self.ykrPopTables:
+            return self.ykrPopTables["en"].keys()
+        else:
+            return self.ykrPopTables[self.locale].keys()
 
 
     def getYkrPopTableDatabaseTableName(self, ykrPopUserFriendlyName):
-        return self.ykrPopTables[ykrPopUserFriendlyName]
+        if self.locale not in self.ykrPopTables:
+            return self.ykrPopTables["en"][ykrPopUserFriendlyName]
+        else:
+            return self.ykrPopTables[self.locale][ykrPopUserFriendlyName]
 
 
     def getYkrJobUserFriendlyNames(self):
-        return self.ykrJobTables.keys()
+        if self.locale not in self.ykrJobTables:
+            return self.ykrJobTables["en"].keys()
+        else:
+            return self.ykrJobTables[self.locale].keys()
 
 
     def getYkrJobTableDatabaseTableName(self, ykrJobUserFriendlyName):
-        return self.ykrJobTables[ykrJobUserFriendlyName]
+        if self.locale not in self.ykrJobTables:
+            return self.ykrJobTables["en"][ykrJobUserFriendlyName]
+        else:
+            return self.ykrJobTables[self.locale][ykrJobUserFriendlyName]
 
     
     def getPredefinedFutureZoningAreasUserFriendlyNames(self):
-        return self.PredefinedFutureZoningAreas.keys()
+        if self.locale not in self.PredefinedFutureZoningAreas:
+            return self.PredefinedFutureZoningAreas["en"].keys()
+        else:
+            return self.PredefinedFutureZoningAreas[self.locale].keys()
 
 
     def getPredefinedFutureZoningAreasDatabaseTableName(self, predefinedFutureZoningAreasUserFriendlyName):
-        return self.PredefinedFutureZoningAreas[predefinedFutureZoningAreasUserFriendlyName]
+        if self.locale not in self.PredefinedFutureZoningAreas:
+            return self.PredefinedFutureZoningAreas["en"][predefinedFutureZoningAreasUserFriendlyName]
+        else:
+            return self.PredefinedFutureZoningAreas[self.locale][predefinedFutureZoningAreasUserFriendlyName]
 
 
     def getEmissionAllocationMethodNames(self):
-        return self.emissionAllocationMethod.keys()
+        if self.locale not in self.emissionAllocationMethod:
+            return self.emissionAllocationMethod["en"].keys()
+        else:
+            return self.emissionAllocationMethod[self.locale].keys()
 
 
     def getEmissionAllocationMethodShortName(self, emissionAllocationMethodUserFriendlyName):
-        return self.emissionAllocationMethod[emissionAllocationMethodUserFriendlyName]
+        if self.locale not in self.emissionAllocationMethod:
+            return self.emissionAllocationMethod["en"][emissionAllocationMethodUserFriendlyName]
+        else:
+            return self.emissionAllocationMethod[self.locale][emissionAllocationMethodUserFriendlyName]

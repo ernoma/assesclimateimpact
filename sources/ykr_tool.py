@@ -106,7 +106,7 @@ class YKRTool:
         self.futureNetworkLayer = None
         self.futureStopsLayer = None
 
-        self.ykrToolDictionaries = YKRToolDictionaries()
+        self.ykrToolDictionaries = YKRToolDictionaries(self.iface, locale)
         self.ykrToolUploadLayer = YKRToolUploadLayer(self.iface)
 
         self.investigatedAreaMapLayer = None
@@ -252,7 +252,7 @@ class YKRTool:
             if retriesLeft > 0:
                 return self.runProcess(retriesLeft - 1)
             else:
-                self.iface.messageBar().pushMessage('Virhe esikäsittelyssä',
+                self.iface.messageBar().pushMessage(self.tr('Error in preprocessing'),
                     str(e), Qgis.Critical, duration=0)
                 self.cleanUpSession()
                 return False
@@ -280,11 +280,15 @@ class YKRTool:
 
         names = self.ykrToolDictionaries.getPredefinedAreaNames()
         md.comboBoxPredefinedArea.addItems(names)
-        md.pitkoScenario.addItems(["static", "wem", "eu80", "kasvu", "muutos", "saasto",
-            "pysahdys"])
+
+        names = self.ykrToolDictionaries.getPITKOScenarioNames()
+        md.pitkoScenario.addItems(names)
+
         names = self.ykrToolDictionaries.getEmissionAllocationMethodNames()
         md.emissionsAllocation.addItems(names)
-        md.elecEmissionType.addItems(["hankinta", "tuotanto"])
+
+        names = self.ykrToolDictionaries.getElectricityTypeNames()
+        md.elecEmissionType.addItems(names)
 
         #md.checkBoxOnlySelectedFeats.setEnabled(False)
         md.futureBox.setEnabled(False)
@@ -403,7 +407,7 @@ class YKRTool:
         try:
             dbParams = self.parseConfigFile(filePath)
         except Exception as e:
-            self.iface.messageBar().pushMessage('Virhe luettaessa tiedostoa',\
+            self.iface.messageBar().pushMessage(self.tr('Error in reading a file'),\
                 str(e), Qgis.Warning, duration=10)
 
         self.setConnectionParamsFromInput(dbParams)
@@ -419,7 +423,7 @@ class YKRTool:
             'password': ''
         }
         if not os.path.exists(filePath):
-            self.iface.messageBar().pushMessage('Virhe', 'Tiedostoa ei voitu lukea',\
+            self.iface.messageBar().pushMessage(self.tr('Error'), self.tr('File could not be read'),\
                 Qgis.Warning)
             return dbParams
 
@@ -430,8 +434,7 @@ class YKRTool:
             for param in params:
                 dbParams[param[0]] = param[1]
         else:
-            self.iface.messageBar().pushMessage('Virhe', 'Tiedosto ei sisällä\
-                tietokannan yhteystietoja', Qgis.Warning)
+            self.iface.messageBar().pushMessage(self.tr('Error'), self.tr('File does not contain database connection parameters'), Qgis.Warning)
 
         return dbParams
 
@@ -555,8 +558,10 @@ class YKRTool:
         if md.radioButtonUseMapLayer.isChecked():
             self.predefinedAreaDBTableName = None
             self.investigatedAreaMapLayer = md.comboBoxMapLayer.currentLayer()
-            if self.investigatedAreaMapLayer == None or not self.investigatedAreaMapLayer.isValid():
-                raise Exception("Virhe ladattaessa tarkastelualueen karttatasoa tietokantaan")
+            if self.investigatedAreaMapLayer == None:
+                raise Exception(self.tr("Investigation area map layer has not been selected"))
+            elif not self.investigatedAreaMapLayer.isValid():
+                raise Exception(self.tr("Investigation area map layer is not valid"))
             dataProvider = self.investigatedAreaMapLayer.dataProvider()
             dataSourceUri = dataProvider.dataSourceUri()
             # QgsMessageLog.logMessage("dataSourceUri: {}".format(dataProvider.dataSourceUri()), 'YKRTool', Qgis.Info)
@@ -587,9 +592,9 @@ class YKRTool:
         md = self.mainDialog
 
         # self.onlySelectedFeats = md.checkBoxUploadOnlySelectedFeatures.isChecked()
-        self.pitkoScenario = md.pitkoScenario.currentText()
+        self.pitkoScenario = self.ykrToolDictionaries.getPITKOScenarioShortName(md.pitkoScenario.currentText())
         self.emissionsAllocation = self.ykrToolDictionaries.getEmissionAllocationMethodShortName(md.emissionsAllocation.currentText())
-        self.elecEmissionType = md.elecEmissionType.currentText()
+        self.elecEmissionType = self.ykrToolDictionaries.getElectricityTypeShortName(md.elecEmissionType.currentText())
 
         if not md.checkBoxCalculateFuture.isChecked():
             self.calculateFuture = False
@@ -657,13 +662,13 @@ class YKRTool:
     def checkFutureLayerValidity(self):
         '''Checks if future calculation input layers are valid'''
         if not self.futureAreasLayer.isValid():
-            raise Exception("Virhe ladattaessa tulevaisuuden aluevaraustietoja")
+            raise Exception(self.tr("Future zoning areas layer is not valid"))
         if self.futureNetworkLayer:
             if not self.futureNetworkLayer.isValid():
-                raise Exception("Virhe ladattaessa keskusverkkotietoja")
+                raise Exception(self.tr("Urban center layer is not valid"))
         if self.futureStopsLayer:
             if not self.futureStopsLayer.isValid():
-                raise Exception("Virhe ladattaessa joukkoliikennepysäkkitietoja")
+                raise Exception(self.tr("Public transit stops layer is not valid"))
 
 
     # def uploadSingleMapLayer(self, layer):
@@ -701,12 +706,12 @@ class YKRTool:
     #         layer.name(), Qgis.Info, duration=3)
 
 
-    def uploadSingleMapLayerFinished(self, context, successful, results):
-        if not successful:
-            self.iface.messageBar().pushMessage('Virhe',
-            'Virhe ladattaessa tasoa tietokantaan', Qgis.Warning, duration=0)
-        else:
-            self.finishReadingProcessingInput()
+    # def uploadSingleMapLayerFinished(self, context, successful, results):
+    #     if not successful:
+    #         self.iface.messageBar().pushMessage('Virhe',
+    #         'Virhe ladattaessa tasoa tietokantaan', Qgis.Warning, duration=0)
+    #     else:
+    #         self.finishReadingProcessingInput()
 
     
     def uploadInputLayers(self):
@@ -750,13 +755,13 @@ class YKRTool:
         task = QgsProcessingAlgRunnerTask(alg, params, context, feedback)
         task.executed.connect(partial(self.uploadFinished, context))
         QgsApplication.taskManager().addTask(task)
-        self.iface.messageBar().pushMessage('Ladataan tasoa tietokantaan',
+        self.iface.messageBar().pushMessage(self.tr('Loading layer to the database'),
             layer.name(), Qgis.Info, duration=3)
 
     def uploadFinished(self, context, successful, results):
         if not successful:
-            self.iface.messageBar().pushMessage('Virhe',
-            'Virhe ladattaessa tasoa tietokantaan', Qgis.Warning, duration=0)
+            self.iface.messageBar().pushMessage(self.tr('Error'),
+            self.tr('Error in loading layer to the database'), Qgis.Warning, duration=0)
         self.uploadNextLayer()
 
     def uploadNextLayer(self):
@@ -775,10 +780,10 @@ class YKRTool:
             queryTask.taskCompleted.connect(self.postCalculation)
             queryTask.taskTerminated.connect(self.postError)
             QgsApplication.taskManager().addTask(queryTask)
-            self.iface.messageBar().pushMessage('Lasketaan',
-                'Laskenta käynnissä', Qgis.Info, duration=15)
+            self.iface.messageBar().pushMessage(self.tr('Emission calculation'),
+                self.tr('Calculating emissions'), Qgis.Info, duration=15)
         except Exception as e:
-            self.iface.messageBar().pushMessage('Virhe laskennassa', str(e), Qgis.Critical, duration=0)
+            self.iface.messageBar().pushMessage(self.tr('Error in calculation'), str(e), Qgis.Critical, duration=0)
             self.cleanUpSession()
             return False
 
@@ -843,20 +848,20 @@ class YKRTool:
         '''Called after QueryTask finishes. Writes session info to sessions table and closes session'''
         try:
             self.writeSessionInfo()
-            self.iface.messageBar().pushMessage('Valmis', 'Laskentasessio ' +\
-                str(self.sessionParams['uuid']) + ' on valmis', Qgis.Success, duration=0)
+            self.iface.messageBar().pushMessage(self.tr('Ready'), self.tr('Emission calculation ') +\
+                str(self.sessionParams['uuid']) + self.tr(' is ready'), Qgis.Success, duration=0)
         except Exception as e:
-            self.iface.messageBar().pushMessage('Virhe kirjoittaessa session tietoja:',\
+            self.iface.messageBar().pushMessage(self.tr('Error in storing session data: '),\
                 str(e), Qgis.Warning, duration=0)
             self.conn.rollback()
         try:
             self.addResultAsLayers()
         except Exception as e:
-            self.iface.messageBar().pushMessage('Virhe lisättäessä tulostasoa:', str(e), Qgis.Warning, duration=0)
+            self.iface.messageBar().pushMessage(self.tr('Error in adding emissions results to the QGIS: '), str(e), Qgis.Warning, duration=0)
         try:
             self.cleanUpSession()
         except Exception as e:
-            self.iface.messageBar().pushMessage('Virhe session sulkemisessa:', str(e), Qgis.Warning, duration=0)
+            self.iface.messageBar().pushMessage(self.tr('Error in cleaning up: '), str(e), Qgis.Warning, duration=0)
 
 
     def writeSessionInfo(self):
@@ -956,7 +961,7 @@ class YKRTool:
                 return self.calculateEmissionsPerFloorSpaceSquares(outputSchemaName, outputTableName, retriesLeft - 1)
             else:
                 self.iface.messageBar().pushMessage(
-                    'Virhe tietokantayhteyden muodostamisessa',
+                    self.tr('Error in connecting to the database'),
                     str(e), Qgis.Warning, duration=0)
                 return False
 
@@ -967,7 +972,7 @@ class YKRTool:
                 conn.commit()
         except Exception as e:
             self.iface.messageBar().pushMessage(
-                'Virhe taulun kohdetta muokatessa "{}"'.format(query),
+                self.tr('Error in modifying the results table ') + "{}".format(query),
                 str(e), Qgis.Warning, duration=0)
             conn.rollback()
             conn.close()
@@ -1004,7 +1009,7 @@ class YKRTool:
                 return self.calculateEmissionsPerPersonJob(outputSchemaName, outputTableName, retriesLeft - 1)
             else:
                 self.iface.messageBar().pushMessage(
-                    'Virhe tietokantayhteyden muodostamisessa',
+                    self.tr('Error in connecting to the database'),
                     str(e), Qgis.Warning, duration=0)
                 return False
 
@@ -1015,7 +1020,7 @@ class YKRTool:
                 conn.commit()
         except Exception as e:
             self.iface.messageBar().pushMessage(
-                'Virhe taulun kohdetta muokatessa "{}"'.format(query),
+                self.tr('Error in modifying the results table ') + "{}".format(query),
                 str(e), Qgis.Warning, duration=0)
             conn.rollback()
             conn.close()
@@ -1067,7 +1072,7 @@ class YKRTool:
                 return self.calculateEmissionsPerPerson(outputSchemaName, outputTableName, retriesLeft - 1)
             else:
                 self.iface.messageBar().pushMessage(
-                    'Virhe tietokantayhteyden muodostamisessa',
+                    self.tr('Error in connecting to the database'),
                     str(e), Qgis.Warning, duration=0)
                 return False
 
@@ -1078,7 +1083,7 @@ class YKRTool:
                 conn.commit()
         except Exception as e:
             self.iface.messageBar().pushMessage(
-                'Virhe taulun kohdetta muokatessa "{}"'.format(query),
+                self.tr('Error in modifying the results table ') + "{}".format(query),
                 str(e), Qgis.Warning, duration=0)
             conn.rollback()
             conn.close()
@@ -1116,7 +1121,7 @@ class YKRTool:
                 return self.calculateEmissionsPerJob(outputSchemaName, outputTableName, retriesLeft - 1)
             else:
                 self.iface.messageBar().pushMessage(
-                    'Virhe tietokantayhteyden muodostamisessa',
+                    self.tr('Error in connecting to the database'),
                     str(e), Qgis.Warning, duration=0)
                 return False
 
@@ -1127,7 +1132,7 @@ class YKRTool:
                 conn.commit()
         except Exception as e:
             self.iface.messageBar().pushMessage(
-                'Virhe taulun kohdetta muokatessa "{}"'.format(query),
+                self.tr('Error in modifying the results table ') + "{}".format(query),
                 str(e), Qgis.Warning, duration=0)
             conn.rollback()
             conn.close()
@@ -1158,7 +1163,7 @@ class YKRTool:
                 return self.zeroCO2inNokianMyllySquare(outputSchemaName, outputTableName, retriesLeft - 1)
             else:
                 self.iface.messageBar().pushMessage(
-                    'Virhe tietokantayhteyden muodostamisessa',
+                    self.tr('Error in connecting to the database'),
                     str(e), Qgis.Warning, duration=0)
                 return False
 
@@ -1168,7 +1173,7 @@ class YKRTool:
                 cur.execute(query)
         except Exception as e:
             self.iface.messageBar().pushMessage(
-                'Virhe taulun kohdetta muokatessa "{}"'.format(query),
+                self.tr('Error in modifying the results table ') + "{}".format(query),
                 str(e), Qgis.Warning, duration=0)
             conn.rollback()
             conn.close()
@@ -1193,7 +1198,7 @@ class YKRTool:
                 return self.updateYearToResultTable(outputSchemaName, outputTableName, retriesLeft - 1)
             else:
                 self.iface.messageBar().pushMessage(
-                    'Virhe tietokantayhteyden muodostamisessa',
+                    self.tr('Error in connecting to the database'),
                     str(e), Qgis.Warning, duration=0)
                 return False
 
@@ -1202,7 +1207,7 @@ class YKRTool:
             cur.execute(query)
         except Exception as e:
             self.iface.messageBar().pushMessage(
-                'Virhe taulun kohdetta muokatessa "{}"'.format(query),
+                self.tr('Error in modifying the results table ') + "{}".format(query),
                 str(e), Qgis.Warning, duration=0)
             conn.rollback()
             conn.close()
@@ -1223,7 +1228,7 @@ class YKRTool:
                 self.conn.commit()
             except Exception as e:
                 self.iface.messageBar().pushMessage(
-                    'Virhe poistettaessa taulua {}'.format(table),
+                     self.tr('Error in removing temporary table ') + '{}'.format(table),
                     str(e), Qgis.Warning, duration=0)
                 self.conn.rollback()
 
@@ -1234,5 +1239,5 @@ class YKRTool:
         '''Called after querytask is terminated. Closes session'''
         self.cur.execute('DROP TABLE IF EXISTS user_input."ykr_{}"'.format(self.sessionParams['uuid']))
         self.cleanUpSession()
-        self.iface.messageBar().pushMessage('Virhe laskentafunktiota suorittaessa',\
-            'Katso lisätiedot virhelokista', Qgis.Critical, duration=0)
+        self.iface.messageBar().pushMessage(self.tr('Error in performing calculation'),\
+            self.tr('See further info in the error log'), Qgis.Critical, duration=0)

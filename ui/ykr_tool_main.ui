@@ -91,7 +91,7 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>Aseta hallinnollinen alue. Oletus: Pirkanmaa</string>
+             <string>Choose the predefined area. Default: Tampere City Region</string>
             </property>
            </widget>
           </item>
@@ -168,7 +168,7 @@
         <bool>false</bool>
        </property>
        <property name="title">
-        <string>Tulevaisuustiedot</string>
+        <string>User Input Data for the Future Estimation</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
@@ -177,7 +177,7 @@
            <bool>false</bool>
           </property>
           <property name="title">
-           <string>Pakolliset</string>
+           <string>Required</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_6">
            <item>
@@ -185,14 +185,14 @@
              <item row="0" column="0">
               <widget class="QLabel" name="futureAreasLabel">
                <property name="text">
-                <string>Aluevaraustiedot:</string>
+                <string>Future Zoning data:</string>
                </property>
               </widget>
              </item>
              <item row="1" column="0">
               <widget class="QLabel" name="targetYearLabel">
                <property name="text">
-                <string>Tavoitevuosi:</string>
+                <string>Target year:</string>
                </property>
               </widget>
              </item>
@@ -253,7 +253,7 @@
            <bool>false</bool>
           </property>
           <property name="title">
-           <string>Vaihtoehtoiset</string>
+           <string>Optional</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_7">
            <item>
@@ -261,14 +261,14 @@
              <item row="0" column="0">
               <widget class="QLabel" name="futureNetworkLabel">
                <property name="text">
-                <string>Keskusverkkotiedot:</string>
+                <string>Urban centre data:</string>
                </property>
               </widget>
              </item>
              <item row="1" column="0">
               <widget class="QLabel" name="futureStopsLabel">
                <property name="text">
-                <string>Joukkoliikennepysäkit:</string>
+                <string>Public transit stops data:</string>
                </property>
               </widget>
              </item>
@@ -368,7 +368,7 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>Valitse PITKO-skenaario. Oletus: wem</string>
+             <string>Choose PITKO scenario. Default: growth</string>
             </property>
            </widget>
           </item>
@@ -388,7 +388,7 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>Valitse päästöjen allokointimenetelmä. Oletus: hjm</string>
+             <string>Choose emissions allocation method. Default: Benefits division method</string>
             </property>
            </widget>
           </item>
@@ -408,7 +408,7 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>Valitse sähköpäästölaji, Oletus: hankinta</string>
+             <string>Choose electricity emission class. Default: purchase</string>
             </property>
            </widget>
           </item>

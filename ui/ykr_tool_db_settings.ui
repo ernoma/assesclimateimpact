@@ -161,7 +161,7 @@
                </size>
               </property>
               <property name="filter">
-               <string>ini-tiedosto (*.ini)</string>
+               <string>ini-file (*.ini)</string>
               </property>
              </widget>
             </item>
