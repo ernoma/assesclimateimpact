@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Urban Infrastructure CHG Emission Estimation Tool for Tampere City Region</string>
   </property>
+  <property name="locale">
+   <locale language="English" country="UnitedStates"/>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout_8">
    <item>
     <layout class="QVBoxLayout" name="mainLayout">
@@ -26,6 +29,9 @@
        </property>
        <property name="toolTip">
         <string/>
+       </property>
+       <property name="locale">
+        <locale language="English" country="UnitedStates"/>
        </property>
        <property name="title">
         <string>Investigated Area</string>
@@ -150,6 +156,9 @@
        </property>
        <property name="toolTip">
         <string>Laske tulevaisuusskenaario</string>
+       </property>
+       <property name="locale">
+        <locale language="English" country="UnitedStates"/>
        </property>
        <property name="text">
         <string>Estimate Future Emissions</string>

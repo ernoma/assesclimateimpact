@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Urban Infrastructure CHG Emission Estimation Tool for Tampere City Region</string>
   </property>
+  <property name="locale">
+   <locale language="English" country="UnitedStates"/>
+  </property>
   <widget class="QDialogButtonBox" name="button_box">
    <property name="geometry">
     <rect>
