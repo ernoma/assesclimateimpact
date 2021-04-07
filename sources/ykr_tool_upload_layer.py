@@ -90,9 +90,11 @@ class YKRToolUploadLayer:
         query = "CREATE TABLE " + targetTableName + "(" + \
             "id serial PRIMARY KEY, "
     
-        if int(str(sourceLayer.wkbType())[:1]) == 3: # polygon
+        # QgsMessageLog.logMessage("quesourceLayer.wkbType()[:1]ry: " + str(sourceLayer.wkbType()), 'YKRTool', Qgis.Info)
+
+        if sourceLayer.wkbType() == 3 or sourceLayer.wkbType() == 1003: # polygon or polygonz
             query += "geom geometry(PolygonZ, 3067)"        
-        elif int(str(sourceLayer.wkbType())[:1]) == 6: # MultiPolygon
+        elif sourceLayer.wkbType() == 6 or sourceLayer.wkbType() == 1006: # MultiPolygon or MultiPolygonZ
             query += "geom geometry(MultiPolygonZ, 3067)"
         else:
             raise Exception(self.tr("Unsupported geometry type"))

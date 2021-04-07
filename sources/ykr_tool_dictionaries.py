@@ -10,7 +10,7 @@ class YKRToolDictionaries:
         self.PredefinedAreas = {
             "fi": {
                 'Tampereen kaupunkiseutu': 'user_input.tre_seutu_kunnat',
-                'Tampereen kaupunkiseudun rakennesuunnitelma 2040': 'tests.rasu',
+                'Tampereen kaupunkiseudun rakennesuunnitelma 2040': 'user_input.seutu_rasu_2040_alue',
                 'Kangasala (2.4.2021)': 'user_input.tre_seutu_kunta_kangasala',
                 'Lempäälä (2.4.2021)': 'user_input.tre_seutu_kunta_lempaala',
                 'Nokia (2.4.2021)': 'user_input.tre_seutu_kunta_nokia',
@@ -18,12 +18,11 @@ class YKRToolDictionaries:
                 'Pirkkala (2.4.2021)': 'user_input.tre_seutu_kunta_pirkkala',
                 'Tampere (2.4.2021)': 'user_input.tre_seutu_kunta_tampere',
                 'Vesilahti (2.4.2021)': 'user_input.tre_seutu_kunta_vesilahti',
-                'Ylöjärvi (2.4.2021)': 'user_input.tre_seutu_kunta_ylojarvi',
-                'Tampere (Tampereen yhdyskuntarakenteen ilmastovaikutukset -projekti)': 'aluejaot.kuntaraja_Tampere'
+                'Ylöjärvi (2.4.2021)': 'user_input.tre_seutu_kunta_ylojarvi'
             },
             "en": {
                 'Tampere City Region': 'user_input.tre_seutu_kunnat',
-                'Tampere City Region Structural Plan 2040': 'tests.rasu',
+                'Tampere City Region Structural Plan 2040': 'user_input.seutu_rasu_2040_alue',
                 'Kangasala (2.4.2021)': 'user_input.tre_seutu_kunta_kangasala',
                 'Lempäälä (2.4.2021)': 'user_input.tre_seutu_kunta_lempaala',
                 'Nokia (2.4.2021)': 'user_input.tre_seutu_kunta_nokia',
@@ -31,8 +30,7 @@ class YKRToolDictionaries:
                 'Pirkkala (2.4.2021)': 'user_input.tre_seutu_kunta_pirkkala',
                 'Tampere (2.4.2021)': 'user_input.tre_seutu_kunta_tampere',
                 'Vesilahti (2.4.2021)': 'user_input.tre_seutu_kunta_vesilahti',
-                'Ylöjärvi (2.4.2021)': 'user_input.tre_seutu_kunta_ylojarvi',
-                'Tampere (Urban Structure Emissions Estimation City of Tampere Project)': 'aluejaot.kuntaraja_Tampere'
+                'Ylöjärvi (2.4.2021)': 'user_input.tre_seutu_kunta_ylojarvi'
             }
         }
 
