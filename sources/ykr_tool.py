@@ -947,6 +947,7 @@ class YKRTool:
 
         layers, layerNames = [], []
         layerNames.append(('CO2 sources {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_sources.qml')))
+        layerNames.extend(self.createUrbanDevelopmentVisualizations(uid, outputSchemaName, outputTableName))
         layerNames.extend(self.calculateRelativeEmissions(uid, outputSchemaName, outputTableName))
         layerNames.append(('CO2 grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_t_grid.qml')))
 
@@ -1013,6 +1014,20 @@ class YKRTool:
 
         return True
 
+    def createUrbanDevelopmentVisualizations(self, uid, outputSchemaName, outputTableName):
+        layerNames = []
+        
+        if self.mainDialog.checkBoxVisualizePopJobMix.isChecked():
+            success = self.calculatePopJobMix(outputSchemaName, outputTableName)
+            if success:
+                layerNames.append(('pop / job mix {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_mix_grid.qml')))
+
+
+        if self.mainDialog.checkBoxVisualizeGoodZonesForPopJobDensityAndSustainableTransport.isChecked():
+            layerNames.append(('pop / good UZ zones {}'.format(uid), os.path.join(self.plugin_dir, 'docs/good_uz_zones_grid.qml')))
+        
+        return layerNames
+
 
     def calculateRelativeEmissions(self, uid, outputSchemaName, outputTableName):
         layerNames = []
@@ -1020,11 +1035,6 @@ class YKRTool:
             success = self.calculateEmissionsPerPerson(outputSchemaName, outputTableName)
             if success:
                 layerNames.append(('CO2 / pop grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_grid.qml')))
-
-        if self.mainDialog.checkBoxVisualizePopJobMix.isChecked():
-            success = self.calculatePopJobMix(outputSchemaName, outputTableName)
-            if success:
-                layerNames.append(('pop / job mix {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_mix_grid.qml')))
 
         if self.mainDialog.checkBoxCalculateEmissionsPerJob.isChecked():
             success = self.calculateEmissionsPerJob(uid, outputSchemaName, outputTableName)

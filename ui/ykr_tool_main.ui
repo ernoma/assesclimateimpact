@@ -536,7 +536,17 @@
           <item row="9" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizePopJobMix">
             <property name="text">
-             <string>Visualize mix of population and jobs</string>
+             <string>Visualize Mix of Population and Jobs</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="0">
+           <widget class="QCheckBox" name="checkBoxVisualizeGoodZonesForPopJobDensityAndSustainableTransport">
+            <property name="text">
+             <string>Visualize Good Zones for Population+Job Density and for Sustainable Transport</string>
             </property>
             <property name="checked">
              <bool>true</bool>
