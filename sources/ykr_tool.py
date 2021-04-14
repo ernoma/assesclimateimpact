@@ -948,11 +948,30 @@ class YKRTool:
         self.addPopulationToResultsTableIfNeeded(outputSchemaName, outputTableName)
         self.addJobsToResultsTable(uid, outputSchemaName, outputTableName)
 
-        layers, layerNames = [], []
-        layerNames.append(('CO2 sources {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_sources.qml')))
+
+        #QgsProject.instance().layerTreeRegistryBridge().setLayerInsertionPoint( QgsProject.instance().layerTreeRoot(), 0 )
+        groupName = "emissions calculation results {}".format(uid)
+        #root = QgsProject.instance().layerTreeRoot()
+        #rootGroup = root.insertGroup(0, groupName)
+
+        rootGroup = self.iface.layerTreeView().currentGroupNode()
+        if rootGroup != None:
+            rootGroup = rootGroup.addGroup(groupName) # ret QgsLayerTreeGroup 
+        else:
+            root = QgsProject.instance().layerTreeRoot()
+            rootGroup = root.insertGroup(0, groupName)
+
+        # order = QgsProject.instance().layerTreeRoot().customLayerOrder()
+        # order.insert( 0, order.pop( order.index( vlayer.id() ) ) ) # vlayer to the top
+        # bridge.setCustomLayerOrder( order )
+
+        layerNames = []
+        layerNames.append(('CO2 sources grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_sources.qml')))
         layerNames.extend(self.createUrbanDevelopmentVisualizations(uid, outputSchemaName, outputTableName))
         layerNames.extend(self.calculateRelativeEmissions(uid, outputSchemaName, outputTableName))
-        layerNames.append(('CO2 grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_t_grid.qml')))
+        layerNames.append(('CO2 total grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_t_grid.qml')))
+
+        self.visualizeTrafficEmissions(rootGroup, uid, outputSchemaName, outputTableName)
 
         uri = QgsDataSourceUri()
         uri.setConnection(self.connParams['host'], self.connParams['port'],\
@@ -965,8 +984,8 @@ class YKRTool:
             renderer = layer.renderer()
             if renderer.type() == 'graduatedSymbol':
                 renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
-            layers.append(layer)
-        QgsProject.instance().addMapLayers(layers)
+            QgsProject.instance().addMapLayer(layer, False)
+            rootGroup.addLayer(layer)
 
 
     def addPopulationToResultsTableIfNeeded(self, outputSchemaName, outputTableName, retriesLeft=3):
@@ -1072,22 +1091,70 @@ class YKRTool:
             if success:
                 ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(self.mainDialog.comboBoxYkrPop.currentText())
                 if ykrPopTableName == '-':
-                    layerNames.append(('pop job mix {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_mix_grid.qml')))
+                    layerNames.append(('pop job mix grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_mix_grid.qml')))
                 else:
-                    layerNames.append(('v_yht job mix {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_mix_grid.qml')))
+                    layerNames.append(('v_yht job mix grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_mix_grid.qml')))
 
         if self.mainDialog.checkBoxVisualizeGoodZonesForPopJobDensityAndSustainableTransport.isChecked():
-            layerNames.append(('pop / good UZ zones {}'.format(uid), os.path.join(self.plugin_dir, 'docs/good_uz_zones_grid.qml')))
+            layerNames.append(('good UZ zones for population, jobs and sustainable transport grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/good_uz_zones_grid.qml')))
         
+        return layerNames
+
+    
+    def visualizeTrafficEmissions(self, rootGroup, uid, outputSchemaName, outputTableName):
+        layerNames = []
+    
+        if self.mainDialog.checkBoxVisualizeTrafficEmissions.isChecked():
+            layerNames.append(('CO2 traffic sources grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_traffic_sources_grid.qml')))
+            layerNames.append(('CO2 traffic total grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_traffic_grid.qml')))
+            layerNames.append(('CO2 commuter and other population traffic grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_personal_traffic_grid.qml')))
+            layerNames.append(('CO2 industry and warehouses traffic grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_iwhs_traffic_grid.qml')))
+            layerNames.append(('CO2 amenities traffic grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_amenities_traffic_grid.qml')))
+
+            layerNames.extend(self.calculateRelativeTrafficEmissions(uid, outputSchemaName, outputTableName))
+
+
+        groupName = "traffic emissions"
+        group = rootGroup.addGroup(groupName)
+
+        uri = QgsDataSourceUri()
+        uri.setConnection(self.connParams['host'], self.connParams['port'],\
+            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+        uri.setDataSource(outputSchemaName, outputTableName, 'geom')
+
+        for name in layerNames:
+            layer = QgsVectorLayer(uri.uri(False), name[0], 'postgres')
+            layer.loadNamedStyle(name[1])
+            renderer = layer.renderer()
+            if renderer.type() == 'graduatedSymbol':
+                renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
+            QgsProject.instance().addMapLayer(layer, False)
+            group.addLayer(layer)
+
+
+    def calculateRelativeTrafficEmissions(self, uid, outputSchemaName, outputTableName):
+        layerNames = []
+        ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(self.mainDialog.comboBoxYkrPop.currentText())
+        success = self.calculateTrafficEmissionsPerPerson(outputSchemaName, outputTableName)
+        if success:
+            if ykrPopTableName == '-':
+                layerNames.append(('CO2 traffic emissions / pop grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_traffic_pop_grid.qml')))
+            else:
+                layerNames.append(('CO2 traffic emissions / v_yht grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_traffic_pop_grid.qml')))
+
         return layerNames
 
 
     def calculateRelativeEmissions(self, uid, outputSchemaName, outputTableName):
         layerNames = []
+        ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(self.mainDialog.comboBoxYkrPop.currentText())
         if self.mainDialog.checkBoxCalculateEmissionsPerPerson.isChecked():
             success = self.calculateEmissionsPerPerson(outputSchemaName, outputTableName)
             if success:
-                layerNames.append(('CO2 / pop grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_grid.qml')))
+                if ykrPopTableName == '-':
+                    layerNames.append(('CO2 / pop grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_grid.qml')))
+                else:
+                    layerNames.append(('CO2 / v_yht grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_grid.qml')))
 
         if self.mainDialog.checkBoxCalculateEmissionsPerJob.isChecked():
             success = self.calculateEmissionsPerJob(uid, outputSchemaName, outputTableName)
@@ -1097,7 +1164,6 @@ class YKRTool:
         if self.mainDialog.checkBoxCalculateEmissionsPerPerson.isChecked() and self.mainDialog.checkBoxCalculateEmissionsPerJob.isChecked():
             success = self.calculateEmissionsPerPersonJob(outputSchemaName, outputTableName)
             if success:
-                ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(self.mainDialog.comboBoxYkrPop.currentText())
                 if ykrPopTableName == '-':
                     layerNames.append(('CO2 / (pop + job) grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_grid.qml')))
                 else:
@@ -1110,6 +1176,54 @@ class YKRTool:
 
         return layerNames
 
+
+    def calculateTrafficEmissionsPerPerson(self, outputSchemaName, outputTableName, retriesLeft=3):
+        md = self.mainDialog
+        queries = []
+        ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
+
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_liikenne_tco2_per_sum_yhteensa_tco2 real"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        if ykrPopTableName == '-':
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_liikenne_tco2_per_sum_yhteensa_tco2 = (sum_yhteensa_tco2 / NULLIF(pop, 0))"
+            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+
+        elif ykrPopTableName != None:
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_liikenne_tco2_per_sum_yhteensa_tco2 = (sum_yhteensa_tco2 / v_yht)"
+            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+
+        conn = None
+
+        try:
+            conn = createDbConnection(self.connParams)
+        except Exception as e:
+            if retriesLeft > 0:
+                return self.calculateTrafficEmissionsPerPerson(outputSchemaName, outputTableName, retriesLeft - 1)
+            else:
+                self.iface.messageBar().pushMessage(
+                    self.tr('Error in connecting to the database'),
+                    str(e), Qgis.Warning, duration=0)
+                return False
+
+        try:
+            cur = conn.cursor()
+            for query in queries:
+                cur.execute(query)
+                conn.commit()
+        except Exception as e:
+            self.iface.messageBar().pushMessage(
+                self.tr('Error in modifying the results table ') + "{}".format(query),
+                str(e), Qgis.Warning, duration=0)
+            conn.rollback()
+            conn.close()
+
+            return False
+
+        return True
 
     def calculatePopJobMix(self, outputSchemaName, outputTableName, retriesLeft=3):
         md = self.mainDialog

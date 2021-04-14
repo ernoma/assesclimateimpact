@@ -431,16 +431,6 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
-           <widget class="QCheckBox" name="checkBoxCalculateEmissionsPerPerson">
-            <property name="text">
-             <string>Calculate Emissions Per Capita</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
           <item row="5" column="0">
            <layout class="QFormLayout" name="formLayout_6">
             <item row="0" column="0">
@@ -482,16 +472,6 @@
             </item>
            </layout>
           </item>
-          <item row="6" column="0">
-           <widget class="QCheckBox" name="checkBoxCalculateEmissionsPerJob">
-            <property name="text">
-             <string>Calculate Emissions Per Worker</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
           <item row="7" column="0">
            <widget class="QLabel" name="label_2">
             <property name="text">
@@ -523,17 +503,17 @@
             </item>
            </layout>
           </item>
-          <item row="8" column="0">
+          <item row="10" column="0">
            <widget class="QCheckBox" name="checkBoxCalculateEmissionsPerFloorSpaceSquares">
             <property name="text">
-             <string>Calculate Emissions Per Floor Squares (m2)</string>
+             <string>Visualize Emissions Per Floor Squares (m2)</string>
             </property>
             <property name="checked">
              <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="9" column="0">
+          <item row="11" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizePopJobMix">
             <property name="text">
              <string>Visualize Mix of Population and Jobs</string>
@@ -543,10 +523,60 @@
             </property>
            </widget>
           </item>
-          <item row="10" column="0">
+          <item row="12" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeGoodZonesForPopJobDensityAndSustainableTransport">
             <property name="text">
              <string>Visualize Good Zones for Population+Job Density and for Sustainable Transport</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="13" column="0">
+           <widget class="QCheckBox" name="checkBoxVisualizeTrafficEmissions">
+            <property name="text">
+             <string>Visualize Traffic Emissions</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="14" column="0">
+           <widget class="QCheckBox" name="checkBoxVisualizeThermoEmissions">
+            <property name="text">
+             <string>Visualize Thermo Emissions</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="15" column="0">
+           <widget class="QCheckBox" name="checkBoxVisualizeElectricityConsumptionEmissions">
+            <property name="text">
+             <string>Visualize Electricity Consumption Emissions</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0">
+           <widget class="QCheckBox" name="checkBoxCalculateEmissionsPerPerson">
+            <property name="text">
+             <string>Visualize Emissions Per Capita</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="0">
+           <widget class="QCheckBox" name="checkBoxCalculateEmissionsPerJob">
+            <property name="text">
+             <string>Visualize Emissions Per Worker</string>
             </property>
             <property name="checked">
              <bool>true</bool>
