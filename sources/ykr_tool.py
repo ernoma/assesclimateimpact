@@ -40,6 +40,7 @@ import uuid
 import os.path
 import psycopg2
 import datetime, getpass
+import traceback
 from configparser import ConfigParser
 from .ykr_tool_dictionaries import YKRToolDictionaries
 from .ykr_tool_tasks import QueryTask
@@ -908,6 +909,7 @@ class YKRTool:
             self.addResultAsLayers()
         except Exception as e:
             self.iface.messageBar().pushMessage(self.tr('Error in adding emissions results to the QGIS: '), str(e), Qgis.Warning, duration=0)
+            QgsMessageLog.logMessage(traceback.format_exc(), 'YKRTool', Qgis.Warning)
         try:
             self.cleanUpSession()
         except Exception as e:
@@ -1095,7 +1097,11 @@ class YKRTool:
         if self.mainDialog.checkBoxCalculateEmissionsPerPerson.isChecked() and self.mainDialog.checkBoxCalculateEmissionsPerJob.isChecked():
             success = self.calculateEmissionsPerPersonJob(outputSchemaName, outputTableName)
             if success:
-                layerNames.append(('CO2 / (pop + job) grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_grid.qml')))
+                ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(self.mainDialog.comboBoxYkrPop.currentText())
+                if ykrPopTableName == '-':
+                    layerNames.append(('CO2 / (pop + job) grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_grid.qml')))
+                else:
+                    layerNames.append(('CO2 / (v_yht + job) grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_grid.qml')))
 
         if self.mainDialog.checkBoxCalculateEmissionsPerFloorSpaceSquares.isChecked():
             success = self.calculateEmissionsPerFloorSpaceSquares(outputSchemaName, outputTableName)
@@ -1115,11 +1121,11 @@ class YKRTool:
 
         ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
         if ykrPopTableName == '-':
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET pop_per_popjob_percentage = (pop::real / NULLIF(pop + tp_yht, 0) * 100)"
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET pop_per_popjob_percentage = (COALESCE(pop, 0)::real / NULLIF(COALESCE(pop, 0) + COALESCE(tp_yht, 0), 0) * 100)"
             QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
         else:
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET pop_per_popjob_percentage = (v_yht::real / NULLIF(v_yht + tp_yht, 0) * 100)"
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET pop_per_popjob_percentage = (COALESCE(v_yht, 0)::real / NULLIF(COALESCE(v_yht, 0) + COALESCE(tp_yht, 0), 0) * 100)"
             QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
 
@@ -1207,11 +1213,11 @@ class YKRTool:
 
         ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
         if ykrPopTableName == '-':
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_as_tp = (sum_yhteensa_tco2 / NULLIF(pop + tp_yht, 0))"
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_as_tp = (sum_yhteensa_tco2 / NULLIF(COALESCE(pop, 0) + COALESCE(tp_yht, 0), 0))"
             QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
         else:
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_as_tp = (sum_yhteensa_tco2 / NULLIF(v_yht + tp_yht, 0))"
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_as_tp = (sum_yhteensa_tco2 / NULLIF(COALESCE(v_yht, 0) + COALESCE(tp_yht, 0), 0))"
             QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
         
