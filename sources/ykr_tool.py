@@ -943,6 +943,7 @@ class YKRTool:
         if self.calculateFuture:
             self.updateYearToResultTable(outputSchemaName, outputTableName)
 
+        self.addPopulationToResultsTableIfNeeded(outputSchemaName, outputTableName)
         self.addJobsToResultsTable(uid, outputSchemaName, outputTableName)
 
         layers, layerNames = [], []
@@ -966,7 +967,54 @@ class YKRTool:
         QgsProject.instance().addMapLayers(layers)
 
 
-    def addJobsToResultsTable(self, uid, outputSchemaName, outputTableName):
+    def addPopulationToResultsTableIfNeeded(self, outputSchemaName, outputTableName, retriesLeft=3):
+        md = self.mainDialog
+        ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
+
+        queries = []
+
+        if ykrPopTableName != None and ykrPopTableName != '-':
+            ykrPopTableNameParts = ykrPopTableName.split('.')
+
+            query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN v_yht integer DEFAULT 0"
+            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET v_yht = (SELECT v_yht FROM \"" + ykrPopTableNameParts[0] + "\".\"" + ykrPopTableNameParts[1] + "\" AS ykr WHERE ykr.xyind = out_grid.xyind AND out_grid.mun = NULLIF(ykr.kunta, '')::int)"
+            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+
+        conn = None
+
+        try:
+            conn = createDbConnection(self.connParams)
+        except Exception as e:
+            if retriesLeft > 0:
+                return self.addPopulationToResultsTableIfNeeded(outputSchemaName, outputTableName, retriesLeft - 1)
+            else:
+                self.iface.messageBar().pushMessage(
+                    self.tr('Error in connecting to the database'),
+                    str(e), Qgis.Warning, duration=0)
+                return False
+
+        try:
+            cur = conn.cursor()
+            for query in queries:
+                cur.execute(query)
+                conn.commit()
+        except Exception as e:
+            self.iface.messageBar().pushMessage(
+                self.tr('Error in modifying the results table ') + "{}".format(query),
+                str(e), Qgis.Warning, duration=0)
+            conn.rollback()
+            conn.close()
+
+            return False
+
+        return True
+
+
+    def addJobsToResultsTable(self, uid, outputSchemaName, outputTableName, retriesLeft=3):
         md = self.mainDialog
         ykrJobTableName = self.ykrToolDictionaries.getYkrJobTableDatabaseTableName(md.comboBoxYkrJob.currentText())
         ykrJobTableNameParts = ykrJobTableName.split('.')
@@ -989,7 +1037,7 @@ class YKRTool:
             conn = createDbConnection(self.connParams)
         except Exception as e:
             if retriesLeft > 0:
-                return self.calculateEmissionsPerJob(outputSchemaName, outputTableName, retriesLeft - 1)
+                return self.addJobsToResultsTable(outputSchemaName, outputTableName, retriesLeft - 1)
             else:
                 self.iface.messageBar().pushMessage(
                     self.tr('Error in connecting to the database'),
@@ -1020,8 +1068,11 @@ class YKRTool:
         if self.mainDialog.checkBoxVisualizePopJobMix.isChecked():
             success = self.calculatePopJobMix(outputSchemaName, outputTableName)
             if success:
-                layerNames.append(('pop / job mix {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_mix_grid.qml')))
-
+                ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(self.mainDialog.comboBoxYkrPop.currentText())
+                if ykrPopTableName == '-':
+                    layerNames.append(('pop job mix {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_mix_grid.qml')))
+                else:
+                    layerNames.append(('v_yht job mix {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_mix_grid.qml')))
 
         if self.mainDialog.checkBoxVisualizeGoodZonesForPopJobDensityAndSustainableTransport.isChecked():
             layerNames.append(('pop / good UZ zones {}'.format(uid), os.path.join(self.plugin_dir, 'docs/good_uz_zones_grid.qml')))
@@ -1062,9 +1113,16 @@ class YKRTool:
         QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
-        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET pop_per_popjob_percentage = (pop::real / NULLIF(pop + tp_yht, 0) * 100)"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-        queries.append(query)
+        ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
+        if ykrPopTableName == '-':
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET pop_per_popjob_percentage = (pop::real / NULLIF(pop + tp_yht, 0) * 100)"
+            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+        else:
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET pop_per_popjob_percentage = (v_yht::real / NULLIF(v_yht + tp_yht, 0) * 100)"
+            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+
 
         conn = None
 
@@ -1099,7 +1157,6 @@ class YKRTool:
 
     def calculateEmissionsPerFloorSpaceSquares(self, outputSchemaName, outputTableName, retriesLeft=3):
         md = self.mainDialog
-
         queries = []
 
         query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_yhteensa_tco2_per_kem real"
@@ -1141,13 +1198,13 @@ class YKRTool:
 
 
     def calculateEmissionsPerPersonJob(self, outputSchemaName, outputTableName, retriesLeft=3):
+        md = self.mainDialog
         queries = []
 
         query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_yhteensa_tco2_per_as_tp real"
         QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
-        md = self.mainDialog
         ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
         if ykrPopTableName == '-':
             query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_as_tp = (sum_yhteensa_tco2 / NULLIF(pop + tp_yht, 0))"
@@ -1189,34 +1246,19 @@ class YKRTool:
 
     def calculateEmissionsPerPerson(self, outputSchemaName, outputTableName, retriesLeft=3):
         md = self.mainDialog
+        queries = []
         ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
 
-        queries = []
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_yhteensa_tco2_per_asukas real"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
 
         if ykrPopTableName == '-':
-            query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_yhteensa_tco2_per_asukas real"
-            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
-
             query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_asukas = (sum_yhteensa_tco2 / NULLIF(pop, 0))"
             QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
 
         elif ykrPopTableName != None:
-            ykrPopTableNameParts = ykrPopTableName.split('.')
-
-            query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN v_yht integer DEFAULT 0"
-            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
-
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET v_yht = (SELECT v_yht FROM \"" + ykrPopTableNameParts[0] + "\".\"" + ykrPopTableNameParts[1] + "\" AS ykr WHERE ykr.xyind = out_grid.xyind AND out_grid.mun = NULLIF(ykr.kunta, '')::int)"
-            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
-
-            query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_yhteensa_tco2_per_asukas real"
-            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
-
             query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_asukas = (sum_yhteensa_tco2 / v_yht)"
             QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
@@ -1253,10 +1295,10 @@ class YKRTool:
 
     def calculateEmissionsPerJob(self, uid, outputSchemaName, outputTableName, retriesLeft=3):
         md = self.mainDialog
+        queries = []
         ykrJobTableName = self.ykrToolDictionaries.getYkrJobTableDatabaseTableName(md.comboBoxYkrJob.currentText())
         ykrJobTableNameParts = ykrJobTableName.split('.')
 
-        queries = []
         query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_yhteensa_tco2_per_tp real"
         QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
