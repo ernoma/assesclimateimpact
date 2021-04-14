@@ -972,11 +972,16 @@ class YKRTool:
         layerNames.append((self.tr('CO2 total grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_t_grid.qml')))
 
         self.visualizeTrafficEmissions(rootGroup, uid, outputSchemaName, outputTableName)
+        self.visualizeThermoEmissions(rootGroup, uid, outputSchemaName, outputTableName)
 
         uri = QgsDataSourceUri()
         uri.setConnection(self.connParams['host'], self.connParams['port'],\
             self.connParams['database'], self.connParams['user'], self.connParams['password'])
         uri.setDataSource(outputSchemaName, outputTableName, 'geom')
+
+
+        groupName = self.tr("general")
+        group = rootGroup.addGroup(groupName)
 
         for name in layerNames:
             layer = QgsVectorLayer(uri.uri(False), name[0], 'postgres')
@@ -985,7 +990,7 @@ class YKRTool:
             if renderer.type() == 'graduatedSymbol':
                 renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
             QgsProject.instance().addMapLayer(layer, False)
-            rootGroup.addLayer(layer)
+            group.addLayer(layer)
 
 
     def addPopulationToResultsTableIfNeeded(self, outputSchemaName, outputTableName, retriesLeft=3):
@@ -1100,7 +1105,49 @@ class YKRTool:
         
         return layerNames
 
+    def visualizeThermoEmissions(self, rootGroup, uid, outputSchemaName, outputTableName):
+        layerNames = []
     
+        if self.mainDialog.checkBoxVisualizeThermoEmissions.isChecked():
+            layerNames.append((self.tr('CO2 buildings thermo sources grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/thermo/CO2_buildings_thermo_sources_grid.qml')))
+            layerNames.append((self.tr('CO2 buildings thermo total grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/thermo/CO2_buildings_thermo_grid.qml')))
+            layerNames.append((self.tr('CO2 buildings water heating grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/thermo/CO2_buildings_water_heating_grid.qml')))
+            layerNames.append((self.tr('CO2 buildings heating grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/thermo/CO2_buildings_heating_grid.qml')))
+            layerNames.append((self.tr('CO2 buildings cooling grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/thermo/CO2_buildings_cooling_grid.qml')))
+
+            layerNames.extend(self.calculateRelativeThermoEmissions(uid, outputSchemaName, outputTableName))
+
+            groupName = self.tr("buildings thermo emissions")
+            group = rootGroup.addGroup(groupName)
+
+            uri = QgsDataSourceUri()
+            uri.setConnection(self.connParams['host'], self.connParams['port'],\
+                self.connParams['database'], self.connParams['user'], self.connParams['password'])
+            uri.setDataSource(outputSchemaName, outputTableName, 'geom')
+
+            for name in layerNames:
+                layer = QgsVectorLayer(uri.uri(False), name[0], 'postgres')
+                layer.loadNamedStyle(name[1])
+                renderer = layer.renderer()
+                if renderer.type() == 'graduatedSymbol':
+                    renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
+                QgsProject.instance().addMapLayer(layer, False)
+                group.addLayer(layer)
+
+
+    def calculateRelativeThermoEmissions(self, uid, outputSchemaName, outputTableName):
+        layerNames = []
+        ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(self.mainDialog.comboBoxYkrPop.currentText())
+        success = self.calculateThermoEmissionsPerPerson(outputSchemaName, outputTableName)
+        if success:
+            if ykrPopTableName == '-':
+                layerNames.append((self.tr('CO2 buildings thermo emissions / pop grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/thermo/CO2_buildings_thermo_pop_grid.qml')))
+            else:
+                layerNames.append((self.tr('CO2 buildings thermo emissions / v_yht grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/thermo/CO2_buildings_thermo_pop_grid.qml')))
+
+        return layerNames
+
+
     def visualizeTrafficEmissions(self, rootGroup, uid, outputSchemaName, outputTableName):
         layerNames = []
     
@@ -1114,22 +1161,22 @@ class YKRTool:
             layerNames.extend(self.calculateRelativeTrafficEmissions(uid, outputSchemaName, outputTableName))
 
 
-        groupName = self.tr("traffic emissions")
-        group = rootGroup.addGroup(groupName)
+            groupName = self.tr("traffic emissions")
+            group = rootGroup.addGroup(groupName)
 
-        uri = QgsDataSourceUri()
-        uri.setConnection(self.connParams['host'], self.connParams['port'],\
-            self.connParams['database'], self.connParams['user'], self.connParams['password'])
-        uri.setDataSource(outputSchemaName, outputTableName, 'geom')
+            uri = QgsDataSourceUri()
+            uri.setConnection(self.connParams['host'], self.connParams['port'],\
+                self.connParams['database'], self.connParams['user'], self.connParams['password'])
+            uri.setDataSource(outputSchemaName, outputTableName, 'geom')
 
-        for name in layerNames:
-            layer = QgsVectorLayer(uri.uri(False), name[0], 'postgres')
-            layer.loadNamedStyle(name[1])
-            renderer = layer.renderer()
-            if renderer.type() == 'graduatedSymbol':
-                renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
-            QgsProject.instance().addMapLayer(layer, False)
-            group.addLayer(layer)
+            for name in layerNames:
+                layer = QgsVectorLayer(uri.uri(False), name[0], 'postgres')
+                layer.loadNamedStyle(name[1])
+                renderer = layer.renderer()
+                if renderer.type() == 'graduatedSymbol':
+                    renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
+                QgsProject.instance().addMapLayer(layer, False)
+                group.addLayer(layer)
 
 
     def calculateRelativeTrafficEmissions(self, uid, outputSchemaName, outputTableName):
@@ -1175,6 +1222,55 @@ class YKRTool:
                 layerNames.append((self.tr('CO2 / floor space squares grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_floor_space_squares_grid.qml')))
 
         return layerNames
+
+
+    def calculateThermoEmissionsPerPerson(self, outputSchemaName, outputTableName, retriesLeft=3):
+        md = self.mainDialog
+        queries = []
+        ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
+
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_lammonsaato_tco2_per_sum_yhteensa_tco2 real"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        if ykrPopTableName == '-':
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_lammonsaato_tco2_per_sum_yhteensa_tco2 = (sum_lammonsaato_tco2 / NULLIF(pop, 0))"
+            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+
+        elif ykrPopTableName != None:
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_lammonsaato_tco2_per_sum_yhteensa_tco2 = (sum_lammonsaato_tco2 / v_yht)"
+            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+
+        conn = None
+
+        try:
+            conn = createDbConnection(self.connParams)
+        except Exception as e:
+            if retriesLeft > 0:
+                return self.calculateThermoEmissionsPerPerson(outputSchemaName, outputTableName, retriesLeft - 1)
+            else:
+                self.iface.messageBar().pushMessage(
+                    self.tr('Error in connecting to the database'),
+                    str(e), Qgis.Warning, duration=0)
+                return False
+
+        try:
+            cur = conn.cursor()
+            for query in queries:
+                cur.execute(query)
+                conn.commit()
+        except Exception as e:
+            self.iface.messageBar().pushMessage(
+                self.tr('Error in modifying the results table ') + "{}".format(query),
+                str(e), Qgis.Warning, duration=0)
+            conn.rollback()
+            conn.close()
+
+            return False
+
+        return True
 
 
     def calculateTrafficEmissionsPerPerson(self, outputSchemaName, outputTableName, retriesLeft=3):

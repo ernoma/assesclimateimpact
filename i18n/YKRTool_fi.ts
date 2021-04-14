@@ -255,8 +255,8 @@
     </message>
     <message>
         <location filename="../ui/ykr_tool_main.ui" line="549"/>
-        <source>Visualize Thermo Emissions</source>
-        <translation>Visualisoi lämmönsäädön päästöt</translation>
+        <source>Visualize Buildings Thermo Emissions</source>
+        <translation>Visualisoi rakennusten lämmönsäädön päästöt</translation>
     </message>
     <message>
         <location filename="../ui/ykr_tool_main.ui" line="569"/>
@@ -405,17 +405,17 @@
         <translation>Virhe laskentaajon puhdistuksessa: </translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1608"/>
+        <location filename="../sources/ykr_tool.py" line="1704"/>
         <source>Error in connecting to the database</source>
         <translation>Virhe tietokantaan yhdistämisessä</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1617"/>
+        <location filename="../sources/ykr_tool.py" line="1713"/>
         <source>Error in modifying the results table </source>
         <translation>Virhe päästötulostaulun muokkauksessa </translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1638"/>
+        <location filename="../sources/ykr_tool.py" line="1734"/>
         <source>Error in removing temporary table </source>
         <translation>Tilapäisen taulun poistamisessa tapahtui virhe </translation>
     </message>
@@ -425,12 +425,12 @@
         <translation>Virhe laskennassa</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1650"/>
+        <location filename="../sources/ykr_tool.py" line="1746"/>
         <source>Error in performing calculation</source>
         <translation>Virhe päästöjen laskennassa</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1650"/>
+        <location filename="../sources/ykr_tool.py" line="1746"/>
         <source>See further info in the error log</source>
         <translation>Katso lisätietoja virhelokista</translation>
     </message>
@@ -470,89 +470,134 @@
         <translation>Kokonaispäästöt ruuduittain tCO2-ekv</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1095"/>
+        <location filename="../sources/ykr_tool.py" line="1100"/>
         <source>pop job mix grid</source>
         <translation>Väestön ja työpaikkojen sekoittuneisuus ruuduittain (pop-kenttä)</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1097"/>
+        <location filename="../sources/ykr_tool.py" line="1102"/>
         <source>v_yht job mix grid</source>
         <translation>Väestön ja työpaikkojen sekoittuneisuus ruuduittain (v_yht-kenttä)</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1100"/>
+        <location filename="../sources/ykr_tool.py" line="1105"/>
         <source>good UZ zones for population, jobs and sustainable transport grid</source>
         <translation>Edulliset YKR-vyöhykkeet asukas- ja työpaikkatiheyden sekä kestävien liikkumismahdollisuuksien näkökulmasta</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1109"/>
+        <location filename="../sources/ykr_tool.py" line="1156"/>
         <source>CO2 traffic sources grid</source>
         <translation>Suurin liikenteen päästöluokka ruuduittain</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1110"/>
+        <location filename="../sources/ykr_tool.py" line="1157"/>
         <source>CO2 traffic total grid</source>
         <translation>Liikenteen kokonaispäästöt ruuduittain tCO2-ekv</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1111"/>
+        <location filename="../sources/ykr_tool.py" line="1158"/>
         <source>CO2 commuter and other population traffic grid</source>
         <translation>Henkilöliikenteen päästöt ruuduittain tCO2-ekv</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1112"/>
+        <location filename="../sources/ykr_tool.py" line="1159"/>
         <source>CO2 industry and warehouses traffic grid</source>
         <translation>Teollisuus- ja varastorakennusten päästöt ruuduittain tCO2-ekv</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1113"/>
+        <location filename="../sources/ykr_tool.py" line="1160"/>
         <source>CO2 amenities traffic grid</source>
         <translation>Palvelurakennusten päästöt ruuduittain tCO2-ekv</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1118"/>
+        <location filename="../sources/ykr_tool.py" line="1165"/>
         <source>traffic emissions</source>
         <translation>Liikenteen päästöt</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1142"/>
+        <location filename="../sources/ykr_tool.py" line="1189"/>
         <source>CO2 traffic emissions / pop grid</source>
         <translation>Liikenteen päästöt per asukas ruuduittain (tCO2-ekv / as., pop-kenttä)</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1144"/>
+        <location filename="../sources/ykr_tool.py" line="1191"/>
         <source>CO2 traffic emissions / v_yht grid</source>
         <translation>Liikenteen päästöt per asukas ruuduittain (tCO2-ekv / as., v_yht-kenttä)</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1156"/>
+        <location filename="../sources/ykr_tool.py" line="1203"/>
         <source>CO2 / pop grid</source>
         <translation>Kokonaispäästöt per asukas ruuduittain (tCO2-ekv / as., pop-kenttä)</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1158"/>
+        <location filename="../sources/ykr_tool.py" line="1205"/>
         <source>CO2 / v_yht grid</source>
         <translation>Kokonaispäästöt per asukas ruuduittain (tCO2-ekv / as., v_yht-kenttä)</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1163"/>
+        <location filename="../sources/ykr_tool.py" line="1210"/>
         <source>CO2 / job grid</source>
         <translation>Kokonaispäästöt per työpaikat ruuduittain (tCO2-ekv / tp_yht)</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1169"/>
+        <location filename="../sources/ykr_tool.py" line="1216"/>
         <source>CO2 / (pop + job) grid</source>
         <translation>Kokonaispäästöt per (asukkaiden lkm + työpaikkojen lkm) ruuduittain (tCO2-ekv / (pop + tp_yht))</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1171"/>
+        <location filename="../sources/ykr_tool.py" line="1218"/>
         <source>CO2 / (v_yht + job) grid</source>
         <translation>Kokonaispäästöt per (asukkaiden lkm + työpaikkojen lkm) ruuduittain (tCO2-ekv / (v_yht + tp_yht))</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1176"/>
+        <location filename="../sources/ykr_tool.py" line="1223"/>
         <source>CO2 / floor space squares grid</source>
         <translation>Kokonaispäästöt per kerrosneliöt ruuduittain (tCO2-ekv / floorspace)</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool.py" line="984"/>
+        <source>general</source>
+        <translation>Yleistä</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool.py" line="1114"/>
+        <source>CO2 buildings thermo total grid</source>
+        <translation>Rakennusten lämmönsäädön kokonaispäästöt ruuduittain tCO2-ekv</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool.py" line="1115"/>
+        <source>CO2 buildings water heating grid</source>
+        <translation>Rakennusten käyttöveden lämmityksen päästöt ruuduittain tCO2-ekv</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool.py" line="1116"/>
+        <source>CO2 buildings heating grid</source>
+        <translation>Rakennusten  lämmityksen päästöt ruuduittain tCO2-ekv</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool.py" line="1117"/>
+        <source>CO2 buildings cooling grid</source>
+        <translation>Rakennusten jäähdytyksen päästöt ruuduittain tCO2-ekv</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool.py" line="1121"/>
+        <source>buildings thermo emissions</source>
+        <translation>Rakennusten lämmönsäädön päästöt</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool.py" line="1145"/>
+        <source>CO2 buildings thermo emissions / pop grid</source>
+        <translation>Lämmönsäädön päästöt per asukas ruuduittain (tCO2-ekv / as., pop-kenttä)</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool.py" line="1147"/>
+        <source>CO2 buildings thermo emissions / v_yht grid</source>
+        <translation>Lämmönsäädön päästöt per asukas ruuduittain (tCO2-ekv / as., v_yht-kenttä)</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool.py" line="1113"/>
+        <source>CO2 buildings thermo sources grid</source>
+        <translation>Suurin lämmönsäädön päästöluokka ruuduittain</translation>
     </message>
 </context>
 <context>

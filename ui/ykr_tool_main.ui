@@ -546,7 +546,7 @@
           <item row="14" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeThermoEmissions">
             <property name="text">
-             <string>Visualize Thermo Emissions</string>
+             <string>Visualize Buildings Thermo Emissions</string>
             </property>
             <property name="checked">
              <bool>true</bool>
