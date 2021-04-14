@@ -1755,6 +1755,51 @@ class YKRTool:
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET sum_yhteensa_tco2 = 0 WHERE xyind = '3141256822125'"
         QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET sum_lammonsaato_tco2 = 0 WHERE xyind = '3141256822125'"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET sum_liikenne_tco2 = 0 WHERE xyind = '3141256822125'"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET sum_sahko_tco2 = 0 WHERE xyind = '3141256822125'"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET sum_rakentaminen_tco2 = 0 WHERE xyind = '3141256822125'"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET tilat_vesi_tco2 = 0 WHERE xyind = '3141256822125'"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET tilat_lammitys_tco2 = 0 WHERE xyind = '3141256822125'"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET tilat_jaahdytys_tco2 = 0 WHERE xyind = '3141256822125'"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET sahko_kiinteistot_tco2 = 0 WHERE xyind = '3141256822125'"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET sahko_kotitaloudet_tco2 = 0 WHERE xyind = '3141256822125'"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET sahko_palv_tco2 = 0 WHERE xyind = '3141256822125'"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET sahko_tv_tco2 = 0 WHERE xyind = '3141256822125'"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET liikenne_hlo_tco2 = 0 WHERE xyind = '3141256822125'"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET liikenne_tv_tco2 = 0 WHERE xyind = '3141256822125'"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET liikenne_palv_tco2 = 0 WHERE xyind = '3141256822125'"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET rak_korjaussaneeraus_tco2 = 0 WHERE xyind = '3141256822125'"
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
 
         conn = None
 
