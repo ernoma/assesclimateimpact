@@ -950,7 +950,7 @@ class YKRTool:
 
 
         #QgsProject.instance().layerTreeRegistryBridge().setLayerInsertionPoint( QgsProject.instance().layerTreeRoot(), 0 )
-        groupName = "emissions calculation results {}".format(uid)
+        groupName = self.tr("emissions calculation results") + " {}".format(uid)
         #root = QgsProject.instance().layerTreeRoot()
         #rootGroup = root.insertGroup(0, groupName)
 
@@ -966,10 +966,10 @@ class YKRTool:
         # bridge.setCustomLayerOrder( order )
 
         layerNames = []
-        layerNames.append(('CO2 sources grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_sources.qml')))
+        layerNames.append((self.tr('CO2 sources grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_sources.qml')))
         layerNames.extend(self.createUrbanDevelopmentVisualizations(uid, outputSchemaName, outputTableName))
         layerNames.extend(self.calculateRelativeEmissions(uid, outputSchemaName, outputTableName))
-        layerNames.append(('CO2 total grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_t_grid.qml')))
+        layerNames.append((self.tr('CO2 total grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_t_grid.qml')))
 
         self.visualizeTrafficEmissions(rootGroup, uid, outputSchemaName, outputTableName)
 
@@ -1091,12 +1091,12 @@ class YKRTool:
             if success:
                 ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(self.mainDialog.comboBoxYkrPop.currentText())
                 if ykrPopTableName == '-':
-                    layerNames.append(('pop job mix grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_mix_grid.qml')))
+                    layerNames.append((self.tr('pop job mix grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_mix_grid.qml')))
                 else:
-                    layerNames.append(('v_yht job mix grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_mix_grid.qml')))
+                    layerNames.append((self.tr('v_yht job mix grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_mix_grid.qml')))
 
         if self.mainDialog.checkBoxVisualizeGoodZonesForPopJobDensityAndSustainableTransport.isChecked():
-            layerNames.append(('good UZ zones for population, jobs and sustainable transport grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/good_uz_zones_grid.qml')))
+            layerNames.append((self.tr('good UZ zones for population, jobs and sustainable transport grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/good_uz_zones_grid.qml')))
         
         return layerNames
 
@@ -1105,16 +1105,16 @@ class YKRTool:
         layerNames = []
     
         if self.mainDialog.checkBoxVisualizeTrafficEmissions.isChecked():
-            layerNames.append(('CO2 traffic sources grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_traffic_sources_grid.qml')))
-            layerNames.append(('CO2 traffic total grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_traffic_grid.qml')))
-            layerNames.append(('CO2 commuter and other population traffic grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_personal_traffic_grid.qml')))
-            layerNames.append(('CO2 industry and warehouses traffic grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_iwhs_traffic_grid.qml')))
-            layerNames.append(('CO2 amenities traffic grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_amenities_traffic_grid.qml')))
+            layerNames.append((self.tr('CO2 traffic sources grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_traffic_sources_grid.qml')))
+            layerNames.append((self.tr('CO2 traffic total grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_traffic_grid.qml')))
+            layerNames.append((self.tr('CO2 commuter and other population traffic grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_personal_traffic_grid.qml')))
+            layerNames.append((self.tr('CO2 industry and warehouses traffic grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_iwhs_traffic_grid.qml')))
+            layerNames.append((self.tr('CO2 amenities traffic grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_amenities_traffic_grid.qml')))
 
             layerNames.extend(self.calculateRelativeTrafficEmissions(uid, outputSchemaName, outputTableName))
 
 
-        groupName = "traffic emissions"
+        groupName = self.tr("traffic emissions")
         group = rootGroup.addGroup(groupName)
 
         uri = QgsDataSourceUri()
@@ -1138,9 +1138,9 @@ class YKRTool:
         success = self.calculateTrafficEmissionsPerPerson(outputSchemaName, outputTableName)
         if success:
             if ykrPopTableName == '-':
-                layerNames.append(('CO2 traffic emissions / pop grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_traffic_pop_grid.qml')))
+                layerNames.append((self.tr('CO2 traffic emissions / pop grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_traffic_pop_grid.qml')))
             else:
-                layerNames.append(('CO2 traffic emissions / v_yht grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_traffic_pop_grid.qml')))
+                layerNames.append((self.tr('CO2 traffic emissions / v_yht grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_traffic_pop_grid.qml')))
 
         return layerNames
 
@@ -1152,27 +1152,27 @@ class YKRTool:
             success = self.calculateEmissionsPerPerson(outputSchemaName, outputTableName)
             if success:
                 if ykrPopTableName == '-':
-                    layerNames.append(('CO2 / pop grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_grid.qml')))
+                    layerNames.append((self.tr('CO2 / pop grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_grid.qml')))
                 else:
-                    layerNames.append(('CO2 / v_yht grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_grid.qml')))
+                    layerNames.append((self.tr('CO2 / v_yht grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_grid.qml')))
 
         if self.mainDialog.checkBoxCalculateEmissionsPerJob.isChecked():
             success = self.calculateEmissionsPerJob(uid, outputSchemaName, outputTableName)
             if success:
-                layerNames.append(('CO2 / job grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_job_grid.qml')))
+                layerNames.append((self.tr('CO2 / job grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_job_grid.qml')))
 
         if self.mainDialog.checkBoxCalculateEmissionsPerPerson.isChecked() and self.mainDialog.checkBoxCalculateEmissionsPerJob.isChecked():
             success = self.calculateEmissionsPerPersonJob(outputSchemaName, outputTableName)
             if success:
                 if ykrPopTableName == '-':
-                    layerNames.append(('CO2 / (pop + job) grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_grid.qml')))
+                    layerNames.append((self.tr('CO2 / (pop + job) grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_grid.qml')))
                 else:
-                    layerNames.append(('CO2 / (v_yht + job) grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_grid.qml')))
+                    layerNames.append((self.tr('CO2 / (v_yht + job) grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_grid.qml')))
 
         if self.mainDialog.checkBoxCalculateEmissionsPerFloorSpaceSquares.isChecked():
             success = self.calculateEmissionsPerFloorSpaceSquares(outputSchemaName, outputTableName)
             if success:
-                layerNames.append(('CO2 / floor space squares grid {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_floor_space_squares_grid.qml')))
+                layerNames.append((self.tr('CO2 / floor space squares grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_floor_space_squares_grid.qml')))
 
         return layerNames
 
