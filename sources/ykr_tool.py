@@ -1104,6 +1104,9 @@ class YKRTool:
         if self.mainDialog.checkBoxVisualizeGoodZonesForPopJobDensityAndSustainableTransport.isChecked():
             layerNames.append((self.tr('good UZ zones for population, jobs and sustainable transport grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/good_uz_zones_grid.qml')))
         
+        if self.mainDialog.checkBoxVisualizeFloorSpaceRatio.isChecked():
+            layerNames.append((self.tr('Buildings floor space / YKR square area >= 0.2') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/floor_space_ratio.qml')))
+
         return layerNames
 
 
