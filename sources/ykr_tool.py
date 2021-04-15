@@ -28,7 +28,8 @@ from PyQt5.QtWidgets import QAction
 
 from qgis.core import (Qgis, QgsVectorLayer, QgsCoordinateReferenceSystem,
     QgsApplication, QgsDataSourceUri, QgsProject, QgsTaskManager,
-    QgsProcessingAlgRunnerTask, QgsProcessingContext, QgsProcessingFeedback, QgsMessageLog)
+    QgsProcessingAlgRunnerTask, QgsProcessingContext, QgsProcessingFeedback, QgsMessageLog,
+    QgsExpression, QgsFeatureRequest)
 from qgis.gui import QgsFileWidget
 from functools import partial
 
@@ -328,6 +329,24 @@ class YKRTool:
 
         md.checkBoxCalculateEmissionsPerPerson.clicked.connect(self.handleCalculateEmissionsPerPersonToggle)
         md.checkBoxCalculateEmissionsPerJob.clicked.connect(self.handleCalculateEmissionsPerJobToggle)
+        md.checkBoxVisualizeTrafficEmissions.clicked.connect(self.handleVisualizeTrafficEmissionsToggle)
+        md.checkBoxVisualizeSustainableUrbanStructure.clicked.connect(self.handleVisualizeSustainableUrbanStructureToggle)
+
+
+    def handleVisualizeTrafficEmissionsToggle(self, checked):
+        if checked:
+            pass
+        else:
+            self.mainDialog.checkBoxVisualizeSustainableUrbanStructure.setChecked(False)
+            self.mainDialog.mMapLayerComboBoxYKRCarOwnershipData.setEnabled(False)
+
+
+    def handleVisualizeSustainableUrbanStructureToggle(self, checked):
+        if checked:
+            self.mainDialog.mMapLayerComboBoxYKRCarOwnershipData.setEnabled(True)
+            self.mainDialog.checkBoxVisualizeTrafficEmissions.setChecked(True)
+        else:
+            self.mainDialog.mMapLayerComboBoxYKRCarOwnershipData.setEnabled(False)
 
 
     def handleCalculateEmissionsPerPersonToggle(self, checked):
@@ -891,7 +910,7 @@ class YKRTool:
         if self.futureStopsLayerDBTableName:
             query += ", '{}'".format(self.futureStopsLayerDBTableName)
         query += ')'
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         return query
 
 
@@ -965,15 +984,15 @@ class YKRTool:
         # order.insert( 0, order.pop( order.index( vlayer.id() ) ) ) # vlayer to the top
         # bridge.setCustomLayerOrder( order )
 
-        layerNames = []
-        layerNames.append((self.tr('CO2 sources grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_sources.qml')))
-        layerNames.extend(self.createUrbanDevelopmentVisualizations(uid, outputSchemaName, outputTableName))
-        layerNames.extend(self.calculateRelativeEmissions(uid, outputSchemaName, outputTableName))
-        layerNames.append((self.tr('CO2 total grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_t_grid.qml')))
-
         self.visualizeTrafficEmissions(rootGroup, uid, outputSchemaName, outputTableName)
         self.visualizeThermoEmissions(rootGroup, uid, outputSchemaName, outputTableName)
         self.visualizeElectricityEmissions(rootGroup, uid, outputSchemaName, outputTableName)
+        self.createUrbanDevelopmentVisualizations(rootGroup, uid, outputSchemaName, outputTableName)
+
+        layerNames = []
+        layerNames.append((self.tr('CO2 sources grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_sources.qml')))
+        layerNames.extend(self.calculateRelativeGeneralEmissions(uid, outputSchemaName, outputTableName))
+        layerNames.append((self.tr('CO2 total grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_t_grid.qml')))
 
         uri = QgsDataSourceUri()
         uri.setConnection(self.connParams['host'], self.connParams['port'],\
@@ -1004,11 +1023,11 @@ class YKRTool:
             ykrPopTableNameParts = ykrPopTableName.split('.')
 
             query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN v_yht integer DEFAULT 0"
-            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
 
             query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET v_yht = (SELECT v_yht FROM \"" + ykrPopTableNameParts[0] + "\".\"" + ykrPopTableNameParts[1] + "\" AS ykr WHERE ykr.xyind = out_grid.xyind AND out_grid.mun = NULLIF(ykr.kunta, '')::int)"
-            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
 
         conn = None
@@ -1048,10 +1067,10 @@ class YKRTool:
 
         queries = []
         query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN tp_yht integer DEFAULT 0"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET tp_yht = (SELECT tp_yht FROM \"" + ykrJobTableNameParts[0] + "\".\"" + ykrJobTableNameParts[1] + "\" AS ykr WHERE ykr.xyind = out_grid.xyind AND out_grid.mun = NULLIF(ykr.kunta, '')::int)"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
         if self.calculateFuture:
@@ -1089,7 +1108,7 @@ class YKRTool:
 
         return True
 
-    def createUrbanDevelopmentVisualizations(self, uid, outputSchemaName, outputTableName):
+    def createUrbanDevelopmentVisualizations(self, rootGroup, uid, outputSchemaName, outputTableName):
         layerNames = []
         
         if self.mainDialog.checkBoxVisualizePopJobMix.isChecked():
@@ -1097,17 +1116,218 @@ class YKRTool:
             if success:
                 ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(self.mainDialog.comboBoxYkrPop.currentText())
                 if ykrPopTableName == '-':
-                    layerNames.append((self.tr('pop job mix grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_mix_grid.qml')))
+                    layerNames.append((self.tr('pop job mix grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/pop_job_mix_grid.qml')))
                 else:
-                    layerNames.append((self.tr('v_yht job mix grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_mix_grid.qml')))
+                    layerNames.append((self.tr('v_yht job mix grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/pop_job_mix_grid.qml')))
 
         if self.mainDialog.checkBoxVisualizeGoodZonesForPopJobDensityAndSustainableTransport.isChecked():
-            layerNames.append((self.tr('good UZ zones for population, jobs and sustainable transport grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/good_uz_zones_grid.qml')))
+            layerNames.append((self.tr('good UZ zones for population, jobs and sustainable transport grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/good_uz_zones_grid.qml')))
         
         if self.mainDialog.checkBoxVisualizeFloorSpaceRatio.isChecked():
-            layerNames.append((self.tr('Buildings floor space / YKR square area >= 0.2') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/floor_space_ratio.qml')))
+            layerNames.append((self.tr('Buildings floor space / YKR square area >= 0.2') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/floor_space_ratio.qml')))
 
-        return layerNames
+        if self.mainDialog.checkBoxVisualizeSustainableUrbanStructure.isChecked():
+            success = self.caclulateSustainableUrbanStructure(uid, outputSchemaName, outputTableName)
+            if success: # sustainable_urban_structure.qml
+                layerNames.append((self.tr('Sustainable Urban Structure, Count of True Value Indicators') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sustainable_urban_structure.qml')))
+                layerNames.append((self.tr('Sustainable Urban Structure, Relatively Low Personal Traffic Emissions') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_relat_low_pers_traffic_emissions.qml')))
+                layerNames.append((self.tr('Sustainable Urban Structure, Households not Owning Cars are Relatively Common') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_households_no_cars_common.qml')))
+                layerNames.append((self.tr('Sustainable Urban Structure, Households not Owning 2 or More Cars are Relatively Common') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_households_below_2_cars_common.qml')))
+                layerNames.append((self.tr('Sustainable Urban Structure, Sufficient Mix of Population and Jobs') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_sufficient_mix_pop_job.qml')))
+                layerNames.append((self.tr('Sustainable Urban Structure, Sufficient Density of Population and Jobs for Walkable City') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_sufficient_pop_job_density_walk_city.qml')))
+                layerNames.append((self.tr('Sustainable Urban Structure, Sufficient Density of Population and Jobs for Public Transport') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_sufficient_pop_job_density_pub_transport.qml')))
+
+        uri = QgsDataSourceUri()
+        uri.setConnection(self.connParams['host'], self.connParams['port'],\
+            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+        uri.setDataSource(outputSchemaName, outputTableName, 'geom')
+
+        groupName = self.tr("urban devlopment")
+        group = rootGroup.addGroup(groupName)
+
+        for name in layerNames:
+            layer = QgsVectorLayer(uri.uri(False), name[0], 'postgres')
+            layer.loadNamedStyle(name[1])
+            renderer = layer.renderer()
+            if renderer.type() == 'graduatedSymbol':
+                renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
+            QgsProject.instance().addMapLayer(layer, False)
+            group.addLayer(layer)
+
+
+    def caclulateSustainableUrbanStructure(self, uid, outputSchemaName, outputTableName):
+        # 1. laske autonomistustiedot QGIS:ssä olevan karttatason avulla pythonin muuttujiin
+        # 2. Lisää laskennan tulostasoon kentät toteutuu vs. ei-toteudu kullekin ehtokentälle ja päivitä
+        # 3. tee erilliset tasot ja visualisoinnit kullekin muuttujalle ja myös yhteinen taso ja visualisointi
+
+        md = self.mainDialog
+
+        carOwnershipMapLayer = md.mMapLayerComboBoxYKRCarOwnershipData.currentLayer()
+        if carOwnershipMapLayer == None:
+            raise Exception(self.tr("YRK Car Ownership Data layer has not been selected"))
+        elif not carOwnershipMapLayer.isValid():
+            raise Exception(self.tr("YRK Car Ownership Data layer is not valid"))
+        # (TODO check that contains expected data) 
+
+        queries = []
+        ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
+
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN joukkoliikennekaup_mahd_tiiveys varchar"
+        # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN kavelykaup_mahd_tiiveys varchar"
+        # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN keskustamainen_toim_seko varchar"
+        # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN kahd_auton_omistus_suht_vahaista varchar"
+        # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN autottomuus_suht_yleista varchar"
+        # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN verrat_alh_henkliik_paast varchar"
+        # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN kestavan_kaupunkirakenteen_mittarit_toteutuu_yht int4"
+        # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        # Get result layer (to calculate only for xyind sqaures on the investigation area)
+        uri = QgsDataSourceUri()
+        uri.setConnection(self.connParams['host'], self.connParams['port'],\
+            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+        uri.setDataSource(outputSchemaName, outputTableName, 'geom')
+
+        targetLayer = QgsVectorLayer(uri.uri(False), "emissions target layer", 'postgres')
+
+        targetFeatures = targetLayer.getFeatures()
+        for targetFeature in targetFeatures:
+            
+            kestavan_kaupunkirakenteen_mittarit_toteutuu_yht = 0
+            kestavan_kaupunkirakenteen_mittarit_toteutuu_yht_none_flag = False
+
+            xyind = targetFeature['xyind']
+            mun = targetFeature['mun']
+
+            '''joukkoliikennekaup_mahd_tiiveys, kavelykaup_mahd_tiiveys ja keskustamainen_toim_seko'''
+            if ykrPopTableName == '-':
+                asukkaat = targetFeature['pop']
+            else:
+                asukkaat = targetFeature['v_yht']
+            tyopaikat = targetFeature['tp_yht']
+            asukkaat = float(asukkaat) if asukkaat != None else 0
+            tyopaikat = float(tyopaikat) if tyopaikat != None else 0
+            if ((asukkaat + tyopaikat) / 6.25 >= 35): # 6,25 hehtaaria = 250x250m
+                query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET joukkoliikennekaup_mahd_tiiveys = 'Toteutuu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+                kestavan_kaupunkirakenteen_mittarit_toteutuu_yht += 1
+            else:
+                query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET joukkoliikennekaup_mahd_tiiveys = 'Ei toteudu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+            if ((asukkaat + tyopaikat) / 6.25 >= 100): # 6,25 hehtaaria = 250x250m
+                query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET kavelykaup_mahd_tiiveys = 'Toteutuu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+                kestavan_kaupunkirakenteen_mittarit_toteutuu_yht += 1
+            else:
+                query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET kavelykaup_mahd_tiiveys = 'Ei toteudu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+            if (asukkaat + tyopaikat > 0) and ((asukkaat / (asukkaat + tyopaikat) >= 0.2) and (asukkaat / (asukkaat + tyopaikat) <= 0.8)):
+                query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET keskustamainen_toim_seko = 'Toteutuu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+                kestavan_kaupunkirakenteen_mittarit_toteutuu_yht += 1
+            else:
+                query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET keskustamainen_toim_seko = 'Ei toteudu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+
+            '''kahd_auton_omistus_suht_vahaista ja autottomuus_suht_yleista'''
+            exp = QgsExpression("xyind = '{}' AND kunta = '{}'".format(xyind, mun))
+            carOwnershipFeatures = list(carOwnershipMapLayer.getFeatures(QgsFeatureRequest(exp)))
+            if len(carOwnershipFeatures) == 1:
+                carOwnershipFeature = carOwnershipFeatures[0]
+                # asuntokunta_0_autoa_pros_osuus = None
+                # asuntokunta_1_autoa_pros_osuus = None
+                # asuntokunta_2_autoa_pros_osuus = None
+                autoja_1 = carOwnershipFeature['autoja_1']
+                autoja_2 = carOwnershipFeature['autoja_2']
+                ak_yht = carOwnershipFeature['ak_yht']
+                if autoja_1 != -1 and autoja_2 != -1:
+                    asuntokunta_0_autoa_pros_osuus = (float(ak_yht) - (autoja_1 + autoja_2)) / ak_yht * 100
+                    asuntokunta_1_autoa_pros_osuus = float(autoja_1) / ak_yht * 100
+                    asuntokunta_2_autoa_pros_osuus = float(autoja_2) / ak_yht * 100
+
+                    if asuntokunta_1_autoa_pros_osuus > asuntokunta_2_autoa_pros_osuus and asuntokunta_2_autoa_pros_osuus < 30:
+                        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET kahd_auton_omistus_suht_vahaista = 'Toteutuu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+                        kestavan_kaupunkirakenteen_mittarit_toteutuu_yht += 1
+                    else:
+                        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET kahd_auton_omistus_suht_vahaista = 'Ei toteudu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+                    # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+                    queries.append(query)
+
+                    
+                    if asuntokunta_0_autoa_pros_osuus > asuntokunta_1_autoa_pros_osuus and asuntokunta_0_autoa_pros_osuus > 40:
+                        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET autottomuus_suht_yleista = 'Toteutuu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+                        kestavan_kaupunkirakenteen_mittarit_toteutuu_yht += 1
+                    else:
+                        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET autottomuus_suht_yleista = 'Ei toteudu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+                    # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+                    queries.append(query)
+                else:
+                    kestavan_kaupunkirakenteen_mittarit_toteutuu_yht_none_flag = True
+            elif len(carOwnershipFeatures) > 1:
+                raise Exception(self.tr("Car ownership table had unexpected count of features for xyind") + " {} " + self.tr("and municipality code" + " {}: {}").format(xyind, mun, len(carOwnershipFeatures)))
+            else:
+                kestavan_kaupunkirakenteen_mittarit_toteutuu_yht_none_flag = True
+
+            '''verrat_alh_henkliik_paast'''
+
+            liikenne_hlo_tco2_per_as_tp = targetFeature['liikenne_hlo_tco2_per_as_tp']
+            if liikenne_hlo_tco2_per_as_tp != None:
+                if liikenne_hlo_tco2_per_as_tp <= 0.05:
+                    query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET verrat_alh_henkliik_paast = 'Toteutuu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+                    kestavan_kaupunkirakenteen_mittarit_toteutuu_yht += 1
+                else:
+                    query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET verrat_alh_henkliik_paast = 'Ei toteudu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+                # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+                queries.append(query)
+            else:
+                kestavan_kaupunkirakenteen_mittarit_toteutuu_yht_none_flag = True
+
+            # if kestavan_kaupunkirakenteen_mittarit_toteutuu_yht_none_flag == False:
+            if kestavan_kaupunkirakenteen_mittarit_toteutuu_yht > 0:
+                query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET kestavan_kaupunkirakenteen_mittarit_toteutuu_yht = {} WHERE xyind ='{}' and mun='{}'".format(kestavan_kaupunkirakenteen_mittarit_toteutuu_yht, xyind, mun)
+                # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+                queries.append(query)
+
+        conn = None
+
+        try:
+            conn = createDbConnection(self.connParams)
+        except Exception as e:
+            if retriesLeft > 0:
+                return self.calculateElectricityEmissionsPerPerson(outputSchemaName, outputTableName, retriesLeft - 1)
+            else:
+                self.iface.messageBar().pushMessage(
+                    self.tr('Error in connecting to the database'),
+                    str(e), Qgis.Warning, duration=0)
+                return False
+
+        try:
+            cur = conn.cursor()
+            for query in queries:
+                cur.execute(query)
+                conn.commit()
+        except Exception as e:
+            self.iface.messageBar().pushMessage(
+                self.tr('Error in modifying the results table ') + "{}".format(query),
+                str(e), Qgis.Warning, duration=0)
+            conn.rollback()
+            conn.close()
+
+            return False
+
+        return True
 
 
     def visualizeElectricityEmissions(self, rootGroup, uid, outputSchemaName, outputTableName):
@@ -1152,7 +1372,6 @@ class YKRTool:
                 layerNames.append((self.tr('CO2 electricity emissions / v_yht grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/electricity/CO2_electricity_pop_grid.qml')))
 
         return layerNames
-
 
 
     def visualizeThermoEmissions(self, rootGroup, uid, outputSchemaName, outputTableName):
@@ -1232,7 +1451,7 @@ class YKRTool:
     def calculateRelativeTrafficEmissions(self, uid, outputSchemaName, outputTableName):
         layerNames = []
         ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(self.mainDialog.comboBoxYkrPop.currentText())
-        success = self.calculateTrafficEmissionsPerPerson(outputSchemaName, outputTableName)
+        success = self.calculateRelativeTrafficEmissionsToDatabase(outputSchemaName, outputTableName)
         if success:
             if ykrPopTableName == '-':
                 layerNames.append((self.tr('CO2 traffic emissions / pop grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_traffic_pop_grid.qml')))
@@ -1242,7 +1461,7 @@ class YKRTool:
         return layerNames
 
 
-    def calculateRelativeEmissions(self, uid, outputSchemaName, outputTableName):
+    def calculateRelativeGeneralEmissions(self, uid, outputSchemaName, outputTableName):
         layerNames = []
         ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(self.mainDialog.comboBoxYkrPop.currentText())
         if self.mainDialog.checkBoxCalculateEmissionsPerPerson.isChecked():
@@ -1280,17 +1499,25 @@ class YKRTool:
         ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
 
         query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_sahko_tco2_per_sum_yhteensa_tco2 real"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_sahko_tco2_per_asukas real"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_sahko_tco2_per_sum_yhteensa_tco2 = (sum_sahko_tco2 / NULLIF(sum_yhteensa_tco2 , 0))"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
         if ykrPopTableName == '-':
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_sahko_tco2_per_sum_yhteensa_tco2 = (sum_sahko_tco2 / NULLIF(pop, 0))"
-            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_sahko_tco2_per_asukas = (sum_sahko_tco2 / NULLIF(pop, 0))"
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
 
         elif ykrPopTableName != None:
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_sahko_tco2_per_sum_yhteensa_tco2 = (sum_sahko_tco2 / v_yht)"
-            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_sahko_tco2_per_asukas = (sum_sahko_tco2 / NULLIF(v_yht, 0))"
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
 
         conn = None
@@ -1329,17 +1556,24 @@ class YKRTool:
         ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
 
         query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_lammonsaato_tco2_per_sum_yhteensa_tco2 real"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_lammonsaato_tco2_per_asukas real"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_lammonsaato_tco2_per_sum_yhteensa_tco2 = (sum_lammonsaato_tco2 / NULLIF(sum_yhteensa_tco2 , 0))"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
         if ykrPopTableName == '-':
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_lammonsaato_tco2_per_sum_yhteensa_tco2 = (sum_lammonsaato_tco2 / NULLIF(pop, 0))"
-            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_lammonsaato_tco2_per_asukas = (sum_lammonsaato_tco2 / NULLIF(pop, 0))"
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
-
         elif ykrPopTableName != None:
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_lammonsaato_tco2_per_sum_yhteensa_tco2 = (sum_lammonsaato_tco2 / v_yht)"
-            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_lammonsaato_tco2_per_asukas = (sum_lammonsaato_tco2 / NULLIF(v_yht, 0))"
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
 
         conn = None
@@ -1372,23 +1606,76 @@ class YKRTool:
         return True
 
 
-    def calculateTrafficEmissionsPerPerson(self, outputSchemaName, outputTableName, retriesLeft=3):
+    def calculateRelativeTrafficEmissionsToDatabase(self, outputSchemaName, outputTableName, retriesLeft=3):
         md = self.mainDialog
         queries = []
         ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
 
         query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_liikenne_tco2_per_sum_yhteensa_tco2 real"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_liikenne_tco2_per_asukas real"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN liikenne_hlo_tco2_per_sum_liikenne_tco2 real"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN liikenne_hlo_tco2_per_sum_yhteensa_tco2 real"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN liikenne_hlo_tco2_per_asukas real"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN liikenne_hlo_tco2_per_tp real"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN liikenne_hlo_tco2_per_as_tp real"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_liikenne_tco2_per_sum_yhteensa_tco2 = (sum_liikenne_tco2 / NULLIF(sum_yhteensa_tco2, 0))"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
         if ykrPopTableName == '-':
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_liikenne_tco2_per_sum_yhteensa_tco2 = (sum_yhteensa_tco2 / NULLIF(pop, 0))"
-            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_liikenne_tco2_per_asukas = (sum_liikenne_tco2 / NULLIF(pop, 0))"
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+        elif ykrPopTableName != None:
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_liikenne_tco2_per_asukas = (sum_liikenne_tco2 /  NULLIF(v_yht, 0))"
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
 
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET liikenne_hlo_tco2_per_sum_liikenne_tco2 = (liikenne_hlo_tco2 / NULLIF(sum_liikenne_tco2, 0))"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET liikenne_hlo_tco2_per_sum_yhteensa_tco2 = (liikenne_hlo_tco2 / NULLIF(sum_yhteensa_tco2, 0))"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        if ykrPopTableName == '-':
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET liikenne_hlo_tco2_per_asukas = (liikenne_hlo_tco2 / NULLIF(pop, 0))"
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
         elif ykrPopTableName != None:
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_liikenne_tco2_per_sum_yhteensa_tco2 = (sum_yhteensa_tco2 / v_yht)"
-            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET liikenne_hlo_tco2_per_asukas = (liikenne_hlo_tco2 /  NULLIF(v_yht, 0))"
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET liikenne_hlo_tco2_per_tp = (liikenne_hlo_tco2 / NULLIF(tp_yht, 0))"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+   
+        if ykrPopTableName == '-':
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET liikenne_hlo_tco2_per_as_tp = (liikenne_hlo_tco2 / NULLIF(COALESCE(pop, 0) + COALESCE(tp_yht, 0), 0))"
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            queries.append(query)
+        elif ykrPopTableName != None:
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET liikenne_hlo_tco2_per_as_tp = (liikenne_hlo_tco2 / NULLIF(COALESCE(v_yht, 0) + COALESCE(tp_yht, 0), 0))"
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
 
         conn = None
@@ -1397,7 +1684,7 @@ class YKRTool:
             conn = createDbConnection(self.connParams)
         except Exception as e:
             if retriesLeft > 0:
-                return self.calculateTrafficEmissionsPerPerson(outputSchemaName, outputTableName, retriesLeft - 1)
+                return self.calculateRelativeTrafficEmissionsToDatabase(outputSchemaName, outputTableName, retriesLeft - 1)
             else:
                 self.iface.messageBar().pushMessage(
                     self.tr('Error in connecting to the database'),
@@ -1425,17 +1712,17 @@ class YKRTool:
         queries = []
 
         query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN pop_per_popjob_percentage numeric(10, 1)"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
         ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
         if ykrPopTableName == '-':
             query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET pop_per_popjob_percentage = (COALESCE(pop, 0)::real / NULLIF(COALESCE(pop, 0) + COALESCE(tp_yht, 0), 0) * 100)"
-            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
         else:
             query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET pop_per_popjob_percentage = (COALESCE(v_yht, 0)::real / NULLIF(COALESCE(v_yht, 0) + COALESCE(tp_yht, 0), 0) * 100)"
-            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
 
 
@@ -1475,11 +1762,11 @@ class YKRTool:
         queries = []
 
         query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_yhteensa_tco2_per_kem real"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_kem = (sum_yhteensa_tco2 / NULLIF(floorspace, 0))"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
         conn = None
@@ -1517,17 +1804,17 @@ class YKRTool:
         queries = []
 
         query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_yhteensa_tco2_per_as_tp real"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
         ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
         if ykrPopTableName == '-':
             query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_as_tp = (sum_yhteensa_tco2 / NULLIF(COALESCE(pop, 0) + COALESCE(tp_yht, 0), 0))"
-            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
         else:
             query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_as_tp = (sum_yhteensa_tco2 / NULLIF(COALESCE(v_yht, 0) + COALESCE(tp_yht, 0), 0))"
-            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
         
         conn = None
@@ -1565,17 +1852,16 @@ class YKRTool:
         ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
 
         query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_yhteensa_tco2_per_asukas real"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
         if ykrPopTableName == '-':
             query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_asukas = (sum_yhteensa_tco2 / NULLIF(pop, 0))"
-            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
-
         elif ykrPopTableName != None:
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_asukas = (sum_yhteensa_tco2 / v_yht)"
-            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_asukas = (sum_yhteensa_tco2 /  NULLIF(v_yht, 0))"
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
 
         conn = None
@@ -1615,11 +1901,11 @@ class YKRTool:
         ykrJobTableNameParts = ykrJobTableName.split('.')
 
         query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_yhteensa_tco2_per_tp real"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
         
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_tp = (sum_yhteensa_tco2 / NULLIF(tp_yht, 0))"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
         conn = None
@@ -1678,11 +1964,11 @@ class YKRTool:
             tp_vali_muutos integer DEFAULT 0,
             tp_vuosi_muutos real DEFAULT 0)
             """.format(uid)
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
         # query = "ALTER TABLE user_output.\"" + uid + "_job_temp\" ADD COLUMN tp_vali_muutos integer"
-        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         # queries.append(query)
 
         years = range(self.sessionParams['baseYear'], self.targetYear + 1)
@@ -1691,10 +1977,10 @@ class YKRTool:
         for year in years:
             query = """INSERT INTO user_output.\"{}_job_temp\"(geom, xyind, mun, vuosi)
                 (SELECT geom, xyind, mun, to_date('{}-01-01', 'YYYY-MM-DD') FROM {})""".format(uid, year, "\"" + outputSchemaName.replace('"', '') + "\".\"" + outputTableName.replace('"', '') + "\"")
-            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
             # query = "ALTER TABLE user_output.\"" + uid + "_job_temp\" ADD COLUMN tp_vuosi_muutos_{} integer".format(year)
-            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             # queries.append(query)
         
         # Laske kullekin vuodelle tuleva työpaikkojen muutos
@@ -1716,7 +2002,7 @@ class YKRTool:
                         date_part('year', output_bau.vuosi) <= kt_bau.k_valmisv AND 
                         ST_Intersects(output_bau.geom, kt_bau.geom)
                 )""".format(uid, "\"" + futureZoningAreasSchemaName + "\".\"" + futureZoningAreasTableName + "\"")
-            QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
                     
         # summaa työpaikkamuutokset yhteen ja tallenna summa kullekin ruudulle omaan sarakkeeseensa kohdevuodelle
@@ -1727,7 +2013,7 @@ class YKRTool:
             AND output_bau.xyind = b.xyind
             AND b.vuosi <= output_bau.vuosi
             )""".format(uid, uid, self.targetYear)
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
         ## päivitä työpaikat kohdevuodelle alkuhetken työpaikoista ja työpaikkojen muutossummasta
@@ -1736,7 +2022,7 @@ class YKRTool:
             FROM user_output.\"{}_job_temp\" AS output_bau
             WHERE (date_part('year', output_bau.vuosi) = {} AND result_table.xyind = output_bau.xyind AND result_table.mun = output_bau.mun)
             )""".format("\"" + outputSchemaName.replace('"', '') + "\".\"" + outputTableName.replace('"', '') + "\"", uid, self.targetYear)
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
         # DROP temp TABLE
@@ -1753,52 +2039,52 @@ class YKRTool:
         queries = []
 
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET sum_yhteensa_tco2 = 0 WHERE xyind = '3141256822125'"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET sum_lammonsaato_tco2 = 0 WHERE xyind = '3141256822125'"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET sum_liikenne_tco2 = 0 WHERE xyind = '3141256822125'"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET sum_sahko_tco2 = 0 WHERE xyind = '3141256822125'"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET sum_rakentaminen_tco2 = 0 WHERE xyind = '3141256822125'"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET tilat_vesi_tco2 = 0 WHERE xyind = '3141256822125'"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET tilat_lammitys_tco2 = 0 WHERE xyind = '3141256822125'"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET tilat_jaahdytys_tco2 = 0 WHERE xyind = '3141256822125'"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET sahko_kiinteistot_tco2 = 0 WHERE xyind = '3141256822125'"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET sahko_kotitaloudet_tco2 = 0 WHERE xyind = '3141256822125'"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET sahko_palv_tco2 = 0 WHERE xyind = '3141256822125'"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET sahko_tv_tco2 = 0 WHERE xyind = '3141256822125'"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET liikenne_hlo_tco2 = 0 WHERE xyind = '3141256822125'"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET liikenne_tv_tco2 = 0 WHERE xyind = '3141256822125'"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET liikenne_palv_tco2 = 0 WHERE xyind = '3141256822125'"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET rak_korjaussaneeraus_tco2 = 0 WHERE xyind = '3141256822125'"
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
         conn = None
@@ -1834,7 +2120,7 @@ class YKRTool:
 
     def updateYearToResultTable(self, outputSchemaName, outputTableName, retriesLeft=3):
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET year = to_date('{}-01-01', 'YYYY-MM-DD')".format(self.targetYear)
-        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
 
         conn = None
 

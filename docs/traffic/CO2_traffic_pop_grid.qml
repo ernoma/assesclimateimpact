@@ -1,21 +1,21 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis styleCategories="AllStyleCategories" simplifyAlgorithm="0" simplifyMaxScale="1" simplifyDrawingHints="1" simplifyDrawingTol="1" labelsEnabled="0" version="3.12.3-București" minScale="100000000" simplifyLocal="1" readOnly="0" hasScaleBasedVisibilityFlag="0" maxScale="0">
+<qgis version="3.12.3-București" hasScaleBasedVisibilityFlag="0" simplifyDrawingHints="1" simplifyAlgorithm="0" simplifyMaxScale="1" minScale="100000000" readOnly="0" simplifyLocal="1" styleCategories="AllStyleCategories" simplifyDrawingTol="1" maxScale="0" labelsEnabled="0">
   <flags>
     <Identifiable>1</Identifiable>
     <Removable>1</Removable>
     <Searchable>1</Searchable>
   </flags>
-  <renderer-v2 symbollevels="0" type="graduatedSymbol" forceraster="0" attr="sum_liikenne_tco2_per_sum_yhteensa_tco2" graduatedMethod="GraduatedColor" enableorderby="0">
+  <renderer-v2 forceraster="0" type="graduatedSymbol" attr="sum_liikenne_tco2_per_asukas" graduatedMethod="GraduatedColor" enableorderby="0" symbollevels="0">
     <ranges>
-      <range render="true" lower="0.000000000000000" symbol="0" label="0 - 0,13" upper="0.130212098000000"/>
-      <range render="true" lower="0.130212098000000" symbol="1" label="0,13 - 0,33" upper="0.329827100000000"/>
-      <range render="true" lower="0.329827100000000" symbol="2" label="0,33 - 0,54" upper="0.542782307000000"/>
-      <range render="true" lower="0.542782307000000" symbol="3" label="0,54 - 0,78" upper="0.781274915000000"/>
-      <range render="true" lower="0.781274915000000" symbol="4" label="0,78 - 1" upper="1.000000000000000"/>
+      <range render="true" label="0 - 0,66" upper="0.658082000000000" symbol="0" lower="0.000000000000000"/>
+      <range render="true" label="0,66 - 2,14" upper="2.136690000000000" symbol="1" lower="0.658082000000000"/>
+      <range render="true" label="2,14 - 4,15" upper="4.147690000000000" symbol="2" lower="2.136690000000000"/>
+      <range render="true" label="4,15 - 8,22" upper="8.218080000000000" symbol="3" lower="4.147690000000000"/>
+      <range render="true" label="8,22 - 15,75" upper="15.752599999999999" symbol="4" lower="8.218080000000000"/>
     </ranges>
     <symbols>
-      <symbol type="fill" name="0" alpha="1" force_rhr="0" clip_to_extent="1">
-        <layer enabled="1" pass="0" class="SimpleFill" locked="0">
+      <symbol force_rhr="0" alpha="1" type="fill" name="0" clip_to_extent="1">
+        <layer pass="0" class="SimpleFill" locked="0" enabled="1">
           <prop v="3x:0,0,0,0,0,0" k="border_width_map_unit_scale"/>
           <prop v="246,239,247,255" k="color"/>
           <prop v="bevel" k="joinstyle"/>
@@ -29,15 +29,15 @@
           <prop v="solid" k="style"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option type="QString" name="name" value=""/>
+              <Option value="" type="QString" name="name"/>
               <Option name="properties"/>
-              <Option type="QString" name="type" value="collection"/>
+              <Option value="collection" type="QString" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol type="fill" name="1" alpha="1" force_rhr="0" clip_to_extent="1">
-        <layer enabled="1" pass="0" class="SimpleFill" locked="0">
+      <symbol force_rhr="0" alpha="1" type="fill" name="1" clip_to_extent="1">
+        <layer pass="0" class="SimpleFill" locked="0" enabled="1">
           <prop v="3x:0,0,0,0,0,0" k="border_width_map_unit_scale"/>
           <prop v="189,201,225,255" k="color"/>
           <prop v="bevel" k="joinstyle"/>
@@ -51,15 +51,15 @@
           <prop v="solid" k="style"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option type="QString" name="name" value=""/>
+              <Option value="" type="QString" name="name"/>
               <Option name="properties"/>
-              <Option type="QString" name="type" value="collection"/>
+              <Option value="collection" type="QString" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol type="fill" name="2" alpha="1" force_rhr="0" clip_to_extent="1">
-        <layer enabled="1" pass="0" class="SimpleFill" locked="0">
+      <symbol force_rhr="0" alpha="1" type="fill" name="2" clip_to_extent="1">
+        <layer pass="0" class="SimpleFill" locked="0" enabled="1">
           <prop v="3x:0,0,0,0,0,0" k="border_width_map_unit_scale"/>
           <prop v="103,169,207,255" k="color"/>
           <prop v="bevel" k="joinstyle"/>
@@ -73,15 +73,15 @@
           <prop v="solid" k="style"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option type="QString" name="name" value=""/>
+              <Option value="" type="QString" name="name"/>
               <Option name="properties"/>
-              <Option type="QString" name="type" value="collection"/>
+              <Option value="collection" type="QString" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol type="fill" name="3" alpha="1" force_rhr="0" clip_to_extent="1">
-        <layer enabled="1" pass="0" class="SimpleFill" locked="0">
+      <symbol force_rhr="0" alpha="1" type="fill" name="3" clip_to_extent="1">
+        <layer pass="0" class="SimpleFill" locked="0" enabled="1">
           <prop v="3x:0,0,0,0,0,0" k="border_width_map_unit_scale"/>
           <prop v="28,144,153,255" k="color"/>
           <prop v="bevel" k="joinstyle"/>
@@ -95,15 +95,15 @@
           <prop v="solid" k="style"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option type="QString" name="name" value=""/>
+              <Option value="" type="QString" name="name"/>
               <Option name="properties"/>
-              <Option type="QString" name="type" value="collection"/>
+              <Option value="collection" type="QString" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol type="fill" name="4" alpha="1" force_rhr="0" clip_to_extent="1">
-        <layer enabled="1" pass="0" class="SimpleFill" locked="0">
+      <symbol force_rhr="0" alpha="1" type="fill" name="4" clip_to_extent="1">
+        <layer pass="0" class="SimpleFill" locked="0" enabled="1">
           <prop v="3x:0,0,0,0,0,0" k="border_width_map_unit_scale"/>
           <prop v="1,108,89,255" k="color"/>
           <prop v="bevel" k="joinstyle"/>
@@ -117,17 +117,17 @@
           <prop v="solid" k="style"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option type="QString" name="name" value=""/>
+              <Option value="" type="QString" name="name"/>
               <Option name="properties"/>
-              <Option type="QString" name="type" value="collection"/>
+              <Option value="collection" type="QString" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
       </symbol>
     </symbols>
     <source-symbol>
-      <symbol type="fill" name="0" alpha="1" force_rhr="0" clip_to_extent="1">
-        <layer enabled="1" pass="0" class="SimpleFill" locked="0">
+      <symbol force_rhr="0" alpha="1" type="fill" name="0" clip_to_extent="1">
+        <layer pass="0" class="SimpleFill" locked="0" enabled="1">
           <prop v="3x:0,0,0,0,0,0" k="border_width_map_unit_scale"/>
           <prop v="145,82,45,255" k="color"/>
           <prop v="bevel" k="joinstyle"/>
@@ -141,9 +141,9 @@
           <prop v="solid" k="style"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option type="QString" name="name" value=""/>
+              <Option value="" type="QString" name="name"/>
               <Option name="properties"/>
-              <Option type="QString" name="type" value="collection"/>
+              <Option value="collection" type="QString" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
@@ -157,8 +157,8 @@
       <prop v="0.25;189,201,225,255:0.5;103,169,207,255:0.75;28,144,153,255" k="stops"/>
     </colorramp>
     <classificationMethod id="Jenks">
-      <symmetricMode enabled="0" astride="0" symmetrypoint="0"/>
-      <labelFormat trimtrailingzeroes="1" labelprecision="4" format="%1 - %2"/>
+      <symmetricMode astride="0" symmetrypoint="0" enabled="0"/>
+      <labelFormat format="%1 - %2" trimtrailingzeroes="1" labelprecision="2"/>
       <parameters>
         <Option/>
       </parameters>
@@ -168,7 +168,7 @@
     <sizescale/>
   </renderer-v2>
   <customproperties>
-    <property key="embeddedWidgets/count" value="0"/>
+    <property value="0" key="embeddedWidgets/count"/>
     <property key="variableNames"/>
     <property key="variableValues"/>
   </customproperties>
@@ -176,12 +176,12 @@
   <featureBlendMode>0</featureBlendMode>
   <layerOpacity>1</layerOpacity>
   <SingleCategoryDiagramRenderer attributeLegend="1" diagramType="Histogram">
-    <DiagramCategory sizeType="MM" backgroundColor="#ffffff" minScaleDenominator="0" penWidth="0" lineSizeType="MM" maxScaleDenominator="1e+08" opacity="1" scaleDependency="Area" sizeScale="3x:0,0,0,0,0,0" width="15" showAxis="1" lineSizeScale="3x:0,0,0,0,0,0" spacingUnit="MM" height="15" spacing="5" direction="0" barWidth="5" penAlpha="255" penColor="#000000" minimumSize="0" backgroundAlpha="255" scaleBasedVisibility="0" rotationOffset="270" spacingUnitScale="3x:0,0,0,0,0,0" enabled="0" labelPlacementMethod="XHeight" diagramOrientation="Up">
-      <fontProperties style="" description="MS Shell Dlg 2,8,-1,5,50,0,0,0,0,0"/>
-      <attribute color="#000000" field="" label=""/>
+    <DiagramCategory spacingUnit="MM" width="15" height="15" spacingUnitScale="3x:0,0,0,0,0,0" minScaleDenominator="0" lineSizeScale="3x:0,0,0,0,0,0" spacing="5" direction="0" barWidth="5" backgroundAlpha="255" sizeScale="3x:0,0,0,0,0,0" showAxis="1" maxScaleDenominator="1e+08" penAlpha="255" sizeType="MM" lineSizeType="MM" scaleDependency="Area" scaleBasedVisibility="0" rotationOffset="270" penWidth="0" penColor="#000000" labelPlacementMethod="XHeight" opacity="1" enabled="0" minimumSize="0" diagramOrientation="Up" backgroundColor="#ffffff">
+      <fontProperties description="MS Shell Dlg 2,8,-1,5,50,0,0,0,0,0" style=""/>
+      <attribute color="#000000" label="" field=""/>
       <axisSymbol>
-        <symbol type="line" name="" alpha="1" force_rhr="0" clip_to_extent="1">
-          <layer enabled="1" pass="0" class="SimpleLine" locked="0">
+        <symbol force_rhr="0" alpha="1" type="line" name="" clip_to_extent="1">
+          <layer pass="0" class="SimpleLine" locked="0" enabled="1">
             <prop v="square" k="capstyle"/>
             <prop v="5;2" k="customdash"/>
             <prop v="3x:0,0,0,0,0,0" k="customdash_map_unit_scale"/>
@@ -200,9 +200,9 @@
             <prop v="3x:0,0,0,0,0,0" k="width_map_unit_scale"/>
             <data_defined_properties>
               <Option type="Map">
-                <Option type="QString" name="name" value=""/>
+                <Option value="" type="QString" name="name"/>
                 <Option name="properties"/>
-                <Option type="QString" name="type" value="collection"/>
+                <Option value="collection" type="QString" name="type"/>
               </Option>
             </data_defined_properties>
           </layer>
@@ -210,12 +210,12 @@
       </axisSymbol>
     </DiagramCategory>
   </SingleCategoryDiagramRenderer>
-  <DiagramLayerSettings placement="1" linePlacementFlags="18" zIndex="0" showAll="1" priority="0" dist="0" obstacle="0">
+  <DiagramLayerSettings placement="1" obstacle="0" dist="0" showAll="1" linePlacementFlags="18" priority="0" zIndex="0">
     <properties>
       <Option type="Map">
-        <Option type="QString" name="name" value=""/>
+        <Option value="" type="QString" name="name"/>
         <Option name="properties"/>
-        <Option type="QString" name="type" value="collection"/>
+        <Option value="collection" type="QString" name="type"/>
       </Option>
     </properties>
   </DiagramLayerSettings>
@@ -223,22 +223,15 @@
     <activeChecks/>
     <checkConfiguration type="Map">
       <Option type="Map" name="QgsGeometryGapCheck">
-        <Option type="double" name="allowedGapsBuffer" value="0"/>
-        <Option type="bool" name="allowedGapsEnabled" value="false"/>
-        <Option type="QString" name="allowedGapsLayer" value=""/>
+        <Option value="0" type="double" name="allowedGapsBuffer"/>
+        <Option value="false" type="bool" name="allowedGapsEnabled"/>
+        <Option value="" type="QString" name="allowedGapsLayer"/>
       </Option>
     </checkConfiguration>
   </geometryOptions>
   <referencedLayers/>
   <referencingLayers/>
   <fieldConfiguration>
-    <field name="id">
-      <editWidget type="TextEdit">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
     <field name="xyind">
       <editWidget type="TextEdit">
         <config>
@@ -246,29 +239,85 @@
         </config>
       </editWidget>
     </field>
-    <field name="vyohyke">
+    <field name="mun">
       <editWidget type="Range">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="asukkaat">
+    <field name="zone">
       <editWidget type="Range">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="tp_yht_2017">
-      <editWidget type="Range">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="vuosi">
+    <field name="year">
       <editWidget type="DateTime">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="floorspace">
+      <editWidget type="Range">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="pop">
+      <editWidget type="Range">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="tilat_vesi_tco2">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="tilat_lammitys_tco2">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="tilat_jaahdytys_tco2">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="sahko_kiinteistot_tco2">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="sahko_kotitaloudet_tco2">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="sahko_palv_tco2">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="sahko_tv_tco2">
+      <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
@@ -295,35 +344,21 @@
         </config>
       </editWidget>
     </field>
-    <field name="sum_liikenne_tco2">
+    <field name="rak_korjaussaneeraus_tco2">
       <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="liikenne_hlo_tco2_per_asukas">
+    <field name="rak_purku_tco2">
       <editWidget type="TextEdit">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="liikenne_hlo_tco2_per_tp_yht">
-      <editWidget type="TextEdit">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="liikenne_hlo_tco2_per_asukas_tp_yht">
-      <editWidget type="TextEdit">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="liikenne_hlo_tco2_per_sum_liikenne_tco2">
+    <field name="rak_uudis_tco2">
       <editWidget type="TextEdit">
         <config>
           <Option/>
@@ -337,7 +372,35 @@
         </config>
       </editWidget>
     </field>
-    <field name="liikenne_hlo_tco2_per_sum_yhteensa_tco2">
+    <field name="sum_lammonsaato_tco2">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="sum_liikenne_tco2">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="sum_sahko_tco2">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="sum_rakentaminen_tco2">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="tp_yht">
       <editWidget type="TextEdit">
         <config>
           <Option/>
@@ -351,109 +414,226 @@
         </config>
       </editWidget>
     </field>
+    <field name="sum_liikenne_tco2_per_asukas">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="liikenne_hlo_tco2_per_sum_liikenne_tco2">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="liikenne_hlo_tco2_per_sum_yhteensa_tco2">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="liikenne_hlo_tco2_per_asukas">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="liikenne_hlo_tco2_per_tp">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="liikenne_hlo_tco2_per_as_tp">
+      <editWidget type="TextEdit">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
   </fieldConfiguration>
   <aliases>
-    <alias name="" field="id" index="0"/>
-    <alias name="" field="xyind" index="1"/>
-    <alias name="" field="vyohyke" index="2"/>
-    <alias name="" field="asukkaat" index="3"/>
-    <alias name="" field="tp_yht_2017" index="4"/>
-    <alias name="" field="vuosi" index="5"/>
-    <alias name="" field="liikenne_hlo_tco2" index="6"/>
-    <alias name="" field="liikenne_tv_tco2" index="7"/>
-    <alias name="" field="liikenne_palv_tco2" index="8"/>
-    <alias name="" field="sum_liikenne_tco2" index="9"/>
-    <alias name="" field="liikenne_hlo_tco2_per_asukas" index="10"/>
-    <alias name="" field="liikenne_hlo_tco2_per_tp_yht" index="11"/>
-    <alias name="" field="liikenne_hlo_tco2_per_asukas_tp_yht" index="12"/>
-    <alias name="" field="liikenne_hlo_tco2_per_sum_liikenne_tco2" index="13"/>
-    <alias name="" field="sum_yhteensa_tco2" index="14"/>
-    <alias name="" field="liikenne_hlo_tco2_per_sum_yhteensa_tco2" index="15"/>
-    <alias name="" field="sum_liikenne_tco2_per_sum_yhteensa_tco2" index="16"/>
+    <alias index="0" name="" field="xyind"/>
+    <alias index="1" name="" field="mun"/>
+    <alias index="2" name="" field="zone"/>
+    <alias index="3" name="" field="year"/>
+    <alias index="4" name="" field="floorspace"/>
+    <alias index="5" name="" field="pop"/>
+    <alias index="6" name="" field="tilat_vesi_tco2"/>
+    <alias index="7" name="" field="tilat_lammitys_tco2"/>
+    <alias index="8" name="" field="tilat_jaahdytys_tco2"/>
+    <alias index="9" name="" field="sahko_kiinteistot_tco2"/>
+    <alias index="10" name="" field="sahko_kotitaloudet_tco2"/>
+    <alias index="11" name="" field="sahko_palv_tco2"/>
+    <alias index="12" name="" field="sahko_tv_tco2"/>
+    <alias index="13" name="" field="liikenne_hlo_tco2"/>
+    <alias index="14" name="" field="liikenne_tv_tco2"/>
+    <alias index="15" name="" field="liikenne_palv_tco2"/>
+    <alias index="16" name="" field="rak_korjaussaneeraus_tco2"/>
+    <alias index="17" name="" field="rak_purku_tco2"/>
+    <alias index="18" name="" field="rak_uudis_tco2"/>
+    <alias index="19" name="" field="sum_yhteensa_tco2"/>
+    <alias index="20" name="" field="sum_lammonsaato_tco2"/>
+    <alias index="21" name="" field="sum_liikenne_tco2"/>
+    <alias index="22" name="" field="sum_sahko_tco2"/>
+    <alias index="23" name="" field="sum_rakentaminen_tco2"/>
+    <alias index="24" name="" field="tp_yht"/>
+    <alias index="25" name="" field="sum_liikenne_tco2_per_sum_yhteensa_tco2"/>
+    <alias index="26" name="" field="sum_liikenne_tco2_per_asukas"/>
+    <alias index="27" name="" field="liikenne_hlo_tco2_per_sum_liikenne_tco2"/>
+    <alias index="28" name="" field="liikenne_hlo_tco2_per_sum_yhteensa_tco2"/>
+    <alias index="29" name="" field="liikenne_hlo_tco2_per_asukas"/>
+    <alias index="30" name="" field="liikenne_hlo_tco2_per_tp"/>
+    <alias index="31" name="" field="liikenne_hlo_tco2_per_as_tp"/>
   </aliases>
   <excludeAttributesWMS/>
   <excludeAttributesWFS/>
   <defaults>
-    <default field="id" expression="" applyOnUpdate="0"/>
-    <default field="xyind" expression="" applyOnUpdate="0"/>
-    <default field="vyohyke" expression="" applyOnUpdate="0"/>
-    <default field="asukkaat" expression="" applyOnUpdate="0"/>
-    <default field="tp_yht_2017" expression="" applyOnUpdate="0"/>
-    <default field="vuosi" expression="" applyOnUpdate="0"/>
-    <default field="liikenne_hlo_tco2" expression="" applyOnUpdate="0"/>
-    <default field="liikenne_tv_tco2" expression="" applyOnUpdate="0"/>
-    <default field="liikenne_palv_tco2" expression="" applyOnUpdate="0"/>
-    <default field="sum_liikenne_tco2" expression="" applyOnUpdate="0"/>
-    <default field="liikenne_hlo_tco2_per_asukas" expression="" applyOnUpdate="0"/>
-    <default field="liikenne_hlo_tco2_per_tp_yht" expression="" applyOnUpdate="0"/>
-    <default field="liikenne_hlo_tco2_per_asukas_tp_yht" expression="" applyOnUpdate="0"/>
-    <default field="liikenne_hlo_tco2_per_sum_liikenne_tco2" expression="" applyOnUpdate="0"/>
-    <default field="sum_yhteensa_tco2" expression="" applyOnUpdate="0"/>
-    <default field="liikenne_hlo_tco2_per_sum_yhteensa_tco2" expression="" applyOnUpdate="0"/>
-    <default field="sum_liikenne_tco2_per_sum_yhteensa_tco2" expression="" applyOnUpdate="0"/>
+    <default expression="" applyOnUpdate="0" field="xyind"/>
+    <default expression="" applyOnUpdate="0" field="mun"/>
+    <default expression="" applyOnUpdate="0" field="zone"/>
+    <default expression="" applyOnUpdate="0" field="year"/>
+    <default expression="" applyOnUpdate="0" field="floorspace"/>
+    <default expression="" applyOnUpdate="0" field="pop"/>
+    <default expression="" applyOnUpdate="0" field="tilat_vesi_tco2"/>
+    <default expression="" applyOnUpdate="0" field="tilat_lammitys_tco2"/>
+    <default expression="" applyOnUpdate="0" field="tilat_jaahdytys_tco2"/>
+    <default expression="" applyOnUpdate="0" field="sahko_kiinteistot_tco2"/>
+    <default expression="" applyOnUpdate="0" field="sahko_kotitaloudet_tco2"/>
+    <default expression="" applyOnUpdate="0" field="sahko_palv_tco2"/>
+    <default expression="" applyOnUpdate="0" field="sahko_tv_tco2"/>
+    <default expression="" applyOnUpdate="0" field="liikenne_hlo_tco2"/>
+    <default expression="" applyOnUpdate="0" field="liikenne_tv_tco2"/>
+    <default expression="" applyOnUpdate="0" field="liikenne_palv_tco2"/>
+    <default expression="" applyOnUpdate="0" field="rak_korjaussaneeraus_tco2"/>
+    <default expression="" applyOnUpdate="0" field="rak_purku_tco2"/>
+    <default expression="" applyOnUpdate="0" field="rak_uudis_tco2"/>
+    <default expression="" applyOnUpdate="0" field="sum_yhteensa_tco2"/>
+    <default expression="" applyOnUpdate="0" field="sum_lammonsaato_tco2"/>
+    <default expression="" applyOnUpdate="0" field="sum_liikenne_tco2"/>
+    <default expression="" applyOnUpdate="0" field="sum_sahko_tco2"/>
+    <default expression="" applyOnUpdate="0" field="sum_rakentaminen_tco2"/>
+    <default expression="" applyOnUpdate="0" field="tp_yht"/>
+    <default expression="" applyOnUpdate="0" field="sum_liikenne_tco2_per_sum_yhteensa_tco2"/>
+    <default expression="" applyOnUpdate="0" field="sum_liikenne_tco2_per_asukas"/>
+    <default expression="" applyOnUpdate="0" field="liikenne_hlo_tco2_per_sum_liikenne_tco2"/>
+    <default expression="" applyOnUpdate="0" field="liikenne_hlo_tco2_per_sum_yhteensa_tco2"/>
+    <default expression="" applyOnUpdate="0" field="liikenne_hlo_tco2_per_asukas"/>
+    <default expression="" applyOnUpdate="0" field="liikenne_hlo_tco2_per_tp"/>
+    <default expression="" applyOnUpdate="0" field="liikenne_hlo_tco2_per_as_tp"/>
   </defaults>
   <constraints>
-    <constraint unique_strength="1" notnull_strength="1" constraints="3" exp_strength="0" field="id"/>
-    <constraint unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0" field="xyind"/>
-    <constraint unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0" field="vyohyke"/>
-    <constraint unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0" field="asukkaat"/>
-    <constraint unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0" field="tp_yht_2017"/>
-    <constraint unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0" field="vuosi"/>
-    <constraint unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0" field="liikenne_hlo_tco2"/>
-    <constraint unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0" field="liikenne_tv_tco2"/>
-    <constraint unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0" field="liikenne_palv_tco2"/>
-    <constraint unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0" field="sum_liikenne_tco2"/>
-    <constraint unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0" field="liikenne_hlo_tco2_per_asukas"/>
-    <constraint unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0" field="liikenne_hlo_tco2_per_tp_yht"/>
-    <constraint unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0" field="liikenne_hlo_tco2_per_asukas_tp_yht"/>
-    <constraint unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0" field="liikenne_hlo_tco2_per_sum_liikenne_tco2"/>
-    <constraint unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0" field="sum_yhteensa_tco2"/>
-    <constraint unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0" field="liikenne_hlo_tco2_per_sum_yhteensa_tco2"/>
-    <constraint unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0" field="sum_liikenne_tco2_per_sum_yhteensa_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="xyind"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="mun"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="zone"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="year"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="floorspace"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="pop"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="tilat_vesi_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="tilat_lammitys_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="tilat_jaahdytys_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="sahko_kiinteistot_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="sahko_kotitaloudet_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="sahko_palv_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="sahko_tv_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="liikenne_hlo_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="liikenne_tv_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="liikenne_palv_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="rak_korjaussaneeraus_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="rak_purku_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="rak_uudis_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="sum_yhteensa_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="sum_lammonsaato_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="sum_liikenne_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="sum_sahko_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="sum_rakentaminen_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="tp_yht"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="sum_liikenne_tco2_per_sum_yhteensa_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="sum_liikenne_tco2_per_asukas"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="liikenne_hlo_tco2_per_sum_liikenne_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="liikenne_hlo_tco2_per_sum_yhteensa_tco2"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="liikenne_hlo_tco2_per_asukas"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="liikenne_hlo_tco2_per_tp"/>
+    <constraint unique_strength="0" constraints="0" exp_strength="0" notnull_strength="0" field="liikenne_hlo_tco2_per_as_tp"/>
   </constraints>
   <constraintExpressions>
-    <constraint exp="" field="id" desc=""/>
-    <constraint exp="" field="xyind" desc=""/>
-    <constraint exp="" field="vyohyke" desc=""/>
-    <constraint exp="" field="asukkaat" desc=""/>
-    <constraint exp="" field="tp_yht_2017" desc=""/>
-    <constraint exp="" field="vuosi" desc=""/>
-    <constraint exp="" field="liikenne_hlo_tco2" desc=""/>
-    <constraint exp="" field="liikenne_tv_tco2" desc=""/>
-    <constraint exp="" field="liikenne_palv_tco2" desc=""/>
-    <constraint exp="" field="sum_liikenne_tco2" desc=""/>
-    <constraint exp="" field="liikenne_hlo_tco2_per_asukas" desc=""/>
-    <constraint exp="" field="liikenne_hlo_tco2_per_tp_yht" desc=""/>
-    <constraint exp="" field="liikenne_hlo_tco2_per_asukas_tp_yht" desc=""/>
-    <constraint exp="" field="liikenne_hlo_tco2_per_sum_liikenne_tco2" desc=""/>
-    <constraint exp="" field="sum_yhteensa_tco2" desc=""/>
-    <constraint exp="" field="liikenne_hlo_tco2_per_sum_yhteensa_tco2" desc=""/>
-    <constraint exp="" field="sum_liikenne_tco2_per_sum_yhteensa_tco2" desc=""/>
+    <constraint desc="" exp="" field="xyind"/>
+    <constraint desc="" exp="" field="mun"/>
+    <constraint desc="" exp="" field="zone"/>
+    <constraint desc="" exp="" field="year"/>
+    <constraint desc="" exp="" field="floorspace"/>
+    <constraint desc="" exp="" field="pop"/>
+    <constraint desc="" exp="" field="tilat_vesi_tco2"/>
+    <constraint desc="" exp="" field="tilat_lammitys_tco2"/>
+    <constraint desc="" exp="" field="tilat_jaahdytys_tco2"/>
+    <constraint desc="" exp="" field="sahko_kiinteistot_tco2"/>
+    <constraint desc="" exp="" field="sahko_kotitaloudet_tco2"/>
+    <constraint desc="" exp="" field="sahko_palv_tco2"/>
+    <constraint desc="" exp="" field="sahko_tv_tco2"/>
+    <constraint desc="" exp="" field="liikenne_hlo_tco2"/>
+    <constraint desc="" exp="" field="liikenne_tv_tco2"/>
+    <constraint desc="" exp="" field="liikenne_palv_tco2"/>
+    <constraint desc="" exp="" field="rak_korjaussaneeraus_tco2"/>
+    <constraint desc="" exp="" field="rak_purku_tco2"/>
+    <constraint desc="" exp="" field="rak_uudis_tco2"/>
+    <constraint desc="" exp="" field="sum_yhteensa_tco2"/>
+    <constraint desc="" exp="" field="sum_lammonsaato_tco2"/>
+    <constraint desc="" exp="" field="sum_liikenne_tco2"/>
+    <constraint desc="" exp="" field="sum_sahko_tco2"/>
+    <constraint desc="" exp="" field="sum_rakentaminen_tco2"/>
+    <constraint desc="" exp="" field="tp_yht"/>
+    <constraint desc="" exp="" field="sum_liikenne_tco2_per_sum_yhteensa_tco2"/>
+    <constraint desc="" exp="" field="sum_liikenne_tco2_per_asukas"/>
+    <constraint desc="" exp="" field="liikenne_hlo_tco2_per_sum_liikenne_tco2"/>
+    <constraint desc="" exp="" field="liikenne_hlo_tco2_per_sum_yhteensa_tco2"/>
+    <constraint desc="" exp="" field="liikenne_hlo_tco2_per_asukas"/>
+    <constraint desc="" exp="" field="liikenne_hlo_tco2_per_tp"/>
+    <constraint desc="" exp="" field="liikenne_hlo_tco2_per_as_tp"/>
   </constraintExpressions>
   <expressionfields/>
   <attributeactions>
-    <defaultAction key="Canvas" value="{00000000-0000-0000-0000-000000000000}"/>
+    <defaultAction value="{00000000-0000-0000-0000-000000000000}" key="Canvas"/>
   </attributeactions>
-  <attributetableconfig sortExpression="" actionWidgetStyle="dropDown" sortOrder="0">
+  <attributetableconfig actionWidgetStyle="dropDown" sortOrder="0" sortExpression="">
     <columns>
-      <column hidden="0" width="-1" type="field" name="id"/>
-      <column hidden="0" width="-1" type="field" name="xyind"/>
-      <column hidden="0" width="-1" type="field" name="vuosi"/>
-      <column hidden="0" width="-1" type="field" name="liikenne_hlo_tco2"/>
-      <column hidden="1" width="-1" type="actions"/>
-      <column hidden="0" width="-1" type="field" name="vyohyke"/>
-      <column hidden="0" width="-1" type="field" name="asukkaat"/>
-      <column hidden="0" width="-1" type="field" name="tp_yht_2017"/>
-      <column hidden="0" width="-1" type="field" name="liikenne_tv_tco2"/>
-      <column hidden="0" width="-1" type="field" name="liikenne_palv_tco2"/>
-      <column hidden="0" width="-1" type="field" name="sum_liikenne_tco2"/>
-      <column hidden="0" width="-1" type="field" name="liikenne_hlo_tco2_per_asukas"/>
-      <column hidden="0" width="-1" type="field" name="liikenne_hlo_tco2_per_tp_yht"/>
-      <column hidden="0" width="-1" type="field" name="liikenne_hlo_tco2_per_asukas_tp_yht"/>
-      <column hidden="0" width="-1" type="field" name="liikenne_hlo_tco2_per_sum_liikenne_tco2"/>
-      <column hidden="0" width="-1" type="field" name="sum_yhteensa_tco2"/>
-      <column hidden="0" width="-1" type="field" name="liikenne_hlo_tco2_per_sum_yhteensa_tco2"/>
-      <column hidden="0" width="-1" type="field" name="sum_liikenne_tco2_per_sum_yhteensa_tco2"/>
+      <column type="field" hidden="0" width="-1" name="xyind"/>
+      <column type="field" hidden="0" width="-1" name="liikenne_hlo_tco2"/>
+      <column type="actions" hidden="1" width="-1"/>
+      <column type="field" hidden="0" width="-1" name="liikenne_tv_tco2"/>
+      <column type="field" hidden="0" width="-1" name="liikenne_palv_tco2"/>
+      <column type="field" hidden="0" width="-1" name="sum_liikenne_tco2"/>
+      <column type="field" hidden="0" width="-1" name="liikenne_hlo_tco2_per_asukas"/>
+      <column type="field" hidden="0" width="-1" name="liikenne_hlo_tco2_per_sum_liikenne_tco2"/>
+      <column type="field" hidden="0" width="-1" name="sum_yhteensa_tco2"/>
+      <column type="field" hidden="0" width="-1" name="liikenne_hlo_tco2_per_sum_yhteensa_tco2"/>
+      <column type="field" hidden="0" width="-1" name="sum_liikenne_tco2_per_sum_yhteensa_tco2"/>
+      <column type="field" hidden="0" width="-1" name="mun"/>
+      <column type="field" hidden="0" width="-1" name="zone"/>
+      <column type="field" hidden="0" width="-1" name="year"/>
+      <column type="field" hidden="0" width="-1" name="floorspace"/>
+      <column type="field" hidden="0" width="-1" name="pop"/>
+      <column type="field" hidden="0" width="-1" name="tilat_vesi_tco2"/>
+      <column type="field" hidden="0" width="-1" name="tilat_lammitys_tco2"/>
+      <column type="field" hidden="0" width="-1" name="tilat_jaahdytys_tco2"/>
+      <column type="field" hidden="0" width="-1" name="sahko_kiinteistot_tco2"/>
+      <column type="field" hidden="0" width="-1" name="sahko_kotitaloudet_tco2"/>
+      <column type="field" hidden="0" width="-1" name="sahko_palv_tco2"/>
+      <column type="field" hidden="0" width="-1" name="sahko_tv_tco2"/>
+      <column type="field" hidden="0" width="-1" name="rak_korjaussaneeraus_tco2"/>
+      <column type="field" hidden="0" width="-1" name="rak_purku_tco2"/>
+      <column type="field" hidden="0" width="-1" name="rak_uudis_tco2"/>
+      <column type="field" hidden="0" width="-1" name="sum_lammonsaato_tco2"/>
+      <column type="field" hidden="0" width="-1" name="sum_sahko_tco2"/>
+      <column type="field" hidden="0" width="-1" name="sum_rakentaminen_tco2"/>
+      <column type="field" hidden="0" width="-1" name="tp_yht"/>
+      <column type="field" hidden="0" width="-1" name="sum_liikenne_tco2_per_asukas"/>
+      <column type="field" hidden="0" width="-1" name="liikenne_hlo_tco2_per_tp"/>
+      <column type="field" hidden="0" width="-1" name="liikenne_hlo_tco2_per_as_tp"/>
     </columns>
   </attributetableconfig>
   <conditionalstyles>
@@ -485,42 +665,86 @@ def my_form_open(dialog, layer, feature):
   <featformsuppress>0</featformsuppress>
   <editorlayout>generatedlayout</editorlayout>
   <editable>
-    <field editable="1" name="asukkaat"/>
-    <field editable="1" name="id"/>
-    <field editable="1" name="liikenne_hlo_tco2"/>
-    <field editable="1" name="liikenne_hlo_tco2_per_asukas"/>
-    <field editable="1" name="liikenne_hlo_tco2_per_asukas_tp_yht"/>
-    <field editable="1" name="liikenne_hlo_tco2_per_sum_liikenne_tco2"/>
-    <field editable="1" name="liikenne_hlo_tco2_per_sum_yhteensa_tco2"/>
-    <field editable="1" name="liikenne_hlo_tco2_per_tp_yht"/>
-    <field editable="1" name="liikenne_palv_tco2"/>
-    <field editable="1" name="liikenne_tv_tco2"/>
-    <field editable="1" name="sum_liikenne_tco2"/>
-    <field editable="1" name="sum_liikenne_tco2_per_sum_yhteensa_tco2"/>
-    <field editable="1" name="sum_yhteensa_tco2"/>
-    <field editable="1" name="tp_yht_2017"/>
-    <field editable="1" name="vuosi"/>
-    <field editable="1" name="vyohyke"/>
-    <field editable="1" name="xyind"/>
+    <field name="asukkaat" editable="1"/>
+    <field name="floorspace" editable="1"/>
+    <field name="id" editable="1"/>
+    <field name="liikenne_hlo_tco2" editable="1"/>
+    <field name="liikenne_hlo_tco2_per_as_tp" editable="1"/>
+    <field name="liikenne_hlo_tco2_per_asukas" editable="1"/>
+    <field name="liikenne_hlo_tco2_per_asukas_tp_yht" editable="1"/>
+    <field name="liikenne_hlo_tco2_per_sum_liikenne_tco2" editable="1"/>
+    <field name="liikenne_hlo_tco2_per_sum_yhteensa_tco2" editable="1"/>
+    <field name="liikenne_hlo_tco2_per_tp" editable="1"/>
+    <field name="liikenne_hlo_tco2_per_tp_yht" editable="1"/>
+    <field name="liikenne_palv_tco2" editable="1"/>
+    <field name="liikenne_tv_tco2" editable="1"/>
+    <field name="mun" editable="1"/>
+    <field name="pop" editable="1"/>
+    <field name="rak_korjaussaneeraus_tco2" editable="1"/>
+    <field name="rak_purku_tco2" editable="1"/>
+    <field name="rak_uudis_tco2" editable="1"/>
+    <field name="sahko_kiinteistot_tco2" editable="1"/>
+    <field name="sahko_kotitaloudet_tco2" editable="1"/>
+    <field name="sahko_palv_tco2" editable="1"/>
+    <field name="sahko_tv_tco2" editable="1"/>
+    <field name="sum_lammonsaato_tco2" editable="1"/>
+    <field name="sum_liikenne_tco2" editable="1"/>
+    <field name="sum_liikenne_tco2_per_asukas" editable="1"/>
+    <field name="sum_liikenne_tco2_per_sum_yhteensa_tco2" editable="1"/>
+    <field name="sum_rakentaminen_tco2" editable="1"/>
+    <field name="sum_sahko_tco2" editable="1"/>
+    <field name="sum_yhteensa_tco2" editable="1"/>
+    <field name="tilat_jaahdytys_tco2" editable="1"/>
+    <field name="tilat_lammitys_tco2" editable="1"/>
+    <field name="tilat_vesi_tco2" editable="1"/>
+    <field name="tp_yht" editable="1"/>
+    <field name="tp_yht_2017" editable="1"/>
+    <field name="vuosi" editable="1"/>
+    <field name="vyohyke" editable="1"/>
+    <field name="xyind" editable="1"/>
+    <field name="year" editable="1"/>
+    <field name="zone" editable="1"/>
   </editable>
   <labelOnTop>
     <field name="asukkaat" labelOnTop="0"/>
+    <field name="floorspace" labelOnTop="0"/>
     <field name="id" labelOnTop="0"/>
     <field name="liikenne_hlo_tco2" labelOnTop="0"/>
+    <field name="liikenne_hlo_tco2_per_as_tp" labelOnTop="0"/>
     <field name="liikenne_hlo_tco2_per_asukas" labelOnTop="0"/>
     <field name="liikenne_hlo_tco2_per_asukas_tp_yht" labelOnTop="0"/>
     <field name="liikenne_hlo_tco2_per_sum_liikenne_tco2" labelOnTop="0"/>
     <field name="liikenne_hlo_tco2_per_sum_yhteensa_tco2" labelOnTop="0"/>
+    <field name="liikenne_hlo_tco2_per_tp" labelOnTop="0"/>
     <field name="liikenne_hlo_tco2_per_tp_yht" labelOnTop="0"/>
     <field name="liikenne_palv_tco2" labelOnTop="0"/>
     <field name="liikenne_tv_tco2" labelOnTop="0"/>
+    <field name="mun" labelOnTop="0"/>
+    <field name="pop" labelOnTop="0"/>
+    <field name="rak_korjaussaneeraus_tco2" labelOnTop="0"/>
+    <field name="rak_purku_tco2" labelOnTop="0"/>
+    <field name="rak_uudis_tco2" labelOnTop="0"/>
+    <field name="sahko_kiinteistot_tco2" labelOnTop="0"/>
+    <field name="sahko_kotitaloudet_tco2" labelOnTop="0"/>
+    <field name="sahko_palv_tco2" labelOnTop="0"/>
+    <field name="sahko_tv_tco2" labelOnTop="0"/>
+    <field name="sum_lammonsaato_tco2" labelOnTop="0"/>
     <field name="sum_liikenne_tco2" labelOnTop="0"/>
+    <field name="sum_liikenne_tco2_per_asukas" labelOnTop="0"/>
     <field name="sum_liikenne_tco2_per_sum_yhteensa_tco2" labelOnTop="0"/>
+    <field name="sum_rakentaminen_tco2" labelOnTop="0"/>
+    <field name="sum_sahko_tco2" labelOnTop="0"/>
     <field name="sum_yhteensa_tco2" labelOnTop="0"/>
+    <field name="tilat_jaahdytys_tco2" labelOnTop="0"/>
+    <field name="tilat_lammitys_tco2" labelOnTop="0"/>
+    <field name="tilat_vesi_tco2" labelOnTop="0"/>
+    <field name="tp_yht" labelOnTop="0"/>
     <field name="tp_yht_2017" labelOnTop="0"/>
     <field name="vuosi" labelOnTop="0"/>
     <field name="vyohyke" labelOnTop="0"/>
     <field name="xyind" labelOnTop="0"/>
+    <field name="year" labelOnTop="0"/>
+    <field name="zone" labelOnTop="0"/>
   </labelOnTop>
   <widgets/>
   <previewExpression>xyind</previewExpression>
