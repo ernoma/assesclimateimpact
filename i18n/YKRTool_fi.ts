@@ -94,16 +94,6 @@
         <translation>Nokian myllyn ruutu hiilineutraaliksi</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="439"/>
-        <source>YKR Population:</source>
-        <translation>YKR-väestö:</translation>
-    </message>
-    <message>
-        <location filename="../ui/ykr_tool_main.ui" line="478"/>
-        <source>YKR Workplaces:</source>
-        <translation>YKR-työpaikat:</translation>
-    </message>
-    <message>
         <location filename="../ui/ykr_tool_main.ui" line="579"/>
         <source>Visualize Good Zones for Population+Job Density and for Sustainable Transport</source>
         <translation>Visualisoi &apos;edulliset&apos; vyöhykkeet</translation>
@@ -292,6 +282,16 @@
         <location filename="../ui/ykr_tool_main.ui" line="632"/>
         <source>Allow other users access (if not already) to the YKR job layer</source>
         <translation>Salli kaikille tietokannan käyttäjille (jos ei jo ole) YKR-työpaikka-taulun käyttö</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="439"/>
+        <source>YKR Population for post calculation visualizations:</source>
+        <translation>YKR-väestö-aineisto laskennan jälkeen tehtäviin visualisointeihin:</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="478"/>
+        <source>YKR Workplaces for post calculation visualizations:</source>
+        <translation>YKR-työpaikka-aineisto laskennan jälkeen tehtäviin visualisointeihin:</translation>
     </message>
 </context>
 <context>
