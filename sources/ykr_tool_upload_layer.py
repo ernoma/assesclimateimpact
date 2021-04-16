@@ -505,3 +505,361 @@ class YKRToolUploadLayer:
 
         QgsProject.instance().addMapLayer(targetLayer)
         return True
+
+
+    def copySourceYKRPopLayerFeaturesToTargetTable(self, connParams, sourceLayer, targetTableName, allowOtherUsersToUseUploadedMapLayer=False, retriesLeft=3):
+        try:
+            conn = createDbConnection(connParams)
+        except Exception as e:
+            if retriesLeft > 0:
+                return self.copySourceYKRPopLayerFeaturesToTargetTable(connParams, sourceLayer, targetTableName, allowOtherUsersToUseUploadedMapLayer, retriesLeft - 1)
+            else:
+                self.iface.messageBar().pushMessage(
+                    self.tr('Error in connecting to the database'),
+                    str(e), Qgis.Warning, duration=0)
+                return False
+
+        try:
+            outputSchemaName, outputTableName = targetTableName.replace('"', '').split('.')
+            cur = conn.cursor()
+            cur.execute("select exists(select * from information_schema.tables where table_schema = '{}' AND table_name='{}')".format(outputSchemaName, outputTableName))
+            if cur.fetchone()[0] == True:
+                self.iface.messageBar().pushMessage(
+                    self.tr('A table with the name ') + targetTableName + self.tr(' already exists'), Qgis.Warning, duration=0)
+                return False
+        except Exception as e:
+            self.iface.messageBar().pushMessage(
+                self.tr('Unexpected database error'),
+                str(e), Qgis.Warning, duration=0)
+            conn.close()
+            return False
+
+        QgsMessageLog.logMessage("copySourceYKRPopLayerFeaturesToTargetTable - checked YKR pop dest table existence" , 'YKRTool', Qgis.Info)
+
+        self.sourceLayer = sourceLayer
+        self.sourceFeatures = sourceLayer.getFeatures()
+        # self.sourceFeatureCount = sourceLayer.featureCount()
+        self.sourceCRS = sourceLayer.sourceCrs()
+
+        query = """CREATE TABLE {}(
+            id serial PRIMARY KEY,""".format('"' + outputSchemaName + '"."' + outputTableName + '"')
+
+        if sourceLayer.wkbType() == 3 or sourceLayer.wkbType() == 1003 or sourceLayer.wkbType() == 6 or sourceLayer.wkbType() == 1006: # polygon or polygonz # MultiPolygon or MultiPolygonZ
+            query += "geom geometry(MultiPolygonZ, 3067),"
+        else:
+            raise Exception(self.tr("Unsupported geometry type"))
+
+
+        query += """
+            xyind varchar NOT NULL,
+            v_yht int4,
+            vuosi varchar,
+            kunta varchar
+            )"""
+
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+
+        try:
+            cur = conn.cursor()
+            cur.execute(query)
+            conn.commit()
+        except Exception as e:
+            self.iface.messageBar().pushMessage(
+                self.tr('Could not create the table to the database'),
+                str(e), Qgis.Warning, duration=0)
+            conn.close()
+            return False
+
+        uri = QgsDataSourceUri()
+        uri.setConnection(connParams['host'], connParams['port'],\
+            connParams['database'], connParams['user'], connParams['password'])
+        uri.setDataSource(outputSchemaName, outputTableName, 'geom')
+
+        targetLayer = QgsVectorLayer(uri.uri(False), outputSchemaName + '.' + outputTableName, 'postgres')
+        self.targetCRS = targetLayer.sourceCrs()
+
+        transform = None
+        if self.sourceCRS != self.targetCRS:
+            transform = QgsCoordinateTransform(self.sourceCRS, self.targetCRS, self.transformContext)
+
+        QgsMessageLog.logMessage("copySourceYKRPopLayerFeaturesToTargetTable - to upload", 'YKRTool', Qgis.Info)
+
+        with conn.cursor(cursor_factory = psycopg2.extras.DictCursor) as cursor:
+            try:
+                for index, sourceFeature in enumerate(self.sourceFeatures):
+                    targetLayerFeature = QgsFeature()
+                    sourceGeom = sourceFeature.geometry()
+
+                    if not sourceGeom.isNull() and transform is not None:
+                        transformedSourceGeom = QgsGeometry(sourceGeom)
+                        transformedSourceGeom.transform(transform)
+                    else:
+                        transformedSourceGeom = QgsGeometry(sourceGeom)
+
+                    targetLayerFeature.setGeometry(transformedSourceGeom)
+
+                    geom = targetLayerFeature.geometry()
+
+                    query = ""
+
+                    if geom.isNull() or geom.isEmpty():
+                        
+                        geom_lack_type = None
+                        if geom.isNull():
+                            message = self.tr('Feature to upload had NULL geometry.')
+                        else:
+                            message = self.tr('Feature to upload had empty geometry.')
+
+                        QgsMessageLog.logMessage(message, 'YKRTool', Qgis.Warning)
+                        # self.iface.messageBar().pushMessage(, Qgis.Warning, duration=0)
+
+                    else:
+                        wkt = geom.asWkt().replace('nan', '0')
+
+                        query = "INSERT INTO {} (geom".format('"' + outputSchemaName + '"."' + outputTableName + '"')
+
+                        if sourceFeature.fieldNameIndex("xyind") != -1:
+                            query += ", xyind"
+                        else: 
+                            raise Exception(self.tr("YKR population source layer is missing required field: xyind"))
+
+                        if sourceFeature.fieldNameIndex("v_yht") != -1:
+                            query += ", v_yht"
+                        else: 
+                            raise Exception(self.tr("YKR population source layer is missing required field: v_yht"))
+
+                        if sourceFeature.fieldNameIndex("vuosi") != -1:
+                            query += ", vuosi"
+                        else: 
+                            raise Exception(self.tr("YKR population source layer is missing required field: vuosi"))
+
+                        if sourceFeature.fieldNameIndex("kunta") != -1:
+                            query += ", kunta"
+                        else: 
+                            raise Exception(self.tr("YKR population source layer is missing required field: kunta"))
+
+                        if geom.isMultipart():
+                            query += ") VALUES (ST_SetSRID(ST_Force3D(ST_GeomFromText('{}')), {})".format(wkt, self.targetCRS.authid().split(':')[1])
+                        else:
+                            query += ") VALUES (ST_Collect(ARRAY[ ST_SetSRID(ST_Force3D(ST_GeomFromText('{}')), {}) ])".format(wkt, self.targetCRS.authid().split(':')[1])
+
+                        value = sourceFeature["xyind"]
+                        query += ", '" + str(value) + "'"
+                        value = sourceFeature["v_yht"]
+                        query += ", '" + str(int(value)) + "'"
+                        value = sourceFeature["vuosi"]
+                        if type(value) is float:
+                            if int(value) == 0:
+                                query += ", '0000'"
+                            else:
+                                query += ", '" + str(int(value)) + "'"
+                        else:
+                            query += ", '" + str(value) + "'"
+                        value = sourceFeature["kunta"]
+                        query += ", '" + str(int(value)) + "'"
+                        query += ")"
+
+                        cursor.execute(query)
+
+                conn.commit()
+            except psycopg2.Error as e:
+                QgsMessageLog.logMessage(self.tr('Could not copy YKR pop data to the database table:') + ' {}'.format(e), 'YKRTool', Qgis.Critical)
+                raise Exception(self.tr('Could not copy YKR pop data to the database table:') + ' {}'.format(e))
+
+        QgsMessageLog.logMessage("copySourceYKRPopLayerFeaturesToTargetTable - uploaded" , 'YKRTool', Qgis.Info)
+
+        if allowOtherUsersToUseUploadedMapLayer:
+            query = "GRANT SELECT ON " + '"' + outputSchemaName + '"."' + outputTableName + '"' + " TO public"
+
+            try:
+                cur = conn.cursor()
+                cur.execute(query)
+                conn.commit()
+            except Exception as e:
+                self.iface.messageBar().pushMessage(
+                    self.tr('Could not give access on table ') + '"' + outputSchemaName + '"."' + outputTableName + '"' + self.tr(' to public.'),
+                    str(e), Qgis.Warning, duration=0)
+                    
+        conn.close()
+
+        QgsProject.instance().addMapLayer(targetLayer)
+        return True
+
+
+    def copySourceYKRJobLayerFeaturesToTargetTable(self, connParams, sourceLayer, targetTableName, allowOtherUsersToUseUploadedMapLayer=False, retriesLeft=3):
+        try:
+            conn = createDbConnection(connParams)
+        except Exception as e:
+            if retriesLeft > 0:
+                return self.copySourceYKRJobLayerFeaturesToTargetTable(connParams, sourceLayer, targetTableName, allowOtherUsersToUseUploadedMapLayer, retriesLeft - 1)
+            else:
+                self.iface.messageBar().pushMessage(
+                    self.tr('Error in connecting to the database'),
+                    str(e), Qgis.Warning, duration=0)
+                return False
+
+        try:
+            outputSchemaName, outputTableName = targetTableName.replace('"', '').split('.')
+            cur = conn.cursor()
+            cur.execute("select exists(select * from information_schema.tables where table_schema = '{}' AND table_name='{}')".format(outputSchemaName, outputTableName))
+            if cur.fetchone()[0] == True:
+                self.iface.messageBar().pushMessage(
+                    self.tr('A table with the name ') + targetTableName + self.tr(' already exists'), Qgis.Warning, duration=0)
+                return False
+        except Exception as e:
+            self.iface.messageBar().pushMessage(
+                self.tr('Unexpected database error'),
+                str(e), Qgis.Warning, duration=0)
+            conn.close()
+            return False
+
+        QgsMessageLog.logMessage("copySourceYKRJobLayerFeaturesToTargetTable - checked YKR job dest table existence" , 'YKRTool', Qgis.Info)
+
+        self.sourceLayer = sourceLayer
+        self.sourceFeatures = sourceLayer.getFeatures()
+        # self.sourceFeatureCount = sourceLayer.featureCount()
+        self.sourceCRS = sourceLayer.sourceCrs()
+
+        query = """CREATE TABLE {}(
+            id serial PRIMARY KEY,""".format('"' + outputSchemaName + '"."' + outputTableName + '"')
+
+        if sourceLayer.wkbType() == 3 or sourceLayer.wkbType() == 1003 or sourceLayer.wkbType() == 6 or sourceLayer.wkbType() == 1006: # polygon or polygonz # MultiPolygon or MultiPolygonZ
+            query += "geom geometry(MultiPolygonZ, 3067),"
+        else:
+            raise Exception(self.tr("Unsupported geometry type"))
+
+
+        query += """
+            xyind varchar NOT NULL,
+            tp_yht int4,
+            vuosi varchar,
+            kunta varchar
+            )"""
+
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+
+        try:
+            cur = conn.cursor()
+            cur.execute(query)
+            conn.commit()
+        except Exception as e:
+            self.iface.messageBar().pushMessage(
+                self.tr('Could not create the table to the database'),
+                str(e), Qgis.Warning, duration=0)
+            conn.close()
+            return False
+
+        uri = QgsDataSourceUri()
+        uri.setConnection(connParams['host'], connParams['port'],\
+            connParams['database'], connParams['user'], connParams['password'])
+        uri.setDataSource(outputSchemaName, outputTableName, 'geom')
+
+        targetLayer = QgsVectorLayer(uri.uri(False), outputSchemaName + '.' + outputTableName, 'postgres')
+        self.targetCRS = targetLayer.sourceCrs()
+
+        transform = None
+        if self.sourceCRS != self.targetCRS:
+            transform = QgsCoordinateTransform(self.sourceCRS, self.targetCRS, self.transformContext)
+
+        QgsMessageLog.logMessage("copySourceYKRJobLayerFeaturesToTargetTable - to upload", 'YKRTool', Qgis.Info)
+
+        with conn.cursor(cursor_factory = psycopg2.extras.DictCursor) as cursor:
+            try:
+                for index, sourceFeature in enumerate(self.sourceFeatures):
+                    targetLayerFeature = QgsFeature()
+                    sourceGeom = sourceFeature.geometry()
+
+                    if not sourceGeom.isNull() and transform is not None:
+                        transformedSourceGeom = QgsGeometry(sourceGeom)
+                        transformedSourceGeom.transform(transform)
+                    else:
+                        transformedSourceGeom = QgsGeometry(sourceGeom)
+
+                    targetLayerFeature.setGeometry(transformedSourceGeom)
+
+                    geom = targetLayerFeature.geometry()
+
+                    query = ""
+
+                    if geom.isNull() or geom.isEmpty():
+                        
+                        geom_lack_type = None
+                        if geom.isNull():
+                            message = self.tr('Feature to upload had NULL geometry.')
+                        else:
+                            message = self.tr('Feature to upload had empty geometry.')
+
+                        QgsMessageLog.logMessage(message, 'YKRTool', Qgis.Warning)
+                        # self.iface.messageBar().pushMessage(, Qgis.Warning, duration=0)
+
+                    else:
+                        wkt = geom.asWkt().replace('nan', '0')
+
+                        query = "INSERT INTO {} (geom".format('"' + outputSchemaName + '"."' + outputTableName + '"')
+
+                        if sourceFeature.fieldNameIndex("xyind") != -1:
+                            query += ", xyind"
+                        else: 
+                            raise Exception(self.tr("YKR job source layer is missing required field: xyind"))
+
+                        if sourceFeature.fieldNameIndex("tp_yht") != -1:
+                            query += ", tp_yht"
+                        else: 
+                            raise Exception(self.tr("YKR job source layer is missing required field: v_yht"))
+
+                        if sourceFeature.fieldNameIndex("vuosi") != -1:
+                            query += ", vuosi"
+                        else: 
+                            raise Exception(self.tr("YKR job source layer is missing required field: vuosi"))
+
+                        if sourceFeature.fieldNameIndex("kunta") != -1:
+                            query += ", kunta"
+                        else: 
+                            raise Exception(self.tr("YKR job source layer is missing required field: kunta"))
+
+                        if geom.isMultipart():
+                            query += ") VALUES (ST_SetSRID(ST_Force3D(ST_GeomFromText('{}')), {})".format(wkt, self.targetCRS.authid().split(':')[1])
+                        else:
+                            query += ") VALUES (ST_Collect(ARRAY[ ST_SetSRID(ST_Force3D(ST_GeomFromText('{}')), {}) ])".format(wkt, self.targetCRS.authid().split(':')[1])
+
+                        value = sourceFeature["xyind"]
+                        query += ", '" + str(value) + "'"
+                        value = sourceFeature["tp_yht"]
+                        query += ", '" + str(int(value)) + "'"
+                        value = sourceFeature["vuosi"]
+                        if type(value) is float:
+                            if int(value) == 0:
+                                query += ", '0000'"
+                            else:
+                                query += ", '" + str(int(value)) + "'"
+                        else:
+                            query += ", '" + str(value) + "'"
+                        value = sourceFeature["kunta"]
+                        query += ", '" + str(int(value)) + "'"
+                        query += ")"
+
+                        cursor.execute(query)
+
+                conn.commit()
+            except psycopg2.Error as e:
+                QgsMessageLog.logMessage(self.tr('Could not copy YKR job data to the database table:') + ' {}'.format(e), 'YKRTool', Qgis.Critical)
+                raise Exception(self.tr('Could not copy YKR job data to the database table:') + ' {}'.format(e))
+
+        QgsMessageLog.logMessage("copySourceYKRJobLayerFeaturesToTargetTable - uploaded" , 'YKRTool', Qgis.Info)
+
+        if allowOtherUsersToUseUploadedMapLayer:
+            query = "GRANT SELECT ON " + '"' + outputSchemaName + '"."' + outputTableName + '"' + " TO public"
+
+            try:
+                cur = conn.cursor()
+                cur.execute(query)
+                conn.commit()
+            except Exception as e:
+                self.iface.messageBar().pushMessage(
+                    self.tr('Could not give access on table ') + '"' + outputSchemaName + '"."' + outputTableName + '"' + self.tr(' to public.'),
+                    str(e), Qgis.Warning, duration=0)
+                    
+        conn.close()
+
+        QgsProject.instance().addMapLayer(targetLayer)
+        return True

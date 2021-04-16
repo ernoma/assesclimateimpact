@@ -109,12 +109,12 @@
         <translation>Visualisoi &apos;edulliset&apos; vyöhykkeet</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="639"/>
+        <location filename="../ui/ykr_tool_main.ui" line="659"/>
         <source>Database connection settings...</source>
         <translation>Tietokanta-asetukset...</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="646"/>
+        <location filename="../ui/ykr_tool_main.ui" line="666"/>
         <source>Info...</source>
         <translation></translation>
     </message>
@@ -283,6 +283,16 @@
         <source>Visualize Sustainable Urban Structure Using YRK Car Ownership Data:</source>
         <translation>Vísualisoi kestävän kaupunkirakenteen lubut SYKE:n Asuntokunnat ja autonomistus aineistolla:</translation>
     </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="622"/>
+        <source>Allow other users access (if not already) to the YKR population layer</source>
+        <translation>Salli kaikille tietokannan käyttäjille (jos ei jo ole) YKR-väestö-taulun käyttö</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="632"/>
+        <source>Allow other users access (if not already) to the YKR job layer</source>
+        <translation>Salli kaikille tietokannan käyttäjille (jos ei jo ole) YKR-työpaikka-taulun käyttö</translation>
+    </message>
 </context>
 <context>
     <name>QueryTask</name>
@@ -305,419 +315,439 @@
 <context>
     <name>YKRTool</name>
     <message>
-        <location filename="../sources/ykr_tool.py" line="230"/>
+        <location filename="../sources/ykr_tool.py" line="233"/>
         <source>&amp;CO2 Emissions Tool</source>
         <translation>&amp;Ilmastovaikutusten arviointityökalu</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="217"/>
+        <location filename="../sources/ykr_tool.py" line="220"/>
         <source>CO2 Emissions Tool</source>
         <translation>Ilmastovaikutusten arviointityökalu</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="260"/>
+        <location filename="../sources/ykr_tool.py" line="263"/>
         <source>Error in preprocessing</source>
         <translation>Virhe esikäsittelyssä</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="436"/>
+        <location filename="../sources/ykr_tool.py" line="439"/>
         <source>Error in reading a file</source>
         <translation>Virhe luettaessa tiedostoa</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="834"/>
+        <location filename="../sources/ykr_tool.py" line="889"/>
         <source>Error</source>
         <translation>Virhe</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="453"/>
+        <location filename="../sources/ykr_tool.py" line="456"/>
         <source>File could not be read</source>
         <translation>Tiedostoa ei voitu lukea</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="464"/>
+        <location filename="../sources/ykr_tool.py" line="467"/>
         <source>File does not contain database connection parameters</source>
         <translation>Tiedosto ei sisällä tietokannan yhteystietoja</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="589"/>
+        <location filename="../sources/ykr_tool.py" line="644"/>
         <source>Investigation area map layer has not been selected</source>
         <translation>Tarkastelualueen karttatasoa ei ole valittu</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="591"/>
+        <location filename="../sources/ykr_tool.py" line="646"/>
         <source>Investigation area map layer is not valid</source>
         <translation>Tarkastelualueen karttataso ei ole validi</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="736"/>
+        <location filename="../sources/ykr_tool.py" line="791"/>
         <source>Future zoning areas layer is not valid</source>
         <translation>Tulevaisuuden aluevaraustietojen karttataso ei ole validi</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="739"/>
+        <location filename="../sources/ykr_tool.py" line="794"/>
         <source>Urban center layer is not valid</source>
         <translation>Keskusverkkokarttaso ei ole validi</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="742"/>
+        <location filename="../sources/ykr_tool.py" line="797"/>
         <source>Public transit stops layer is not valid</source>
         <translation>Joukkoliikennepysäkkien karttataso ei ole validi</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="829"/>
+        <location filename="../sources/ykr_tool.py" line="884"/>
         <source>Loading layer to the database</source>
         <translation>Ladataan tasoa tietokantaan</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="834"/>
+        <location filename="../sources/ykr_tool.py" line="889"/>
         <source>Error in loading layer to the database</source>
         <translation>Virhe tason tietokantaan viennissä</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="854"/>
+        <location filename="../sources/ykr_tool.py" line="909"/>
         <source>Emission calculation</source>
         <translation>Päästölaskenta</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="854"/>
+        <location filename="../sources/ykr_tool.py" line="909"/>
         <source>Calculating emissions</source>
         <translation>Lasketaan päästöjä</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="922"/>
+        <location filename="../sources/ykr_tool.py" line="977"/>
         <source>Ready</source>
         <translation>Valmis</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="922"/>
+        <location filename="../sources/ykr_tool.py" line="977"/>
         <source>Emission calculation </source>
         <translation>Päästölaskenta </translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="922"/>
+        <location filename="../sources/ykr_tool.py" line="977"/>
         <source> is ready</source>
         <translation> on valmis</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="925"/>
+        <location filename="../sources/ykr_tool.py" line="980"/>
         <source>Error in storing session data: </source>
         <translation>Laskentakerran tietojen tallennuksessa tietokantaan virhe: </translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="931"/>
+        <location filename="../sources/ykr_tool.py" line="986"/>
         <source>Error in adding emissions results to the QGIS: </source>
         <translation>Päästölaskutietojen lisäämisessä QGIS:iin virhe: </translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="936"/>
+        <location filename="../sources/ykr_tool.py" line="991"/>
         <source>Error in cleaning up: </source>
         <translation>Virhe laskentaajon puhdistuksessa: </translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="2134"/>
+        <location filename="../sources/ykr_tool.py" line="2353"/>
         <source>Error in connecting to the database</source>
         <translation>Virhe tietokantaan yhdistämisessä</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="2143"/>
+        <location filename="../sources/ykr_tool.py" line="2362"/>
         <source>Error in modifying the results table </source>
         <translation>Virhe päästötulostaulun muokkauksessa </translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="2164"/>
+        <location filename="../sources/ykr_tool.py" line="2383"/>
         <source>Error in removing temporary table </source>
         <translation>Tilapäisen taulun poistamisessa tapahtui virhe </translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="857"/>
+        <location filename="../sources/ykr_tool.py" line="912"/>
         <source>Error in calculation</source>
         <translation>Virhe laskennassa</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="2176"/>
+        <location filename="../sources/ykr_tool.py" line="2395"/>
         <source>Error in performing calculation</source>
         <translation>Virhe päästöjen laskennassa</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="2176"/>
+        <location filename="../sources/ykr_tool.py" line="2395"/>
         <source>See further info in the error log</source>
         <translation>Katso lisätietoja virhelokista</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="659"/>
+        <location filename="../sources/ykr_tool.py" line="714"/>
         <source>Future urban center map layer has not been selected</source>
         <translation>Keskusverkkokarttatasoa ei ole valittu</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="661"/>
+        <location filename="../sources/ykr_tool.py" line="716"/>
         <source>Future urban center map layer is not valid</source>
         <translation>Keskusverkkotaso ei ole validi</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="691"/>
+        <location filename="../sources/ykr_tool.py" line="746"/>
         <source>Future public transit stops map layer has not been selected</source>
         <translation>Joukkoliikennepysäkkikarttatasoa ei ole valittu</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="693"/>
+        <location filename="../sources/ykr_tool.py" line="748"/>
         <source>Future public transit stops map layer is not valid</source>
         <translation>Joukkoliikennepysäkkikarttataso ei ole validi</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="973"/>
+        <location filename="../sources/ykr_tool.py" line="1028"/>
         <source>emissions calculation results</source>
         <translation>Päästölaskennan tuloskarttatasot</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="994"/>
+        <location filename="../sources/ykr_tool.py" line="1049"/>
         <source>CO2 sources grid</source>
         <translation>Suurin päästöluokka ruuduittain</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="996"/>
+        <location filename="../sources/ykr_tool.py" line="1051"/>
         <source>CO2 total grid</source>
         <translation>Kokonaispäästöt ruuduittain tCO2-ekv</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1120"/>
+        <location filename="../sources/ykr_tool.py" line="1187"/>
         <source>pop job mix grid</source>
         <translation>Väestön ja työpaikkojen sekoittuneisuus ruuduittain (pop-kenttä)</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1122"/>
+        <location filename="../sources/ykr_tool.py" line="1189"/>
         <source>v_yht job mix grid</source>
         <translation>Väestön ja työpaikkojen sekoittuneisuus ruuduittain (v_yht-kenttä)</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1125"/>
+        <location filename="../sources/ykr_tool.py" line="1192"/>
         <source>good UZ zones for population, jobs and sustainable transport grid</source>
         <translation>Edulliset YKR-vyöhykkeet asukas- ja työpaikkatiheyden sekä kestävien liikkumismahdollisuuksien näkökulmasta</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1425"/>
+        <location filename="../sources/ykr_tool.py" line="1622"/>
         <source>CO2 traffic sources grid</source>
         <translation>Suurin liikenteen päästöluokka ruuduittain</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1426"/>
+        <location filename="../sources/ykr_tool.py" line="1623"/>
         <source>CO2 traffic total grid</source>
         <translation>Liikenteen kokonaispäästöt ruuduittain tCO2-ekv</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1427"/>
+        <location filename="../sources/ykr_tool.py" line="1624"/>
         <source>CO2 commuter and other population traffic grid</source>
         <translation>Henkilöliikenteen päästöt ruuduittain tCO2-ekv</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1428"/>
+        <location filename="../sources/ykr_tool.py" line="1625"/>
         <source>CO2 industry and warehouses traffic grid</source>
         <translation>Teollisuus- ja varastorakennusten päästöt ruuduittain tCO2-ekv</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1429"/>
+        <location filename="../sources/ykr_tool.py" line="1626"/>
         <source>CO2 amenities traffic grid</source>
         <translation>Palvelurakennusten päästöt ruuduittain tCO2-ekv</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1434"/>
+        <location filename="../sources/ykr_tool.py" line="1631"/>
         <source>traffic emissions</source>
         <translation>Liikenteen päästöt</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1458"/>
+        <location filename="../sources/ykr_tool.py" line="1658"/>
         <source>CO2 traffic emissions / pop grid</source>
         <translation>Liikenteen päästöt per asukas ruuduittain (tCO2-ekv / as., pop-kenttä)</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1460"/>
+        <location filename="../sources/ykr_tool.py" line="1660"/>
         <source>CO2 traffic emissions / v_yht grid</source>
         <translation>Liikenteen päästöt per asukas ruuduittain (tCO2-ekv / as., v_yht-kenttä)</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1472"/>
+        <location filename="../sources/ykr_tool.py" line="1675"/>
         <source>CO2 / pop grid</source>
         <translation>Kokonaispäästöt per asukas ruuduittain (tCO2-ekv / as., pop-kenttä)</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1474"/>
+        <location filename="../sources/ykr_tool.py" line="1677"/>
         <source>CO2 / v_yht grid</source>
         <translation>Kokonaispäästöt per asukas ruuduittain (tCO2-ekv / as., v_yht-kenttä)</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1479"/>
+        <location filename="../sources/ykr_tool.py" line="1682"/>
         <source>CO2 / job grid</source>
         <translation>Kokonaispäästöt per työpaikat ruuduittain (tCO2-ekv / tp_yht)</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1485"/>
+        <location filename="../sources/ykr_tool.py" line="1688"/>
         <source>CO2 / (pop + job) grid</source>
         <translation>Kokonaispäästöt per (asukkaiden lkm + työpaikkojen lkm) ruuduittain (tCO2-ekv / (pop + tp_yht))</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1487"/>
+        <location filename="../sources/ykr_tool.py" line="1690"/>
         <source>CO2 / (v_yht + job) grid</source>
         <translation>Kokonaispäästöt per (asukkaiden lkm + työpaikkojen lkm) ruuduittain (tCO2-ekv / (v_yht + tp_yht))</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1492"/>
+        <location filename="../sources/ykr_tool.py" line="1695"/>
         <source>CO2 / floor space squares grid</source>
         <translation>Kokonaispäästöt per kerrosneliöt ruuduittain (tCO2-ekv / floorspace)</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1004"/>
+        <location filename="../sources/ykr_tool.py" line="1059"/>
         <source>general</source>
         <translation>Yleistä</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1383"/>
+        <location filename="../sources/ykr_tool.py" line="1577"/>
         <source>CO2 buildings thermo total grid</source>
         <translation>Rakennusten lämmönsäädön kokonaispäästöt ruuduittain tCO2-ekv</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1384"/>
+        <location filename="../sources/ykr_tool.py" line="1578"/>
         <source>CO2 buildings water heating grid</source>
         <translation>Rakennusten käyttöveden lämmityksen päästöt ruuduittain tCO2-ekv</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1385"/>
+        <location filename="../sources/ykr_tool.py" line="1579"/>
         <source>CO2 buildings heating grid</source>
         <translation>Rakennusten  lämmityksen päästöt ruuduittain tCO2-ekv</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1386"/>
+        <location filename="../sources/ykr_tool.py" line="1580"/>
         <source>CO2 buildings cooling grid</source>
         <translation>Rakennusten jäähdytyksen päästöt ruuduittain tCO2-ekv</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1390"/>
+        <location filename="../sources/ykr_tool.py" line="1584"/>
         <source>buildings thermo emissions</source>
         <translation>Rakennusten lämmönsäädön päästöt</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1414"/>
+        <location filename="../sources/ykr_tool.py" line="1611"/>
         <source>CO2 buildings thermo emissions / pop grid</source>
         <translation>Lämmönsäädön päästöt per asukas ruuduittain (tCO2-ekv / as., pop-kenttä)</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1416"/>
+        <location filename="../sources/ykr_tool.py" line="1613"/>
         <source>CO2 buildings thermo emissions / v_yht grid</source>
         <translation>Lämmönsäädön päästöt per asukas ruuduittain (tCO2-ekv / as., v_yht-kenttä)</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1382"/>
+        <location filename="../sources/ykr_tool.py" line="1576"/>
         <source>CO2 buildings thermo sources grid</source>
         <translation>Suurin lämmönsäädön päästöluokka ruuduittain</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1341"/>
+        <location filename="../sources/ykr_tool.py" line="1532"/>
         <source>CO2 household electricity grid</source>
         <translation>Kotitalouksien sähkön käytön päästöt ruuduittain tCO2-ekv</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1342"/>
+        <location filename="../sources/ykr_tool.py" line="1533"/>
         <source>CO2 amenities electricity grid</source>
         <translation>Palveluiden sähkön käytön päästöt ruuduittain tCO2-ekv</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1343"/>
+        <location filename="../sources/ykr_tool.py" line="1534"/>
         <source>CO2 industry and warehouses electricity grid</source>
         <translation>Teollisuuden ja varastojen sähkönkäytön päästöt ruuduittain tCO2-ekv</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1338"/>
+        <location filename="../sources/ykr_tool.py" line="1529"/>
         <source>CO2 electricity sources grid</source>
         <translation>Suurin sähkön käytön päästöluokka ruuduittain</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1339"/>
+        <location filename="../sources/ykr_tool.py" line="1530"/>
         <source>CO2 electricity total grid</source>
         <translation>Sähkön käytön kokonaispäästöt ruuduittain tCO2-ekv</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1340"/>
+        <location filename="../sources/ykr_tool.py" line="1531"/>
         <source>CO2 buildings electricity grid</source>
         <translation>Kiinteistöjen sähkön käytön päästöt ruuduittain tCO2-ekv</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1347"/>
+        <location filename="../sources/ykr_tool.py" line="1538"/>
         <source>electricity emissions</source>
         <translation>Sähkön päästöt</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1371"/>
+        <location filename="../sources/ykr_tool.py" line="1565"/>
         <source>CO2 electricity emissions / pop grid</source>
         <translation>Sähkön käytön päästöt per asukas ruuduittain (tCO2-ekv / as., pop-kenttä)</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1373"/>
+        <location filename="../sources/ykr_tool.py" line="1567"/>
         <source>CO2 electricity emissions / v_yht grid</source>
         <translation>Sähkön käytön päästöt per asukas ruuduittain (tCO2-ekv / as., v_yht-kenttä)</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1128"/>
+        <location filename="../sources/ykr_tool.py" line="1195"/>
         <source>Buildings floor space / YKR square area &gt;= 0.2</source>
         <translation>Rakennusten yhteenlaskettu kerrosala / ruudun kerrosalaan &gt;= 0,2</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1168"/>
+        <location filename="../sources/ykr_tool.py" line="1258"/>
         <source>YRK Car Ownership Data layer has not been selected</source>
         <translation>YKR asuntokunnat ja autonomistus -karttatasoa ei ole valittuna</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1170"/>
+        <location filename="../sources/ykr_tool.py" line="1260"/>
         <source>YRK Car Ownership Data layer is not valid</source>
         <translation>YKR asuntokunnat ja autonomistus -karttataso ei ole validi</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1280"/>
-        <source>Car ownership table had unexpected count of features for xyind</source>
-        <translation>YKR asuntokunnat ja autonomistus -aineistossa oli odottamaton määrä ruutuja xyind-arvolla</translation>
-    </message>
-    <message>
-        <location filename="../sources/ykr_tool.py" line="1280"/>
+        <location filename="../sources/ykr_tool.py" line="1455"/>
         <source>and municipality code {}: {}</source>
         <translation>ja kuntakoodilla</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1133"/>
+        <location filename="../sources/ykr_tool.py" line="1475"/>
         <source>Sustainable Urban Structure, Count of True Value Indicators</source>
         <translation>Kestävä kaupunkirakenne, toteutuvien tavoitelukujen lukumäärä</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1134"/>
+        <location filename="../sources/ykr_tool.py" line="1476"/>
         <source>Sustainable Urban Structure, Relatively Low Personal Traffic Emissions</source>
         <translation>Kestävä kaupunkirakenne, Verrattain alhaiset liikkumisen päästöt</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1135"/>
+        <location filename="../sources/ykr_tool.py" line="1477"/>
         <source>Sustainable Urban Structure, Households not Owning Cars are Relatively Common</source>
         <translation>Kestävä kaupunkirakenne, Tiiveyden myötä laskeva autoistumisaste, Autottomien asuntokuntien osuus ylittää 1-autoiset; autottomien osuus yli 40 %</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1136"/>
+        <location filename="../sources/ykr_tool.py" line="1478"/>
         <source>Sustainable Urban Structure, Households not Owning 2 or More Cars are Relatively Common</source>
         <translation>Kestävä kaupunkirakenne, Tiiveyden myötä laskeva autoistumisaste, 1-autoisten asuntokuntien osuus ylittää 2-autoiset; 2-autoisten osuus alle 30 %</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1137"/>
+        <location filename="../sources/ykr_tool.py" line="1479"/>
         <source>Sustainable Urban Structure, Sufficient Mix of Population and Jobs</source>
         <translation>Kestävä kaupunkirakenne, Riittävä kaupunkirakenteen sekoittuneisuus</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1138"/>
+        <location filename="../sources/ykr_tool.py" line="1480"/>
         <source>Sustainable Urban Structure, Sufficient Density of Population and Jobs for Walkable City</source>
         <translation>Kestävä kaupunkirakenne, Riittävä kaupunkirakenteen tiiveys, Kävelykaupungin mahdollistava tiiveys</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1139"/>
+        <location filename="../sources/ykr_tool.py" line="1481"/>
         <source>Sustainable Urban Structure, Sufficient Density of Population and Jobs for Public Transport</source>
         <translation>Kestävä kaupunkirakenne, Riittävä kaupunkirakenteen tiiveys, Joukkoliikennekaupungin mahdollistava tiiveys</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool.py" line="1146"/>
+        <location filename="../sources/ykr_tool.py" line="1176"/>
         <source>urban devlopment</source>
         <translation>Kaupunkikehitys</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool.py" line="593"/>
+        <source>YKR population layer is not valid</source>
+        <translation>YKR-väestö-karttataso ei ole validi</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool.py" line="614"/>
+        <source>YKR Job layer has not been selected</source>
+        <translation>YKR-työpaikka-karttatasoa ei ole valittu</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool.py" line="616"/>
+        <source>YKR Job layer is not valid</source>
+        <translation>YKR-työpaikka-karttataso ei ole validi</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool.py" line="1455"/>
+        <source>temporary layer had unexpected count of features for xyind</source>
+        <translation>väliaikaisessa karttatasossa on odottamaton määrä kohteita, joiden xyind on</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool.py" line="591"/>
+        <source>YKR population layer has not been selected</source>
+        <translation>YKR-väestö-karttatasoa ei ole valittu</translation>
     </message>
 </context>
 <context>
@@ -731,42 +761,42 @@
 <context>
     <name>YKRToolUploadLayer</name>
     <message>
-        <location filename="../sources/ykr_tool_upload_layer.py" line="366"/>
+        <location filename="../sources/ykr_tool_upload_layer.py" line="700"/>
         <source>Error in connecting to the database</source>
         <translation>Virhe tietokantaan yhdistämisessä</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool_upload_layer.py" line="376"/>
+        <location filename="../sources/ykr_tool_upload_layer.py" line="710"/>
         <source>A table with the name </source>
         <translation>Tietokantataulu nimellä </translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool_upload_layer.py" line="376"/>
+        <location filename="../sources/ykr_tool_upload_layer.py" line="710"/>
         <source> already exists</source>
         <translation> on jo olemassa</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool_upload_layer.py" line="380"/>
+        <location filename="../sources/ykr_tool_upload_layer.py" line="714"/>
         <source>Unexpected database error</source>
         <translation>Odottamaton tietokantavirhe</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool_upload_layer.py" line="100"/>
+        <location filename="../sources/ykr_tool_upload_layer.py" line="733"/>
         <source>Unsupported geometry type</source>
         <translation>Geometriatyyppi, jota ei tueta</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool_upload_layer.py" line="406"/>
+        <location filename="../sources/ykr_tool_upload_layer.py" line="750"/>
         <source>Could not create the table to the database</source>
         <translation>Taulun lisääminen tietokantaan epäonnistui</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool_upload_layer.py" line="447"/>
+        <location filename="../sources/ykr_tool_upload_layer.py" line="793"/>
         <source>Feature to upload had NULL geometry.</source>
         <translation>Tietokantaan lisättävän kohteen geometria oli NULL.</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool_upload_layer.py" line="449"/>
+        <location filename="../sources/ykr_tool_upload_layer.py" line="795"/>
         <source>Feature to upload had empty geometry.</source>
         <translation>Tietokantaan lisättävän kohteen geometria oli tyhjä.</translation>
     </message>
@@ -776,12 +806,12 @@
         <translation>Taulun lisääminen tietokantaan epäonnistui:</translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool_upload_layer.py" line="503"/>
+        <location filename="../sources/ykr_tool_upload_layer.py" line="863"/>
         <source>Could not give access on table </source>
         <translation>Tauluun ei voitu antaa pääsyoikeuksia </translation>
     </message>
     <message>
-        <location filename="../sources/ykr_tool_upload_layer.py" line="503"/>
+        <location filename="../sources/ykr_tool_upload_layer.py" line="863"/>
         <source> to public.</source>
         <translation> kaikille.</translation>
     </message>
@@ -824,6 +854,56 @@
         <location filename="../sources/ykr_tool_upload_layer.py" line="472"/>
         <source>Future public transit stops source layer is missing required field: k_liikv</source>
         <translation>Joukkoliikennepysäkkikarttasosta puuttuu vaadittu kenttä: k_liikv</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool_upload_layer.py" line="628"/>
+        <source>YKR population source layer is missing required field: xyind</source>
+        <translation>YKR-väestön lähdetaulusta puuttuu vaadittu kenttä: xyind</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool_upload_layer.py" line="633"/>
+        <source>YKR population source layer is missing required field: v_yht</source>
+        <translation>YKR-väestön lähdetaulusta puuttuu vaadittu kenttä: v_yht</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool_upload_layer.py" line="638"/>
+        <source>YKR population source layer is missing required field: vuosi</source>
+        <translation>YKR-väestön lähdetaulusta puuttuu vaadittu kenttä: vuosi</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool_upload_layer.py" line="643"/>
+        <source>YKR population source layer is missing required field: kunta</source>
+        <translation>YKR-väestön lähdetaulusta puuttuu vaadittu kenttä: kunta</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool_upload_layer.py" line="671"/>
+        <source>Could not copy YKR pop data to the database table:</source>
+        <translation>YKR-väestö-aineiston kopiointi tietokantaan epäonnistui:</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool_upload_layer.py" line="808"/>
+        <source>YKR job source layer is missing required field: xyind</source>
+        <translation>YKR-työpaikkojen lähdetaulusta puuttuu vaadittu kenttä: xyind</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool_upload_layer.py" line="813"/>
+        <source>YKR job source layer is missing required field: v_yht</source>
+        <translation>YKR-työpaikkojen lähdetaulusta puuttuu vaadittu kenttä: v_yht</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool_upload_layer.py" line="818"/>
+        <source>YKR job source layer is missing required field: vuosi</source>
+        <translation>YKR-työpaikkojen lähdetaulusta puuttuu vaadittu kenttä: vuosi</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool_upload_layer.py" line="823"/>
+        <source>YKR job source layer is missing required field: kunta</source>
+        <translation>YKR-työpaikkojen lähdetaulusta puuttuu vaadittu kenttä: kunta</translation>
+    </message>
+    <message>
+        <location filename="../sources/ykr_tool_upload_layer.py" line="851"/>
+        <source>Could not copy YKR job data to the database table:</source>
+        <translation>YKR-työpaikka-aineiston kopiointi tietokantaan epäonnistui:</translation>
     </message>
 </context>
 </TS>

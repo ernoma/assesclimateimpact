@@ -40,7 +40,7 @@
         <item>
          <layout class="QFormLayout" name="formLayout_3">
           <item row="0" column="0">
-           <widget class="QRadioButton" name="radioButtonUseMapLayer">
+           <widget class="QRadioButton" name="radioButtonUseMapLayerForInvestigatedArea">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -63,7 +63,7 @@
            </widget>
           </item>
           <item row="4" column="0">
-           <widget class="QRadioButton" name="radioButtonUsePredefinedArea">
+           <widget class="QRadioButton" name="radioButtonUsePredefinedAreaForInvestigatedArea">
             <property name="text">
              <string>Use Predefined Area</string>
             </property>
@@ -463,7 +463,7 @@
             <item>
              <widget class="QCheckBox" name="checkBoxLoadYkrPopFromMapLayer">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="text">
                <string>Load from a map layer</string>
@@ -472,14 +472,14 @@
             </item>
            </layout>
           </item>
-          <item row="5" column="0">
+          <item row="6" column="0">
            <widget class="QLabel" name="label_2">
             <property name="text">
              <string>YKR Workplaces:</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="1">
+          <item row="6" column="1">
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
              <widget class="QComboBox" name="comboBoxYkrJob"/>
@@ -494,7 +494,7 @@
             <item>
              <widget class="QCheckBox" name="checkBoxLoadYkrJobFromMapLayer">
               <property name="enabled">
-               <bool>false</bool>
+               <bool>true</bool>
               </property>
               <property name="text">
                <string>Load from a map layer</string>
@@ -503,7 +503,7 @@
             </item>
            </layout>
           </item>
-          <item row="6" column="0">
+          <item row="8" column="0">
            <widget class="QCheckBox" name="checkBoxCalculateEmissionsPerPerson">
             <property name="text">
              <string>Visualize Emissions Per Capita</string>
@@ -513,7 +513,7 @@
             </property>
            </widget>
           </item>
-          <item row="7" column="0">
+          <item row="9" column="0">
            <widget class="QCheckBox" name="checkBoxCalculateEmissionsPerJob">
             <property name="text">
              <string>Visualize Emissions Per Worker</string>
@@ -523,7 +523,7 @@
             </property>
            </widget>
           </item>
-          <item row="8" column="0">
+          <item row="10" column="0">
            <widget class="QCheckBox" name="checkBoxCalculateEmissionsPerFloorSpaceSquares">
             <property name="text">
              <string>Visualize Emissions Per Floor Squares (m2)</string>
@@ -533,7 +533,7 @@
             </property>
            </widget>
           </item>
-          <item row="9" column="0">
+          <item row="11" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeTrafficEmissions">
             <property name="text">
              <string>Visualize Traffic Emissions</string>
@@ -543,7 +543,7 @@
             </property>
            </widget>
           </item>
-          <item row="10" column="0">
+          <item row="12" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeThermoEmissions">
             <property name="text">
              <string>Visualize Buildings Thermo Emissions</string>
@@ -553,7 +553,7 @@
             </property>
            </widget>
           </item>
-          <item row="11" column="0">
+          <item row="13" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeElectricityConsumptionEmissions">
             <property name="text">
              <string>Visualize Electricity Consumption Emissions</string>
@@ -563,7 +563,7 @@
             </property>
            </widget>
           </item>
-          <item row="12" column="0">
+          <item row="14" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizePopJobMix">
             <property name="text">
              <string>Visualize Mix of Population and Jobs</string>
@@ -573,7 +573,7 @@
             </property>
            </widget>
           </item>
-          <item row="13" column="0">
+          <item row="15" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeGoodZonesForPopJobDensityAndSustainableTransport">
             <property name="text">
              <string>Visualize Good Zones for Population+Job Density and for Sustainable Transport</string>
@@ -583,7 +583,7 @@
             </property>
            </widget>
           </item>
-          <item row="14" column="0">
+          <item row="16" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeFloorSpaceRatio">
             <property name="text">
              <string>Visualize Floor Space Ratio</string>
@@ -593,7 +593,7 @@
             </property>
            </widget>
           </item>
-          <item row="15" column="0">
+          <item row="17" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeSustainableUrbanStructure">
             <property name="enabled">
              <bool>true</bool>
@@ -606,10 +606,30 @@
             </property>
            </widget>
           </item>
-          <item row="15" column="1">
+          <item row="17" column="1">
            <widget class="QgsMapLayerComboBox" name="mMapLayerComboBoxYKRCarOwnershipData">
             <property name="enabled">
              <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QCheckBox" name="checkBoxAllowOtherUsersToUseUploadedYKRPopLayer">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Allow other users access (if not already) to the YKR population layer</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="QCheckBox" name="checkBoxAllowOtherUsersToUseUploadedYKRJobLayer">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Allow other users access (if not already) to the YKR job layer</string>
             </property>
            </widget>
           </item>
