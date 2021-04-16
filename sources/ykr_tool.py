@@ -22,14 +22,15 @@
  ***************************************************************************/
 """
 from PyQt5 import uic
-from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
 
 from qgis.core import (Qgis, QgsVectorLayer, QgsCoordinateReferenceSystem,
     QgsApplication, QgsDataSourceUri, QgsProject, QgsTaskManager,
     QgsProcessingAlgRunnerTask, QgsProcessingContext, QgsProcessingFeedback, QgsMessageLog,
-    QgsExpression, QgsFeatureRequest)
+    QgsExpression, QgsFeatureRequest,
+    QgsFeature, QgsField)
 from qgis.gui import QgsFileWidget
 from functools import partial
 
@@ -1111,6 +1112,9 @@ class YKRTool:
     def createUrbanDevelopmentVisualizations(self, rootGroup, uid, outputSchemaName, outputTableName):
         layerNames = []
         
+        groupName = self.tr("urban devlopment")
+        group = rootGroup.addGroup(groupName)
+
         if self.mainDialog.checkBoxVisualizePopJobMix.isChecked():
             success = self.calculatePopJobMix(outputSchemaName, outputTableName)
             if success:
@@ -1127,23 +1131,20 @@ class YKRTool:
             layerNames.append((self.tr('Buildings floor space / YKR square area >= 0.2') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/floor_space_ratio.qml')))
 
         if self.mainDialog.checkBoxVisualizeSustainableUrbanStructure.isChecked():
-            success = self.caclulateSustainableUrbanStructure(uid, outputSchemaName, outputTableName)
-            if success: # sustainable_urban_structure.qml
-                layerNames.append((self.tr('Sustainable Urban Structure, Count of True Value Indicators') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sustainable_urban_structure.qml')))
-                layerNames.append((self.tr('Sustainable Urban Structure, Relatively Low Personal Traffic Emissions') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_relat_low_pers_traffic_emissions.qml')))
-                layerNames.append((self.tr('Sustainable Urban Structure, Households not Owning Cars are Relatively Common') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_households_no_cars_common.qml')))
-                layerNames.append((self.tr('Sustainable Urban Structure, Households not Owning 2 or More Cars are Relatively Common') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_households_below_2_cars_common.qml')))
-                layerNames.append((self.tr('Sustainable Urban Structure, Sufficient Mix of Population and Jobs') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_sufficient_mix_pop_job.qml')))
-                layerNames.append((self.tr('Sustainable Urban Structure, Sufficient Density of Population and Jobs for Walkable City') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_sufficient_pop_job_density_walk_city.qml')))
-                layerNames.append((self.tr('Sustainable Urban Structure, Sufficient Density of Population and Jobs for Public Transport') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_sufficient_pop_job_density_pub_transport.qml')))
+            success = self.caclulateSustainableUrbanStructure(group, uid, outputSchemaName, outputTableName)
+            # if success: # sustainable_urban_structure.qml
+            #     layerNames.append((self.tr('Sustainable Urban Structure, Count of True Value Indicators') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sustainable_urban_structure.qml')))
+            #     layerNames.append((self.tr('Sustainable Urban Structure, Relatively Low Personal Traffic Emissions') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_relat_low_pers_traffic_emissions.qml')))
+            #     layerNames.append((self.tr('Sustainable Urban Structure, Households not Owning Cars are Relatively Common') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_households_no_cars_common.qml')))
+            #     layerNames.append((self.tr('Sustainable Urban Structure, Households not Owning 2 or More Cars are Relatively Common') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_households_below_2_cars_common.qml')))
+            #     layerNames.append((self.tr('Sustainable Urban Structure, Sufficient Mix of Population and Jobs') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_sufficient_mix_pop_job.qml')))
+            #     layerNames.append((self.tr('Sustainable Urban Structure, Sufficient Density of Population and Jobs for Walkable City') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_sufficient_pop_job_density_walk_city.qml')))
+            #     layerNames.append((self.tr('Sustainable Urban Structure, Sufficient Density of Population and Jobs for Public Transport') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_sufficient_pop_job_density_pub_transport.qml')))
 
         uri = QgsDataSourceUri()
         uri.setConnection(self.connParams['host'], self.connParams['port'],\
             self.connParams['database'], self.connParams['user'], self.connParams['password'])
         uri.setDataSource(outputSchemaName, outputTableName, 'geom')
-
-        groupName = self.tr("urban devlopment")
-        group = rootGroup.addGroup(groupName)
 
         for name in layerNames:
             layer = QgsVectorLayer(uri.uri(False), name[0], 'postgres')
@@ -1155,7 +1156,33 @@ class YKRTool:
             group.addLayer(layer)
 
 
-    def caclulateSustainableUrbanStructure(self, uid, outputSchemaName, outputTableName):
+    def createSustainableUrbanStructureResultLayer(self):
+        layer = QgsVectorLayer("Polygon?crs=epsg:3067", "Sustainable Urban Structure", "memory")
+        provider = layer.dataProvider()
+        layer.startEditing()
+        provider.addAttributes([QgsField("id", QVariant.Int, "integer"),
+                                QgsField("xyind", QVariant.String, "string"),
+                                QgsField("mun", QVariant.String, "string"),
+                                QgsField("liikenne_hlo_tco2_per_as_tp", QVariant.Double, "double"),
+                                QgsField("asukkaat", QVariant.Int, "integer"),
+                                QgsField("tyopaikat", QVariant.Int, "integer"),
+                                QgsField("asuntokunta_0_autoa_pros_osuus", QVariant.Double, "double"),
+                                QgsField("asuntokunta_1_autoa_pros_osuus", QVariant.Double, "double"),
+                                QgsField("asuntokunta_2_autoa_pros_osuus", QVariant.Double, "double"),
+                                QgsField("joukkoliikennekaup_mahd_tiiveys", QVariant.String, "string"),
+                                QgsField("kavelykaup_mahd_tiiveys", QVariant.String, "string"),
+                                QgsField("keskustamainen_toim_seko", QVariant.String, "string"),
+                                QgsField("kahd_auton_omistus_suht_vahaista", QVariant.String, "string"),
+                                QgsField("autottomuus_suht_yleista", QVariant.String, "string"),
+                                QgsField("verrat_alh_henkliik_paast", QVariant.String, "string"),
+                                QgsField("kestavan_kaupunkirakenteen_mittarit_toteutuu_yht", QVariant.Int, "integer")
+                                ])
+        layer.commitChanges()
+
+        return (layer, provider)
+
+
+    def caclulateSustainableUrbanStructure(self, group, uid, outputSchemaName, outputTableName):
         # 1. laske autonomistustiedot QGIS:ssä olevan karttatason avulla pythonin muuttujiin
         # 2. Lisää laskennan tulostasoon kentät toteutuu vs. ei-toteudu kullekin ehtokentälle ja päivitä
         # 3. tee erilliset tasot ja visualisoinnit kullekin muuttujalle ja myös yhteinen taso ja visualisointi
@@ -1171,6 +1198,11 @@ class YKRTool:
 
         queries = []
         ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
+
+        (tempLayer, tempProvider) = self.createSustainableUrbanStructureResultLayer()
+        tempLayer.startEditing()
+
+        features = []
 
         query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN joukkoliikennekaup_mahd_tiiveys varchar"
         # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
@@ -1203,13 +1235,30 @@ class YKRTool:
         targetLayer = QgsVectorLayer(uri.uri(False), "emissions target layer", 'postgres')
 
         targetFeatures = targetLayer.getFeatures()
+
+        xyinds = set()
+        muns = set()
+
         for targetFeature in targetFeatures:
-            
+
             kestavan_kaupunkirakenteen_mittarit_toteutuu_yht = 0
             kestavan_kaupunkirakenteen_mittarit_toteutuu_yht_none_flag = False
 
+            geometry = targetFeature.geometry()
+
+            qgs_feature = QgsFeature()
+            qgs_feature.setGeometry(geometry)
+            fields = tempLayer.fields()
+            qgs_feature.setFields(fields)
+
             xyind = targetFeature['xyind']
             mun = targetFeature['mun']
+            xyinds.add(xyind)
+            muns.add(mun)
+
+            qgs_feature['id'] = targetFeature.id()
+            qgs_feature['xyind'] = xyind
+            qgs_feature['mun'] = mun
 
             '''joukkoliikennekaup_mahd_tiiveys, kavelykaup_mahd_tiiveys ja keskustamainen_toim_seko'''
             if ykrPopTableName == '-':
@@ -1217,117 +1266,193 @@ class YKRTool:
             else:
                 asukkaat = targetFeature['v_yht']
             tyopaikat = targetFeature['tp_yht']
+            qgs_feature['asukkaat'] = asukkaat
+            qgs_feature['tyopaikat'] = tyopaikat
             asukkaat = float(asukkaat) if asukkaat != None else 0
             tyopaikat = float(tyopaikat) if tyopaikat != None else 0
             if ((asukkaat + tyopaikat) / 6.25 >= 35): # 6,25 hehtaaria = 250x250m
                 query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET joukkoliikennekaup_mahd_tiiveys = 'Toteutuu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
                 kestavan_kaupunkirakenteen_mittarit_toteutuu_yht += 1
+                qgs_feature['joukkoliikennekaup_mahd_tiiveys'] = 'Toteutuu'
             else:
                 query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET joukkoliikennekaup_mahd_tiiveys = 'Ei toteudu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+                qgs_feature['joukkoliikennekaup_mahd_tiiveys'] = 'Ei toteudu'
             # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
             if ((asukkaat + tyopaikat) / 6.25 >= 100): # 6,25 hehtaaria = 250x250m
                 query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET kavelykaup_mahd_tiiveys = 'Toteutuu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
                 kestavan_kaupunkirakenteen_mittarit_toteutuu_yht += 1
+                qgs_feature['kavelykaup_mahd_tiiveys'] = 'Toteutuu'
             else:
                 query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET kavelykaup_mahd_tiiveys = 'Ei toteudu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+                qgs_feature['kavelykaup_mahd_tiiveys'] = 'Ei toteudu'
             # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
             if (asukkaat + tyopaikat > 0) and ((asukkaat / (asukkaat + tyopaikat) >= 0.2) and (asukkaat / (asukkaat + tyopaikat) <= 0.8)):
                 query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET keskustamainen_toim_seko = 'Toteutuu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
                 kestavan_kaupunkirakenteen_mittarit_toteutuu_yht += 1
+                qgs_feature['keskustamainen_toim_seko'] = 'Toteutuu'
             else:
                 query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET keskustamainen_toim_seko = 'Ei toteudu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+                qgs_feature['keskustamainen_toim_seko'] = 'Ei toteudu'
             # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
-
-            '''kahd_auton_omistus_suht_vahaista ja autottomuus_suht_yleista'''
-            exp = QgsExpression("xyind = '{}' AND kunta = '{}'".format(xyind, mun))
-            carOwnershipFeatures = list(carOwnershipMapLayer.getFeatures(QgsFeatureRequest(exp)))
-            if len(carOwnershipFeatures) == 1:
-                carOwnershipFeature = carOwnershipFeatures[0]
-                # asuntokunta_0_autoa_pros_osuus = None
-                # asuntokunta_1_autoa_pros_osuus = None
-                # asuntokunta_2_autoa_pros_osuus = None
-                autoja_1 = carOwnershipFeature['autoja_1']
-                autoja_2 = carOwnershipFeature['autoja_2']
-                ak_yht = carOwnershipFeature['ak_yht']
-                if autoja_1 != -1 and autoja_2 != -1:
-                    asuntokunta_0_autoa_pros_osuus = (float(ak_yht) - (autoja_1 + autoja_2)) / ak_yht * 100
-                    asuntokunta_1_autoa_pros_osuus = float(autoja_1) / ak_yht * 100
-                    asuntokunta_2_autoa_pros_osuus = float(autoja_2) / ak_yht * 100
-
-                    if asuntokunta_1_autoa_pros_osuus > asuntokunta_2_autoa_pros_osuus and asuntokunta_2_autoa_pros_osuus < 30:
-                        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET kahd_auton_omistus_suht_vahaista = 'Toteutuu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
-                        kestavan_kaupunkirakenteen_mittarit_toteutuu_yht += 1
-                    else:
-                        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET kahd_auton_omistus_suht_vahaista = 'Ei toteudu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
-                    # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-                    queries.append(query)
-
-                    
-                    if asuntokunta_0_autoa_pros_osuus > asuntokunta_1_autoa_pros_osuus and asuntokunta_0_autoa_pros_osuus > 40:
-                        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET autottomuus_suht_yleista = 'Toteutuu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
-                        kestavan_kaupunkirakenteen_mittarit_toteutuu_yht += 1
-                    else:
-                        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET autottomuus_suht_yleista = 'Ei toteudu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
-                    # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-                    queries.append(query)
-                else:
-                    kestavan_kaupunkirakenteen_mittarit_toteutuu_yht_none_flag = True
-            elif len(carOwnershipFeatures) > 1:
-                raise Exception(self.tr("Car ownership table had unexpected count of features for xyind") + " {} " + self.tr("and municipality code" + " {}: {}").format(xyind, mun, len(carOwnershipFeatures)))
-            else:
-                kestavan_kaupunkirakenteen_mittarit_toteutuu_yht_none_flag = True
 
             '''verrat_alh_henkliik_paast'''
 
             liikenne_hlo_tco2_per_as_tp = targetFeature['liikenne_hlo_tco2_per_as_tp']
             if liikenne_hlo_tco2_per_as_tp != None:
+                qgs_feature['liikenne_hlo_tco2_per_as_tp'] = liikenne_hlo_tco2_per_as_tp
                 if liikenne_hlo_tco2_per_as_tp <= 0.05:
                     query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET verrat_alh_henkliik_paast = 'Toteutuu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
                     kestavan_kaupunkirakenteen_mittarit_toteutuu_yht += 1
+                    qgs_feature['verrat_alh_henkliik_paast'] = 'Toteutuu'
                 else:
                     query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET verrat_alh_henkliik_paast = 'Ei toteudu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+                    qgs_feature['verrat_alh_henkliik_paast'] = 'Ei toteudu'
                 # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
                 queries.append(query)
             else:
                 kestavan_kaupunkirakenteen_mittarit_toteutuu_yht_none_flag = True
 
-            # if kestavan_kaupunkirakenteen_mittarit_toteutuu_yht_none_flag == False:
             if kestavan_kaupunkirakenteen_mittarit_toteutuu_yht > 0:
+                qgs_feature['kestavan_kaupunkirakenteen_mittarit_toteutuu_yht'] = kestavan_kaupunkirakenteen_mittarit_toteutuu_yht
                 query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET kestavan_kaupunkirakenteen_mittarit_toteutuu_yht = {} WHERE xyind ='{}' and mun='{}'".format(kestavan_kaupunkirakenteen_mittarit_toteutuu_yht, xyind, mun)
                 # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
                 queries.append(query)
 
-        conn = None
+            features.append(qgs_feature)
 
-        try:
-            conn = createDbConnection(self.connParams)
-        except Exception as e:
-            if retriesLeft > 0:
-                return self.calculateElectricityEmissionsPerPerson(outputSchemaName, outputTableName, retriesLeft - 1)
-            else:
-                self.iface.messageBar().pushMessage(
-                    self.tr('Error in connecting to the database'),
-                    str(e), Qgis.Warning, duration=0)
-                return False
+        tempProvider.addFeatures(features)
+        tempLayer.commitChanges()
+        tempLayer.startEditing()
 
-        try:
-            cur = conn.cursor()
-            for query in queries:
-                cur.execute(query)
-                conn.commit()
-        except Exception as e:
-            self.iface.messageBar().pushMessage(
-                self.tr('Error in modifying the results table ') + "{}".format(query),
-                str(e), Qgis.Warning, duration=0)
-            conn.rollback()
-            conn.close()
+        '''kahd_auton_omistus_suht_vahaista ja autottomuus_suht_yleista''' # Erikseen, jotta nopeampaa
+        fields = tempLayer.fields()
+        index_asuntokunta_0_autoa_pros_osuus = fields.indexOf("asuntokunta_0_autoa_pros_osuus")
+        index_asuntokunta_1_autoa_pros_osuus = fields.indexOf("asuntokunta_1_autoa_pros_osuus")
+        index_asuntokunta_2_autoa_pros_osuus = fields.indexOf("asuntokunta_2_autoa_pros_osuus")
+        index_kahd_auton_omistus_suht_vahaista = fields.indexOf("kahd_auton_omistus_suht_vahaista")
+        index_autottomuus_suht_yleista = fields.indexOf("autottomuus_suht_yleista")
+        index_kestavan_kaupunkirakenteen_mittarit_toteutuu_yht = fields.indexOf("kestavan_kaupunkirakenteen_mittarit_toteutuu_yht")
+        for carOwnershipFeature in carOwnershipMapLayer.getFeatures():
+            mun = carOwnershipFeature['kunta']
+            xyind = carOwnershipFeature['xyind']
+            if mun in muns and xyind in xyinds:
+                # QgsMessageLog.logMessage("mun {} in muns and xyind {} in xyinds".format(mun, xyind), 'YKRTool', Qgis.Info)
+                exp = QgsExpression("xyind = '{}' AND mun = '{}'".format(xyind, mun))
+                qgs_features = list(tempLayer.getFeatures(QgsFeatureRequest(exp)))
+                # exp = QgsExpression("xyind = '{}' AND kunta = '{}'".format(xyind, mun))
+                # carOwnershipFeatures = list(carOwnershipMapLayer.getFeatures(QgsFeatureRequest(exp)))
+                # if len(carOwnershipFeatures) == 1:
+                # carOwnershipFeature = carOwnershipFeatures[0]
+                if len(qgs_features) == 1:
+                    # QgsMessageLog.logMessage("found 1 qgs_features", 'YKRTool', Qgis.Info)
+                    qgs_feature = qgs_features[0]
+                    kestavan_kaupunkirakenteen_mittarit_toteutuu_yht = qgs_feature['kestavan_kaupunkirakenteen_mittarit_toteutuu_yht'] if qgs_feature['kestavan_kaupunkirakenteen_mittarit_toteutuu_yht'] != None else 0
+                    # QgsMessageLog.logMessage("kestavan_kaupunkirakenteen_mittarit_toteutuu_yht alkup: {}".format(kestavan_kaupunkirakenteen_mittarit_toteutuu_yht), 'YKRTool', Qgis.Info)
+                    autoja_1 = carOwnershipFeature['autoja_1']
+                    autoja_2 = carOwnershipFeature['autoja_2']
+                    ak_yht = carOwnershipFeature['ak_yht']
+                    if autoja_1 != -1 and autoja_2 != -1:
+                        asuntokunta_0_autoa_pros_osuus = (float(ak_yht) - (autoja_1 + autoja_2)) / ak_yht * 100
+                        asuntokunta_1_autoa_pros_osuus = float(autoja_1) / ak_yht * 100
+                        asuntokunta_2_autoa_pros_osuus = float(autoja_2) / ak_yht * 100
+                        
+                        tempLayer.changeAttributeValue(qgs_feature.id(), index_asuntokunta_0_autoa_pros_osuus, asuntokunta_0_autoa_pros_osuus)
+                        tempLayer.changeAttributeValue(qgs_feature.id(), index_asuntokunta_1_autoa_pros_osuus, asuntokunta_1_autoa_pros_osuus)
+                        tempLayer.changeAttributeValue(qgs_feature.id(), index_asuntokunta_2_autoa_pros_osuus, asuntokunta_2_autoa_pros_osuus)
 
-            return False
+                        if asuntokunta_1_autoa_pros_osuus > asuntokunta_2_autoa_pros_osuus and asuntokunta_2_autoa_pros_osuus < 30:
+                            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET kahd_auton_omistus_suht_vahaista = 'Toteutuu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+                            kestavan_kaupunkirakenteen_mittarit_toteutuu_yht += 1
+                            tempLayer.changeAttributeValue(qgs_feature.id(), index_kahd_auton_omistus_suht_vahaista, 'Toteutuu')
+                        else:
+                            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET kahd_auton_omistus_suht_vahaista = 'Ei toteudu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+                            tempLayer.changeAttributeValue(qgs_feature.id(), index_kahd_auton_omistus_suht_vahaista, 'Ei toteudu')
+                        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+                        queries.append(query)
+
+                        if asuntokunta_0_autoa_pros_osuus > asuntokunta_1_autoa_pros_osuus and asuntokunta_0_autoa_pros_osuus > 40:
+                            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET autottomuus_suht_yleista = 'Toteutuu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+                            kestavan_kaupunkirakenteen_mittarit_toteutuu_yht += 1
+                            tempLayer.changeAttributeValue(qgs_feature.id(), index_autottomuus_suht_yleista, 'Toteutuu')
+                        else:
+                            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET autottomuus_suht_yleista = 'Ei toteudu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+                            tempLayer.changeAttributeValue(qgs_feature.id(), index_autottomuus_suht_yleista, 'Ei toteudu')
+                        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+                        queries.append(query)
+                    else:
+                        kestavan_kaupunkirakenteen_mittarit_toteutuu_yht_none_flag = True
+                elif len(qgs_features) > 1:
+                    raise Exception(self.tr("temporary layer had unexpected count of features for xyind") + " {} " + self.tr("and municipality code" + " {}: {}").format(xyind, mun, len(qgs_features)))
+                else:
+                    kestavan_kaupunkirakenteen_mittarit_toteutuu_yht_none_flag = True
+
+                # if kestavan_kaupunkirakenteen_mittarit_toteutuu_yht_none_flag == False:
+                if kestavan_kaupunkirakenteen_mittarit_toteutuu_yht > 0:
+                    tempLayer.changeAttributeValue(qgs_feature.id(), index_kestavan_kaupunkirakenteen_mittarit_toteutuu_yht, kestavan_kaupunkirakenteen_mittarit_toteutuu_yht)
+                    query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET kestavan_kaupunkirakenteen_mittarit_toteutuu_yht = {} WHERE xyind ='{}' and mun='{}'".format(kestavan_kaupunkirakenteen_mittarit_toteutuu_yht, xyind, mun)
+                    # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+                    queries.append(query)
+
+            # qgs_feature.setAttributes(values)
+
+
+        # tempProvider.addFeatures(features)
+        tempLayer.commitChanges()
+        # QgsProject.instance().addMapLayer(layer)
+
+        layerNames = []
+
+        layerNames.append((self.tr('Sustainable Urban Structure, Count of True Value Indicators') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sustainable_urban_structure.qml')))
+        layerNames.append((self.tr('Sustainable Urban Structure, Relatively Low Personal Traffic Emissions') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_relat_low_pers_traffic_emissions.qml')))
+        layerNames.append((self.tr('Sustainable Urban Structure, Households not Owning Cars are Relatively Common') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_households_no_cars_common.qml')))
+        layerNames.append((self.tr('Sustainable Urban Structure, Households not Owning 2 or More Cars are Relatively Common') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_households_below_2_cars_common.qml')))
+        layerNames.append((self.tr('Sustainable Urban Structure, Sufficient Mix of Population and Jobs') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_sufficient_mix_pop_job.qml')))
+        layerNames.append((self.tr('Sustainable Urban Structure, Sufficient Density of Population and Jobs for Walkable City') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_sufficient_pop_job_density_walk_city.qml')))
+        layerNames.append((self.tr('Sustainable Urban Structure, Sufficient Density of Population and Jobs for Public Transport') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_sufficient_pop_job_density_pub_transport.qml')))
+
+        for name in layerNames:
+            layer = tempLayer.clone()
+            layer.setName(name[0])
+            layer.loadNamedStyle(name[1])
+            renderer = layer.renderer()
+            if renderer.type() == 'graduatedSymbol':
+                renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
+            QgsProject.instance().addMapLayer(layer, False)
+            group.addLayer(layer)
 
         return True
+
+        # conn = None
+
+        # try:
+        #     conn = createDbConnection(self.connParams)
+        # except Exception as e:
+        #     if retriesLeft > 0:
+        #         return self.calculateElectricityEmissionsPerPerson(outputSchemaName, outputTableName, retriesLeft - 1)
+        #     else:
+        #         self.iface.messageBar().pushMessage(
+        #             self.tr('Error in connecting to the database'),
+        #             str(e), Qgis.Warning, duration=0)
+        #         return False
+
+        # try:
+        #     cur = conn.cursor()
+        #     for query in queries:
+        #         cur.execute(query)
+        #         conn.commit()
+        # except Exception as e:
+        #     self.iface.messageBar().pushMessage(
+        #         self.tr('Error in modifying the results table ') + "{}".format(query),
+        #         str(e), Qgis.Warning, duration=0)
+        #     conn.rollback()
+        #     conn.close()
+
+        #     return False
+
+        # return True
 
 
     def visualizeElectricityEmissions(self, rootGroup, uid, outputSchemaName, outputTableName):
