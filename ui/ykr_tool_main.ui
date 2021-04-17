@@ -472,6 +472,16 @@
             </item>
            </layout>
           </item>
+          <item row="5" column="0">
+           <widget class="QCheckBox" name="checkBoxAllowOtherUsersToUseUploadedYKRPopLayer">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Allow other users access (if not already) to the YKR population layer</string>
+            </property>
+           </widget>
+          </item>
           <item row="6" column="0">
            <widget class="QLabel" name="label_2">
             <property name="text">
@@ -502,6 +512,16 @@
              </widget>
             </item>
            </layout>
+          </item>
+          <item row="7" column="0">
+           <widget class="QCheckBox" name="checkBoxAllowOtherUsersToUseUploadedYKRJobLayer">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Allow other users access (if not already) to the YKR job layer</string>
+            </property>
+           </widget>
           </item>
           <item row="8" column="0">
            <widget class="QCheckBox" name="checkBoxCalculateEmissionsPerPerson">
@@ -583,7 +603,7 @@
             </property>
            </widget>
           </item>
-          <item row="16" column="0">
+          <item row="17" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeFloorSpaceRatio">
             <property name="text">
              <string>Visualize Floor Space Ratio</string>
@@ -593,7 +613,7 @@
             </property>
            </widget>
           </item>
-          <item row="17" column="0">
+          <item row="18" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeSustainableUrbanStructure">
             <property name="enabled">
              <bool>true</bool>
@@ -606,37 +626,27 @@
             </property>
            </widget>
           </item>
-          <item row="17" column="1">
+          <item row="18" column="1">
            <widget class="QgsMapLayerComboBox" name="mMapLayerComboBoxYKRCarOwnershipData">
             <property name="enabled">
              <bool>false</bool>
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
-           <widget class="QCheckBox" name="checkBoxAllowOtherUsersToUseUploadedYKRPopLayer">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Allow other users access (if not already) to the YKR population layer</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="0">
-           <widget class="QCheckBox" name="checkBoxAllowOtherUsersToUseUploadedYKRJobLayer">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Allow other users access (if not already) to the YKR job layer</string>
-            </property>
-           </widget>
-          </item>
-          <item row="18" column="0">
+          <item row="19" column="0">
            <widget class="QCheckBox" name="checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone">
             <property name="text">
-             <string>Add Quickchart.io Links of Relative Emissions By Zone</string>
+             <string>Add Quickchart.io Links of Relative Emissions By Zone to the Results Table</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="20" column="0">
+           <widget class="QCheckBox" name="checkBoxAddQuickchartIoLinksOfZoneSquaresAndPopJobPercentagesOfTotalByZone">
+            <property name="text">
+             <string>Add Quickchart.io Links of Zone Squares and Pop + Job as Percentages of Total By Zone</string>
             </property>
             <property name="checked">
              <bool>true</bool>

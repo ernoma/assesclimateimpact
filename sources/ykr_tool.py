@@ -123,6 +123,9 @@ class YKRTool:
         self.ykrUploadedPopTableName = None
         self.ykrUploadedJobTableName = None
 
+        self.layers = []
+
+
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
         """Get the translation for a string using Qt translation API.
@@ -253,7 +256,7 @@ class YKRTool:
         if result:
             self.runProcess()
 
-    def runProcess(self, retriesLeft=0):
+    def runProcess(self, retriesLeft=3):
         try:
             self.preProcess()
         except Exception as e:
@@ -269,6 +272,7 @@ class YKRTool:
 
 
     def preProcess(self):
+        self.layers = []
         '''Starts calculation'''
         if not self.connParams:
             configFilePath = QSettings().value("/YKRTool/configFilePath", "", type=str)
@@ -1075,7 +1079,7 @@ class YKRTool:
         layerNames.append((self.tr('CO2 sources grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_sources.qml')))
         layerNames.extend(self.calculateRelativeGeneralEmissions(uid, outputSchemaName, outputTableName))
         layerNames.append((self.tr('CO2 total grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_t_grid.qml')))
-        layerNames.append((self.tr('Zones (UZ and urban-countryside)') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/zones.qml')))
+        layerNames.append((self.tr('YKR Zones (UZ and urban-countryside)') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/zones.qml')))
 
         self.createQuickchartIoLinks(uid, outputSchemaName, outputTableName)
 
@@ -1094,18 +1098,28 @@ class YKRTool:
             renderer = layer.renderer()
             if renderer.type() == 'graduatedSymbol':
                 renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
+            self.layers.append(layer)
             QgsProject.instance().addMapLayer(layer, False)
             group.addLayer(layer)
 
+        for layer in self.layers: # To have all columns in all layers
+            layer.setDataSource( layer.source(), layer.name(), layer.providerType() )
+            #layer.dataProvider().reloadData()
+
 
     def createQuickchartIoLinks(self, uid, outputSchemaName, outputTableName, retriesLeft=3):
+        queries = []
+    
         if self.mainDialog.checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone.isChecked():
-            queries = []
-
             queries.extend(self.createQuickchartIoEmissionsPerFloorSpaceByZone(uid, outputSchemaName, outputTableName))
             queries.extend(self.createQuickchartIoEmissionsPerPopJobByZone(uid, outputSchemaName, outputTableName))
             queries.extend(self.createQuickchartIoPersonalEmissionsPerPopJobByZone(uid, outputSchemaName, outputTableName))
 
+        if self.mainDialog.checkBoxAddQuickchartIoLinksOfZoneSquaresAndPopJobPercentagesOfTotalByZone.isChecked():
+            queries.extend(self.createQuickchartIoZoneSquaresPercentagesOfTotalByZone(uid, outputSchemaName, outputTableName))
+            queries.extend(self.createQuickchartIoPopJobPercentagesOfTotalByZone(uid, outputSchemaName, outputTableName))
+
+        if len(queries) > 0:
             conn = None
 
             try:
@@ -1136,6 +1150,501 @@ class YKRTool:
             conn.commit()
 
             return True
+
+
+    def createQuickchartIoZoneSquaresPercentagesOfTotalByZone(self, uid, outputSchemaName, outputTableName):
+        queries = []
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN chart_yhdrak_vyohykkeet_pros_osuus_ruuduista_by_zone VARCHAR"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        
+        sum_squares_on_zone_1 = 0
+        sum_squares_on_zone_10 = 0
+        sum_squares_on_zone_837101 = 0
+        sum_squares_on_zone_2 = 0
+        sum_squares_on_zone_3 = 0
+        sum_squares_on_zone_4 = 0
+        sum_squares_on_zone_5 = 0
+        sum_squares_on_zone_81 = 0
+        sum_squares_on_zone_82 = 0
+        sum_squares_on_zone_83 = 0
+        sum_squares_on_zone_84 = 0
+        sum_squares_on_zone_85 = 0
+        sum_squares_on_zone_86 = 0
+        sum_squares_on_zone_87 = 0
+
+        sum_squares_on_good_zones = 0
+
+        sum_all_squares = 0
+
+        good_zones = [1, 2, 3, 10, 837101]
+
+        uri = QgsDataSourceUri()
+        uri.setConnection(self.connParams['host'], self.connParams['port'],\
+            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+        uri.setDataSource(outputSchemaName, outputTableName, 'geom')
+
+        targetLayer = QgsVectorLayer(uri.uri(False), "emissions target layer", 'postgres')
+
+        targetFeatures = targetLayer.getFeatures()
+
+        for targetFeature in targetFeatures:
+            sum_all_squares += 1
+
+            if targetFeature['zone'] == 1:
+                sum_squares_on_zone_1 += 1
+                if 1 in good_zones:
+                    sum_squares_on_good_zones += 1
+            elif targetFeature['zone'] == 10:
+                sum_squares_on_zone_10 += 1
+                if 10 in good_zones:
+                    sum_squares_on_good_zones += 1
+            elif targetFeature['zone'] == 837101:
+                sum_squares_on_zone_837101 += 1
+                if 837101 in good_zones:
+                    sum_squares_on_good_zones += 1
+            elif targetFeature['zone'] == 2:
+                sum_squares_on_zone_2 += 1
+                if 2 in good_zones:
+                    sum_squares_on_good_zones += 1              
+            elif targetFeature['zone'] == 3:
+                sum_squares_on_zone_3 += 1
+                if 3 in good_zones:
+                    sum_squares_on_good_zones += 1
+            elif targetFeature['zone'] == 4:
+                sum_squares_on_zone_4 += 1
+                if 4 in good_zones:
+                    sum_squares_on_good_zones += 1
+            elif targetFeature['zone'] == 5:
+                sum_squares_on_zone_5 += 1
+                if 5 in good_zones:
+                    sum_squares_on_good_zones += 1
+            elif targetFeature['zone'] == 81:
+                sum_squares_on_zone_81 += 1
+                if 81 in good_zones:
+                    sum_squares_on_good_zones += 1
+            elif targetFeature['zone'] == 82:
+                sum_squares_on_zone_82 += 1
+                if 82 in good_zones:
+                    sum_squares_on_good_zones += 1
+            elif targetFeature['zone'] == 83:
+                sum_squares_on_zone_83 += 1
+                if 83 in good_zones:
+                    sum_squares_on_good_zones += 1
+            elif targetFeature['zone'] == 84:
+                sum_squares_on_zone_84 += 1
+                if 84 in good_zones:
+                    sum_squares_on_good_zones += 1
+            elif targetFeature['zone'] == 85:
+                sum_squares_on_zone_85 += 1
+                if 85 in good_zones:
+                    sum_squares_on_good_zones += 1
+            elif targetFeature['zone'] == 86:
+                sum_squares_on_zone_86 += 1
+                if 86 in good_zones:
+                    sum_squares_on_good_zones += 1
+            elif targetFeature['zone'] == 87:
+                sum_squares_on_zone_87 += 1
+                if 87 in good_zones:
+                    sum_squares_on_good_zones += 1
+
+        sum_squares_on_good_zones_as_percentage_of_total = ((sum_squares_on_good_zones / sum_all_squares) if sum_all_squares > 0 else 0) * 100
+        sum_squares_on_zone_1_as_percentage_of_total = ((sum_squares_on_zone_1 / sum_all_squares) if sum_all_squares > 0 else 0) * 100
+        sum_squares_on_zone_10_as_percentage_of_total = ((sum_squares_on_zone_10 / sum_all_squares) if sum_all_squares > 0 else 0) * 100
+        sum_squares_on_zone_837101_as_percentage_of_total = ((sum_squares_on_zone_837101 / sum_all_squares) if sum_all_squares > 0 else 0) * 100
+        sum_squares_on_zone_2_as_percentage_of_total = ((sum_squares_on_zone_2 / sum_all_squares) if sum_all_squares > 0 else 0) * 100
+        sum_squares_on_zone_3_as_percentage_of_total = ((sum_squares_on_zone_3 / sum_all_squares) if sum_all_squares > 0 else 0) * 100
+        sum_squares_on_zone_4_as_percentage_of_total = ((sum_squares_on_zone_4 / sum_all_squares) if sum_all_squares > 0 else 0) * 100
+        sum_squares_on_zone_5_as_percentage_of_total = ((sum_squares_on_zone_5 / sum_all_squares) if sum_all_squares > 0 else 0) * 100
+        sum_squares_on_zone_81_as_percentage_of_total = ((sum_squares_on_zone_81 / sum_all_squares) if sum_all_squares > 0 else 0) * 100
+        sum_squares_on_zone_82_as_percentage_of_total = ((sum_squares_on_zone_82 / sum_all_squares) if sum_all_squares > 0 else 0) * 100
+        sum_squares_on_zone_83_as_percentage_of_total = ((sum_squares_on_zone_83 / sum_all_squares) if sum_all_squares > 0 else 0) * 100
+        sum_squares_on_zone_84_as_percentage_of_total = ((sum_squares_on_zone_84 / sum_all_squares) if sum_all_squares > 0 else 0) * 100
+        sum_squares_on_zone_85_as_percentage_of_total = ((sum_squares_on_zone_85 / sum_all_squares) if sum_all_squares > 0 else 0) * 100
+        sum_squares_on_zone_86_as_percentage_of_total = ((sum_squares_on_zone_86 / sum_all_squares) if sum_all_squares > 0 else 0) * 100
+        sum_squares_on_zone_87_as_percentage_of_total = ((sum_squares_on_zone_87 / sum_all_squares) if sum_all_squares > 0 else 0) * 100
+
+
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET chart_yhdrak_vyohykkeet_pros_osuus_ruuduista_by_zone = "
+        query += ("'https://quickchart.io/chart?w=600&h=300&c={type:''bar'',"
+            "data:{labels:["
+                "''Edullisimmat vyöhykkeet'',"
+                "''1 = Keskustan jalankulkuvyöhyke'',"
+                "''10 = Alakeskuksen jalankulkuvyöhyke'',"
+                "''837101 = Hervanta (alakeskus, HLT:ssä eroja)'',"
+                "''2 = Keskustan reunavyöhyke'',"
+                "''3 = Intensiivinen joukkoliikkennevyöhyke'',"
+                "''4 = Joukkoliikkennevyöhyke'',"
+                "''5 = Autovyöhyke'',"
+                "''81 = Sisempi kaupunkialue'',"
+                "''82 = Ulompi kaupunkialue'',"
+                "''83 = Kaupungin kehysalue'',"
+                "''84 = Maaseudun paikalliskeskus'',"
+                "''85 = Kaupungin läheinen maaseutu'',"
+                "''86 = Ydinmaaseutu'',"
+                "''87 = Harvaan asuttu maaseutu''],"
+                "datasets:[")
+        query += (
+                "{backgroundColor:""["
+                "''rgba(255,154,1,1)'',"
+                "''rgba(117,213,205,1)'',"
+                "''rgba(207,30,169,1)'',"
+                "''rgba(235,102,58,1)'',"
+                "''rgba(238,36,100,1)'',"
+                "''rgba(119,73,226,1)'',"
+                "''rgba(238,169,65,1)'',"
+                "''rgba(145,222,77,1)'',"
+                "''rgba(66,118,221,1)'',"
+                "''rgba(21,24,155,1)'',"
+                "''rgba(115,92,158,1)'',"
+                "''rgba(155,155,155,1)'',"
+                "''rgba(174,107,24,1)'',"
+                "''rgba(213,180,60,1)'',"
+                "''rgba(48,108,35,1)''],")
+        query += "data:[''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'']}},".format(
+            round(sum_squares_on_good_zones_as_percentage_of_total, 1),
+            round(sum_squares_on_zone_1_as_percentage_of_total, 1),
+            round(sum_squares_on_zone_10_as_percentage_of_total, 1),
+            round(sum_squares_on_zone_837101_as_percentage_of_total, 1),
+            round(sum_squares_on_zone_2_as_percentage_of_total, 1),
+            round(sum_squares_on_zone_3_as_percentage_of_total, 1),
+            round(sum_squares_on_zone_4_as_percentage_of_total, 1),
+            round(sum_squares_on_zone_5_as_percentage_of_total, 1),
+            round(sum_squares_on_zone_81_as_percentage_of_total, 1),
+            round(sum_squares_on_zone_82_as_percentage_of_total, 1),
+            round(sum_squares_on_zone_83_as_percentage_of_total, 1),
+            round(sum_squares_on_zone_84_as_percentage_of_total, 1),
+            round(sum_squares_on_zone_85_as_percentage_of_total, 1),
+            round(sum_squares_on_zone_86_as_percentage_of_total, 1),
+            round(sum_squares_on_zone_87_as_percentage_of_total, 1)
+        )
+        query += (
+                "{backgroundColor:""["
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)''],")
+        query += "data:[''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'']}}".format(
+            round(100-sum_squares_on_good_zones_as_percentage_of_total, 1),
+            round(100-sum_squares_on_zone_1_as_percentage_of_total, 1),
+            round(100-sum_squares_on_zone_10_as_percentage_of_total, 1),
+            round(100-sum_squares_on_zone_837101_as_percentage_of_total, 1),
+            round(100-sum_squares_on_zone_2_as_percentage_of_total, 1),
+            round(100-sum_squares_on_zone_3_as_percentage_of_total, 1),
+            round(100-sum_squares_on_zone_4_as_percentage_of_total, 1),
+            round(100-sum_squares_on_zone_5_as_percentage_of_total, 1),
+            round(100-sum_squares_on_zone_81_as_percentage_of_total, 1),
+            round(100-sum_squares_on_zone_82_as_percentage_of_total, 1),
+            round(100-sum_squares_on_zone_83_as_percentage_of_total, 1),
+            round(100-sum_squares_on_zone_84_as_percentage_of_total, 1),
+            round(100-sum_squares_on_zone_85_as_percentage_of_total, 1),
+            round(100-sum_squares_on_zone_86_as_percentage_of_total, 1),
+            round(100-sum_squares_on_zone_87_as_percentage_of_total, 1)
+        )
+        query += "]},"
+        query += "options:{scales:{xAxes:[{stacked:true}],yAxes:[{stacked:true}]},title:{display:true,text:''Yhdyskuntrakenteen vyöhykkeet (%25 ruuduista)''},legend:{display:false}}}'"
+
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        return queries
+
+
+    def createQuickchartIoPopJobPercentagesOfTotalByZone(self, uid, outputSchemaName, outputTableName):
+        md = self.mainDialog
+        
+        queries = []
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN chart_as_ja_tp_pros_osuus_ruuduista_by_zone VARCHAR"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        
+        sum_pop_job_on_zone_1 = 0
+        sum_pop_job_on_zone_10 = 0
+        sum_pop_job_on_zone_837101 = 0
+        sum_pop_job_on_zone_2 = 0
+        sum_pop_job_on_zone_3 = 0
+        sum_pop_job_on_zone_4 = 0
+        sum_pop_job_on_zone_5 = 0
+        sum_pop_job_on_zone_81 = 0
+        sum_pop_job_on_zone_82 = 0
+        sum_pop_job_on_zone_83 = 0
+        sum_pop_job_on_zone_84 = 0
+        sum_pop_job_on_zone_85 = 0
+        sum_pop_job_on_zone_86 = 0
+        sum_pop_job_on_zone_87 = 0
+
+        # sum_pop_on_zone_1 = 0
+        # sum_pop_on_zone_10 = 0
+        # sum_pop_on_zone_837101 = 0
+        # sum_pop_on_zone_2 = 0
+        # sum_pop_on_zone_3 = 0
+        # sum_pop_on_zone_4 = 0
+        # sum_pop_on_zone_5 = 0
+        # sum_pop_on_zone_81 = 0
+        # sum_pop_on_zone_82 = 0
+        # sum_pop_on_zone_83 = 0
+        # sum_pop_on_zone_84 = 0
+        # sum_pop_on_zone_85 = 0
+        # sum_pop_on_zone_86 = 0
+        # sum_pop_on_zone_87 = 0
+
+        # sum_job_on_zone_1 = 0
+        # sum_job_on_zone_10 = 0
+        # sum_job_on_zone_837101 = 0
+        # sum_job_on_zone_2 = 0
+        # sum_job_on_zone_3 = 0
+        # sum_job_on_zone_4 = 0
+        # sum_job_on_zone_5 = 0
+        # sum_job_on_zone_81 = 0
+        # sum_job_on_zone_82 = 0
+        # sum_job_on_zone_83 = 0
+        # sum_job_on_zone_84 = 0
+        # sum_job_on_zone_85 = 0
+        # sum_job_on_zone_86 = 0
+        # sum_job_on_zone_87 = 0
+
+        # sum_pop_on_good_zones = 0
+        # sum_job_on_good_zones = 0
+        sum_pop_job_on_good_zones = 0
+
+        sum_of_pop_all_squares = 0
+        sum_of_job_all_squares = 0
+        sum_of_pop_job_all_squares = 0
+
+        good_zones = [1, 2, 3, 10, 837101]
+
+        uri = QgsDataSourceUri()
+        uri.setConnection(self.connParams['host'], self.connParams['port'],\
+            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+        uri.setDataSource(outputSchemaName, outputTableName, 'geom')
+
+        targetLayer = QgsVectorLayer(uri.uri(False), "emissions target layer", 'postgres')
+
+        targetFeatures = targetLayer.getFeatures()
+
+        for targetFeature in targetFeatures:
+            if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                sum_of_pop_all_squares += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+            else:
+                sum_of_pop_all_squares += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+            sum_of_job_all_squares += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+
+            if targetFeature['zone'] in good_zones:
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_pop_job_on_good_zones += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_pop_job_on_good_zones += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_pop_job_on_good_zones += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+
+            if targetFeature['zone'] == 1:
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_pop_job_on_zone_1 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_pop_job_on_zone_1 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_pop_job_on_zone_1 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 10:
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_pop_job_on_zone_10 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_pop_job_on_zone_10 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_pop_job_on_zone_10 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 837101:
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_pop_job_on_zone_837101 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_pop_job_on_zone_837101 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_pop_job_on_zone_837101 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 2:
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_pop_job_on_zone_2 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)  
+                else:            
+                    sum_pop_job_on_zone_2 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_pop_job_on_zone_2 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 3:
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_pop_job_on_zone_3 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_pop_job_on_zone_3 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_pop_job_on_zone_3 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 4:
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_pop_job_on_zone_4 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_pop_job_on_zone_4 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_pop_job_on_zone_4 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 5:
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_pop_job_on_zone_5 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_pop_job_on_zone_5 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_pop_job_on_zone_5 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 81:
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_pop_job_on_zone_81 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_pop_job_on_zone_81 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_pop_job_on_zone_81 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 82:
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_pop_job_on_zone_82 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_pop_job_on_zone_82 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_pop_job_on_zone_82 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 83:
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_pop_job_on_zone_83 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_pop_job_on_zone_83 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_pop_job_on_zone_83 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 84:
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_pop_job_on_zone_84 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_pop_job_on_zone_84 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_pop_job_on_zone_84 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 85:
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_pop_job_on_zone_85 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_pop_job_on_zone_85 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_pop_job_on_zone_85 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 86:
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_pop_job_on_zone_86 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_pop_job_on_zone_86 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_pop_job_on_zone_86 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 87:
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_pop_job_on_zone_87 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_pop_job_on_zone_87 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_pop_job_on_zone_87 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+
+        sum_of_pop_job_all_squares = sum_of_pop_all_squares + sum_of_job_all_squares
+
+        sum_pop_job_on_good_zones_as_percentage_of_total = ((sum_pop_job_on_good_zones / sum_of_pop_job_all_squares) if sum_of_pop_job_all_squares > 0 else 0) * 100
+        sum_pop_job_on_zone_1_as_percentage_of_total = ((sum_pop_job_on_zone_1 / sum_of_pop_job_all_squares) if sum_of_pop_job_all_squares > 0 else 0) * 100
+        sum_pop_job_on_zone_10_as_percentage_of_total = ((sum_pop_job_on_zone_10 / sum_of_pop_job_all_squares) if sum_of_pop_job_all_squares > 0 else 0) * 100
+        sum_pop_job_on_zone_837101_as_percentage_of_total = ((sum_pop_job_on_zone_837101 / sum_of_pop_job_all_squares) if sum_of_pop_job_all_squares > 0 else 0) * 100
+        sum_pop_job_on_zone_2_as_percentage_of_total = ((sum_pop_job_on_zone_2 / sum_of_pop_job_all_squares) if sum_of_pop_job_all_squares > 0 else 0) * 100
+        sum_pop_job_on_zone_3_as_percentage_of_total = ((sum_pop_job_on_zone_3 / sum_of_pop_job_all_squares) if sum_of_pop_job_all_squares > 0 else 0) * 100
+        sum_pop_job_on_zone_4_as_percentage_of_total = ((sum_pop_job_on_zone_4 / sum_of_pop_job_all_squares) if sum_of_pop_job_all_squares > 0 else 0) * 100
+        sum_pop_job_on_zone_5_as_percentage_of_total = ((sum_pop_job_on_zone_5 / sum_of_pop_job_all_squares) if sum_of_pop_job_all_squares > 0 else 0) * 100
+        sum_pop_job_on_zone_81_as_percentage_of_total = ((sum_pop_job_on_zone_81 / sum_of_pop_job_all_squares) if sum_of_pop_job_all_squares > 0 else 0) * 100
+        sum_pop_job_on_zone_82_as_percentage_of_total = ((sum_pop_job_on_zone_82 / sum_of_pop_job_all_squares) if sum_of_pop_job_all_squares > 0 else 0) * 100
+        sum_pop_job_on_zone_83_as_percentage_of_total = ((sum_pop_job_on_zone_83 / sum_of_pop_job_all_squares) if sum_of_pop_job_all_squares > 0 else 0) * 100
+        sum_pop_job_on_zone_84_as_percentage_of_total = ((sum_pop_job_on_zone_84 / sum_of_pop_job_all_squares) if sum_of_pop_job_all_squares > 0 else 0) * 100
+        sum_pop_job_on_zone_85_as_percentage_of_total = ((sum_pop_job_on_zone_85 / sum_of_pop_job_all_squares) if sum_of_pop_job_all_squares > 0 else 0) * 100
+        sum_pop_job_on_zone_86_as_percentage_of_total = ((sum_pop_job_on_zone_86 / sum_of_pop_job_all_squares) if sum_of_pop_job_all_squares > 0 else 0) * 100
+        sum_pop_job_on_zone_87_as_percentage_of_total = ((sum_pop_job_on_zone_87 / sum_of_pop_job_all_squares) if sum_of_pop_job_all_squares > 0 else 0) * 100
+
+
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET chart_as_ja_tp_pros_osuus_ruuduista_by_zone = "
+        query += ("'https://quickchart.io/chart?w=600&h=300&c={type:''bar'',"
+            "data:{labels:["
+                "''Edullisimmat vyöhykkeet'',"
+                "''1 = Keskustan jalankulkuvyöhyke'',"
+                "''10 = Alakeskuksen jalankulkuvyöhyke'',"
+                "''837101 = Hervanta (alakeskus, HLT:ssä eroja)'',"
+                "''2 = Keskustan reunavyöhyke'',"
+                "''3 = Intensiivinen joukkoliikkennevyöhyke'',"
+                "''4 = Joukkoliikkennevyöhyke'',"
+                "''5 = Autovyöhyke'',"
+                "''81 = Sisempi kaupunkialue'',"
+                "''82 = Ulompi kaupunkialue'',"
+                "''83 = Kaupungin kehysalue'',"
+                "''84 = Maaseudun paikalliskeskus'',"
+                "''85 = Kaupungin läheinen maaseutu'',"
+                "''86 = Ydinmaaseutu'',"
+                "''87 = Harvaan asuttu maaseutu''],"
+                "datasets:[")
+        query += (
+                "{backgroundColor:""["
+                "''rgba(255,154,1,1)'',"
+                "''rgba(117,213,205,1)'',"
+                "''rgba(207,30,169,1)'',"
+                "''rgba(235,102,58,1)'',"
+                "''rgba(238,36,100,1)'',"
+                "''rgba(119,73,226,1)'',"
+                "''rgba(238,169,65,1)'',"
+                "''rgba(145,222,77,1)'',"
+                "''rgba(66,118,221,1)'',"
+                "''rgba(21,24,155,1)'',"
+                "''rgba(115,92,158,1)'',"
+                "''rgba(155,155,155,1)'',"
+                "''rgba(174,107,24,1)'',"
+                "''rgba(213,180,60,1)'',"
+                "''rgba(48,108,35,1)''],")
+        query += "data:[''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'']}},".format(
+            round(sum_pop_job_on_good_zones_as_percentage_of_total, 1),
+            round(sum_pop_job_on_zone_1_as_percentage_of_total, 1),
+            round(sum_pop_job_on_zone_10_as_percentage_of_total, 1),
+            round(sum_pop_job_on_zone_837101_as_percentage_of_total, 1),
+            round(sum_pop_job_on_zone_2_as_percentage_of_total, 1),
+            round(sum_pop_job_on_zone_3_as_percentage_of_total, 1),
+            round(sum_pop_job_on_zone_4_as_percentage_of_total, 1),
+            round(sum_pop_job_on_zone_5_as_percentage_of_total, 1),
+            round(sum_pop_job_on_zone_81_as_percentage_of_total, 1),
+            round(sum_pop_job_on_zone_82_as_percentage_of_total, 1),
+            round(sum_pop_job_on_zone_83_as_percentage_of_total, 1),
+            round(sum_pop_job_on_zone_84_as_percentage_of_total, 1),
+            round(sum_pop_job_on_zone_85_as_percentage_of_total, 1),
+            round(sum_pop_job_on_zone_86_as_percentage_of_total, 1),
+            round(sum_pop_job_on_zone_87_as_percentage_of_total, 1)
+        )
+        query += (
+                "{backgroundColor:""["
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)'',"
+                "''rgba(0,0,0,1)''],")
+        query += "data:[''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'']}}".format(
+            round(100-sum_pop_job_on_good_zones_as_percentage_of_total, 1),
+            round(100-sum_pop_job_on_zone_1_as_percentage_of_total, 1),
+            round(100-sum_pop_job_on_zone_10_as_percentage_of_total, 1),
+            round(100-sum_pop_job_on_zone_837101_as_percentage_of_total, 1),
+            round(100-sum_pop_job_on_zone_2_as_percentage_of_total, 1),
+            round(100-sum_pop_job_on_zone_3_as_percentage_of_total, 1),
+            round(100-sum_pop_job_on_zone_4_as_percentage_of_total, 1),
+            round(100-sum_pop_job_on_zone_5_as_percentage_of_total, 1),
+            round(100-sum_pop_job_on_zone_81_as_percentage_of_total, 1),
+            round(100-sum_pop_job_on_zone_82_as_percentage_of_total, 1),
+            round(100-sum_pop_job_on_zone_83_as_percentage_of_total, 1),
+            round(100-sum_pop_job_on_zone_84_as_percentage_of_total, 1),
+            round(100-sum_pop_job_on_zone_85_as_percentage_of_total, 1),
+            round(100-sum_pop_job_on_zone_86_as_percentage_of_total, 1),
+            round(100-sum_pop_job_on_zone_87_as_percentage_of_total, 1)
+        )
+        query += "]},"
+        query += "options:{scales:{xAxes:[{stacked:true}],yAxes:[{stacked:true}]},title:{display:true,text:''Asukkaat ja työpaikat (%25 yhteissummasta)''},legend:{display:false}}}'"
+
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        return queries
 
 
     def createQuickchartIoEmissionsPerFloorSpaceByZone(self, uid, outputSchemaName, outputTableName):
@@ -1936,6 +2445,7 @@ class YKRTool:
             renderer = layer.renderer()
             if renderer.type() == 'graduatedSymbol':
                 renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
+            self.layers.append(layer)
             QgsProject.instance().addMapLayer(layer, False)
             group.addLayer(layer)
 
@@ -2216,6 +2726,7 @@ class YKRTool:
             renderer = layer.renderer()
             if renderer.type() == 'graduatedSymbol':
                 renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
+            # self.layers.append(layer)
             QgsProject.instance().addMapLayer(layer, False)
             group.addLayer(layer)
 
@@ -2278,6 +2789,7 @@ class YKRTool:
                 renderer = layer.renderer()
                 if renderer.type() == 'graduatedSymbol':
                     renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
+                self.layers.append(layer)
                 QgsProject.instance().addMapLayer(layer, False)
                 group.addLayer(layer)
 
@@ -2324,6 +2836,7 @@ class YKRTool:
                 renderer = layer.renderer()
                 if renderer.type() == 'graduatedSymbol':
                     renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
+                self.layers.append(layer)
                 QgsProject.instance().addMapLayer(layer, False)
                 group.addLayer(layer)
 
@@ -2371,6 +2884,7 @@ class YKRTool:
                 renderer = layer.renderer()
                 if renderer.type() == 'graduatedSymbol':
                     renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
+                self.layers.append(layer)
                 QgsProject.instance().addMapLayer(layer, False)
                 group.addLayer(layer)
 
