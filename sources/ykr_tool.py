@@ -332,8 +332,20 @@ class YKRTool:
 
         md.checkBoxCalculateEmissionsPerPerson.clicked.connect(self.handleCalculateEmissionsPerPersonToggle)
         md.checkBoxCalculateEmissionsPerJob.clicked.connect(self.handleCalculateEmissionsPerJobToggle)
+        md.checkBoxCalculateEmissionsPerFloorSpaceSquares.clicked.connect(self.handleCalculateEmissionsPerFloorSpaceSquaresToggle)
         md.checkBoxVisualizeTrafficEmissions.clicked.connect(self.handleVisualizeTrafficEmissionsToggle)
         md.checkBoxVisualizeSustainableUrbanStructure.clicked.connect(self.handleVisualizeSustainableUrbanStructureToggle)
+        md.checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone.clicked.connect(self.handleAddQuickchartIoLinksOfRelativeEmissionsByZoneToggle)
+
+
+    def handleAddQuickchartIoLinksOfRelativeEmissionsByZoneToggle(self, checked):
+        if checked:
+            self.mainDialog.checkBoxCalculateEmissionsPerPerson.setChecked(True)
+            self.mainDialog.checkBoxCalculateEmissionsPerJob.setChecked(True)
+            self.mainDialog.checkBoxCalculateEmissionsPerFloorSpaceSquares.setChecked(True)
+            self.mainDialog.checkBoxVisualizeTrafficEmissions.setChecked(True)
+        else:
+            pass
 
 
     def handleVisualizeTrafficEmissionsToggle(self, checked):
@@ -342,6 +354,7 @@ class YKRTool:
         else:
             self.mainDialog.checkBoxVisualizeSustainableUrbanStructure.setChecked(False)
             self.mainDialog.mMapLayerComboBoxYKRCarOwnershipData.setEnabled(False)
+            self.mainDialog.checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone.setChecked(False)
 
 
     def handleVisualizeSustainableUrbanStructureToggle(self, checked):
@@ -353,7 +366,11 @@ class YKRTool:
 
 
     def handleCalculateEmissionsPerPersonToggle(self, checked):
-        md = self.mainDialog
+        if checked:
+            pass
+        else:
+            self.mainDialog.checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone.setChecked(False)
+            # self.mainDialog.checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone.setEnabled(False)
 
         # if checked:
         #     md.comboBoxYkrPop.setEnabled(True)
@@ -366,7 +383,10 @@ class YKRTool:
 
 
     def handleCalculateEmissionsPerJobToggle(self, checked):
-        md = self.mainDialog
+        if checked:
+            pass
+        else:
+            self.mainDialog.checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone.setChecked(False)
 
         # if checked:
         #     md.comboBoxYkrJob.setEnabled(True)
@@ -376,6 +396,13 @@ class YKRTool:
         #     md.comboBoxYkrJob.setEnabled(False)
         #     md.mapLayerComboBoxYkrJob.setEnabled(False)
         #     md.checkBoxLoadYkrJobFromMapLayer.setEnabled(False)
+
+
+    def handleCalculateEmissionsPerFloorSpaceSquaresToggle(self, checked):
+        if checked:
+            pass
+        else:
+            self.mainDialog.checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone.setChecked(False)
 
 
     def handleRadioButtonUseMapLayerForInvestigatedAreaToggle(self, checked):
@@ -1048,6 +1075,9 @@ class YKRTool:
         layerNames.append((self.tr('CO2 sources grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_sources.qml')))
         layerNames.extend(self.calculateRelativeGeneralEmissions(uid, outputSchemaName, outputTableName))
         layerNames.append((self.tr('CO2 total grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_t_grid.qml')))
+        layerNames.append((self.tr('Zones (UZ and urban-countryside)') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/zones.qml')))
+
+        self.createQuickchartIoLinks(uid, outputSchemaName, outputTableName)
 
         uri = QgsDataSourceUri()
         uri.setConnection(self.connParams['host'], self.connParams['port'],\
@@ -1066,6 +1096,696 @@ class YKRTool:
                 renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
             QgsProject.instance().addMapLayer(layer, False)
             group.addLayer(layer)
+
+
+    def createQuickchartIoLinks(self, uid, outputSchemaName, outputTableName, retriesLeft=3):
+        if self.mainDialog.checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone.isChecked():
+            queries = []
+
+            queries.extend(self.createQuickchartIoEmissionsPerFloorSpaceByZone(uid, outputSchemaName, outputTableName))
+            queries.extend(self.createQuickchartIoEmissionsPerPopJobByZone(uid, outputSchemaName, outputTableName))
+            queries.extend(self.createQuickchartIoPersonalEmissionsPerPopJobByZone(uid, outputSchemaName, outputTableName))
+
+            conn = None
+
+            try:
+                conn = createDbConnection(self.connParams)
+            except Exception as e:
+                if retriesLeft > 0:
+                    return self.createQuickchartIoLinks(uid, outputSchemaName, outputTableName, retriesLeft - 1)
+                else:
+                    self.iface.messageBar().pushMessage(
+                        self.tr('Error in connecting to the database'),
+                        str(e), Qgis.Warning, duration=0)
+                    return False
+
+            try:
+                cur = conn.cursor()
+                for query in queries:
+                    cur.execute(query)
+                    conn.commit()
+            except Exception as e:
+                self.iface.messageBar().pushMessage(
+                    self.tr('Error in modifying the results table ') + "{}".format(query),
+                    str(e), Qgis.Warning, duration=0)
+                conn.rollback()
+                conn.close()
+
+                return False
+
+            conn.commit()
+
+            return True
+
+
+    def createQuickchartIoEmissionsPerFloorSpaceByZone(self, uid, outputSchemaName, outputTableName):
+        queries = []
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN chart_paastot_yhteensa_tco2_per_floor_space_squares_by_zone VARCHAR"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        
+        #sum_yhteensa_tco2_per_kem
+        sum_all_squares_sum_yhteensa_tco2_zone_1 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_10 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_837101 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_2 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_3 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_4 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_5 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_81 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_82 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_83 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_84 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_85 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_86 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_87 = 0
+
+        sum_all_squares_kem_zone_1 = 0
+        sum_all_squares_kem_zone_10 = 0
+        sum_all_squares_kem_zone_837101 = 0
+        sum_all_squares_kem_zone_2 = 0
+        sum_all_squares_kem_zone_3 = 0
+        sum_all_squares_kem_zone_4 = 0
+        sum_all_squares_kem_zone_5 = 0
+        sum_all_squares_kem_zone_81 = 0
+        sum_all_squares_kem_zone_82 = 0
+        sum_all_squares_kem_zone_83 = 0
+        sum_all_squares_kem_zone_84 = 0
+        sum_all_squares_kem_zone_85 = 0
+        sum_all_squares_kem_zone_86 = 0
+        sum_all_squares_kem_zone_87 = 0
+
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_1 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_10 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_837101 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_2 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_3 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_4 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_5 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_81 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_82 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_83 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_84 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_85 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_86 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_87 = 0
+
+        uri = QgsDataSourceUri()
+        uri.setConnection(self.connParams['host'], self.connParams['port'],\
+            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+        uri.setDataSource(outputSchemaName, outputTableName, 'geom')
+
+        targetLayer = QgsVectorLayer(uri.uri(False), "emissions target layer", 'postgres')
+
+        targetFeatures = targetLayer.getFeatures()
+
+        for targetFeature in targetFeatures:
+            if targetFeature['zone'] == 1:
+                sum_all_squares_sum_yhteensa_tco2_zone_1 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                sum_all_squares_kem_zone_1 += (targetFeature['floorspace'] if targetFeature['floorspace'] != None else 0)
+            elif targetFeature['zone'] == 10:
+                sum_all_squares_sum_yhteensa_tco2_zone_10 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                sum_all_squares_kem_zone_10 += (targetFeature['floorspace'] if targetFeature['floorspace'] != None else 0)
+            elif targetFeature['zone'] == 837101:
+                sum_all_squares_sum_yhteensa_tco2_zone_837101 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                sum_all_squares_kem_zone_837101 += (targetFeature['floorspace'] if targetFeature['floorspace'] != None else 0)
+            elif targetFeature['zone'] == 2:
+                sum_all_squares_sum_yhteensa_tco2_zone_2 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                sum_all_squares_kem_zone_2 += (targetFeature['floorspace'] if targetFeature['floorspace'] != None else 0)                
+            elif targetFeature['zone'] == 3:
+                sum_all_squares_sum_yhteensa_tco2_zone_3 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                sum_all_squares_kem_zone_3 += (targetFeature['floorspace'] if targetFeature['floorspace'] != None else 0)
+            elif targetFeature['zone'] == 4:
+                sum_all_squares_sum_yhteensa_tco2_zone_4 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                sum_all_squares_kem_zone_4 += (targetFeature['floorspace'] if targetFeature['floorspace'] != None else 0)
+            elif targetFeature['zone'] == 5:
+                sum_all_squares_sum_yhteensa_tco2_zone_5 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                sum_all_squares_kem_zone_5 += (targetFeature['floorspace'] if targetFeature['floorspace'] != None else 0)
+            elif targetFeature['zone'] == 81:
+                sum_all_squares_sum_yhteensa_tco2_zone_81 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                sum_all_squares_kem_zone_81 += (targetFeature['floorspace'] if targetFeature['floorspace'] != None else 0)
+            elif targetFeature['zone'] == 82:
+                sum_all_squares_sum_yhteensa_tco2_zone_82 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                sum_all_squares_kem_zone_82 += (targetFeature['floorspace'] if targetFeature['floorspace'] != None else 0)
+            elif targetFeature['zone'] == 83:
+                sum_all_squares_sum_yhteensa_tco2_zone_83 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                sum_all_squares_kem_zone_83 += (targetFeature['floorspace'] if targetFeature['floorspace'] != None else 0)
+            elif targetFeature['zone'] == 84:
+                sum_all_squares_sum_yhteensa_tco2_zone_84 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                sum_all_squares_kem_zone_84 += (targetFeature['floorspace'] if targetFeature['floorspace'] != None else 0)
+            elif targetFeature['zone'] == 85:
+                sum_all_squares_sum_yhteensa_tco2_zone_85 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                sum_all_squares_kem_zone_85 += (targetFeature['floorspace'] if targetFeature['floorspace'] != None else 0)
+            elif targetFeature['zone'] == 86:
+                sum_all_squares_sum_yhteensa_tco2_zone_86 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                sum_all_squares_kem_zone_86 += (targetFeature['floorspace'] if targetFeature['floorspace'] != None else 0)
+            elif targetFeature['zone'] == 87:
+                sum_all_squares_sum_yhteensa_tco2_zone_87 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                sum_all_squares_kem_zone_87 += (targetFeature['floorspace'] if targetFeature['floorspace'] != None else 0)
+
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_1 = ((sum_all_squares_sum_yhteensa_tco2_zone_1 / sum_all_squares_kem_zone_1) if sum_all_squares_kem_zone_1 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_10 = ((sum_all_squares_sum_yhteensa_tco2_zone_10 / sum_all_squares_kem_zone_10) if sum_all_squares_kem_zone_10 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_837101 = ((sum_all_squares_sum_yhteensa_tco2_zone_837101 / sum_all_squares_kem_zone_837101) if sum_all_squares_sum_yhteensa_tco2_zone_837101 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_2 = ((sum_all_squares_sum_yhteensa_tco2_zone_2 / sum_all_squares_kem_zone_2) if sum_all_squares_kem_zone_2 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_3 = ((sum_all_squares_sum_yhteensa_tco2_zone_3 / sum_all_squares_kem_zone_3) if sum_all_squares_kem_zone_3 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_4 = ((sum_all_squares_sum_yhteensa_tco2_zone_4 / sum_all_squares_kem_zone_4) if sum_all_squares_kem_zone_4 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_5 = ((sum_all_squares_sum_yhteensa_tco2_zone_5 / sum_all_squares_kem_zone_5) if sum_all_squares_kem_zone_5 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_81 = ((sum_all_squares_sum_yhteensa_tco2_zone_81 / sum_all_squares_kem_zone_81) if sum_all_squares_kem_zone_81 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_82 = ((sum_all_squares_sum_yhteensa_tco2_zone_82 / sum_all_squares_kem_zone_82) if sum_all_squares_kem_zone_82 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_83 = ((sum_all_squares_sum_yhteensa_tco2_zone_83 / sum_all_squares_kem_zone_83) if sum_all_squares_kem_zone_83 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_84 = ((sum_all_squares_sum_yhteensa_tco2_zone_84 / sum_all_squares_kem_zone_84) if sum_all_squares_kem_zone_84 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_85 = ((sum_all_squares_sum_yhteensa_tco2_zone_85 / sum_all_squares_kem_zone_85) if sum_all_squares_kem_zone_85 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_86 = ((sum_all_squares_sum_yhteensa_tco2_zone_86 / sum_all_squares_kem_zone_86) if sum_all_squares_kem_zone_86 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_kem_zone_87 = ((sum_all_squares_sum_yhteensa_tco2_zone_87 / sum_all_squares_kem_zone_87) if sum_all_squares_kem_zone_87 > 0 else 0)
+
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET chart_paastot_yhteensa_tco2_per_floor_space_squares_by_zone = "
+        query += ("'https://quickchart.io/chart?w=600&h=300&c={type:''bar'',"
+            "data:{labels:["
+                "''1 = Keskustan jalankulkuvyöhyke'',"
+                "''10 = Alakeskuksen jalankulkuvyöhyke'',"
+                "''837101 = Hervanta (alakeskus, HLT:ssä eroja)'',"
+                "''2 = Keskustan reunavyöhyke'',"
+                "''3 = Intensiivinen joukkoliikkennevyöhyke'',"
+                "''4 = Joukkoliikkennevyöhyke'',"
+                "''5 = Autovyöhyke'',"
+                "''81 = Sisempi kaupunkialue'',"
+                "''82 = Ulompi kaupunkialue'',"
+                "''83 = Kaupungin kehysalue'',"
+                "''84 = Maaseudun paikalliskeskus'',"
+                "''85 = Kaupungin läheinen maaseutu'',"
+                "''86 = Ydinmaaseutu'',"
+                "''87 = Harvaan asuttu maaseutu''],"
+                "datasets:[{backgroundColor: ["
+                    "''rgba(117,213,205,1)'',"
+                    "''rgba(207,30,169,1)'',"
+                    "''rgba(235,102,58,1)'',"
+                    "''rgba(238,36,100,1)'',"
+                    "''rgba(119,73,226,1)'',"
+                    "''rgba(238,169,65,1)'',"
+                    "''rgba(145,222,77,1)'',"
+                    "''rgba(66,118,221,1)'',"
+                    "''rgba(21,24,155,1)'',"
+                    "''rgba(115,92,158,1)'',"
+                    "''rgba(155,155,155,1)'',"
+                    "''rgba(174,107,24,1)'',"
+                    "''rgba(213,180,60,1)'',"
+                    "''rgba(48,108,35,1)''],")
+        query += "data:[''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'']}}]}},".format(
+            round(sum_all_squares_sum_yhteensa_tco2_per_kem_zone_1, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_kem_zone_10, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_kem_zone_837101, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_kem_zone_2, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_kem_zone_3, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_kem_zone_4, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_kem_zone_5, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_kem_zone_81, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_kem_zone_82, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_kem_zone_83, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_kem_zone_84, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_kem_zone_85, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_kem_zone_86, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_kem_zone_87, 3)
+        )
+        query += ("options:{title:{display:true,text:''Päästöt yhteensä tCO2-ekv / k-\u33A1''},legend:{display:false},plugins:{datalabels:{padding:5,display:true,color:''black'',font:{size:6},anchor:''end'',align:''end'',offset:-5},"
+                    "scales:{xAxes:[{ticks:{fontSize:8},gridLines:{display:true}}],yAxes:[{ticks:{fontSize:8,suggestedMin:0,maxTicksLimit:5}}]},"
+                    "legend:{position:''bottom'',labels:{boxWidth:20,fontSize:8}}}}}'")
+
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        return queries
+
+
+    def createQuickchartIoEmissionsPerPopJobByZone(self, uid, outputSchemaName, outputTableName):
+        md = self.mainDialog
+
+        queries = []
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN chart_paastot_yhteensa_tco2_per_pop_job_by_zone VARCHAR"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        
+        #sum_yhteensa_tco2_per_kem
+        sum_all_squares_sum_yhteensa_tco2_zone_1 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_10 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_837101 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_2 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_3 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_4 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_5 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_81 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_82 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_83 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_84 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_85 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_86 = 0
+        sum_all_squares_sum_yhteensa_tco2_zone_87 = 0
+
+        sum_all_squares_pop_job_zone_1 = 0
+        sum_all_squares_pop_job_zone_10 = 0
+        sum_all_squares_pop_job_zone_837101 = 0
+        sum_all_squares_pop_job_zone_2 = 0
+        sum_all_squares_pop_job_zone_3 = 0
+        sum_all_squares_pop_job_zone_4 = 0
+        sum_all_squares_pop_job_zone_5 = 0
+        sum_all_squares_pop_job_zone_81 = 0
+        sum_all_squares_pop_job_zone_82 = 0
+        sum_all_squares_pop_job_zone_83 = 0
+        sum_all_squares_pop_job_zone_84 = 0
+        sum_all_squares_pop_job_zone_85 = 0
+        sum_all_squares_pop_job_zone_86 = 0
+        sum_all_squares_pop_job_zone_87 = 0
+
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_1 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_10 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_837101 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_2 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_3 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_4 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_5 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_81 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_82 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_83 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_84 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_85 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_86 = 0
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_87 = 0
+
+        uri = QgsDataSourceUri()
+        uri.setConnection(self.connParams['host'], self.connParams['port'],\
+            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+        uri.setDataSource(outputSchemaName, outputTableName, 'geom')
+
+        targetLayer = QgsVectorLayer(uri.uri(False), "emissions target layer", 'postgres')
+
+        targetFeatures = targetLayer.getFeatures()
+
+        for targetFeature in targetFeatures:
+            if targetFeature['zone'] == 1:
+                sum_all_squares_sum_yhteensa_tco2_zone_1 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_1 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_1 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_1 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 10:
+                sum_all_squares_sum_yhteensa_tco2_zone_10 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_10 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_10 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_10 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 837101:
+                sum_all_squares_sum_yhteensa_tco2_zone_837101 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_837101 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_837101 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_837101 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 2:
+                sum_all_squares_sum_yhteensa_tco2_zone_2 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_2 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)  
+                else:            
+                    sum_all_squares_pop_job_zone_2 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_2 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 3:
+                sum_all_squares_sum_yhteensa_tco2_zone_3 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_3 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_3 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_3 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 4:
+                sum_all_squares_sum_yhteensa_tco2_zone_4 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_4 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_4 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_4 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 5:
+                sum_all_squares_sum_yhteensa_tco2_zone_5 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_5 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_5 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_5 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 81:
+                sum_all_squares_sum_yhteensa_tco2_zone_81 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_81 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_81 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_81 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 82:
+                sum_all_squares_sum_yhteensa_tco2_zone_82 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_82 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_82 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_82 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 83:
+                sum_all_squares_sum_yhteensa_tco2_zone_83 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_83 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_83 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_83 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 84:
+                sum_all_squares_sum_yhteensa_tco2_zone_84 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_84 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_84 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_84 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 85:
+                sum_all_squares_sum_yhteensa_tco2_zone_85 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_85 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_85 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_85 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 86:
+                sum_all_squares_sum_yhteensa_tco2_zone_86 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_86 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_86 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_86 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 87:
+                sum_all_squares_sum_yhteensa_tco2_zone_87 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_87 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_87 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_87 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_1 = ((sum_all_squares_sum_yhteensa_tco2_zone_1 / sum_all_squares_pop_job_zone_1) if sum_all_squares_pop_job_zone_1 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_10 = ((sum_all_squares_sum_yhteensa_tco2_zone_10 / sum_all_squares_pop_job_zone_10) if sum_all_squares_pop_job_zone_10 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_837101 = ((sum_all_squares_sum_yhteensa_tco2_zone_837101 / sum_all_squares_pop_job_zone_837101) if sum_all_squares_sum_yhteensa_tco2_zone_837101 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_2 = ((sum_all_squares_sum_yhteensa_tco2_zone_2 / sum_all_squares_pop_job_zone_2) if sum_all_squares_pop_job_zone_2 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_3 = ((sum_all_squares_sum_yhteensa_tco2_zone_3 / sum_all_squares_pop_job_zone_3) if sum_all_squares_pop_job_zone_3 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_4 = ((sum_all_squares_sum_yhteensa_tco2_zone_4 / sum_all_squares_pop_job_zone_4) if sum_all_squares_pop_job_zone_4 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_5 = ((sum_all_squares_sum_yhteensa_tco2_zone_5 / sum_all_squares_pop_job_zone_5) if sum_all_squares_pop_job_zone_5 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_81 = ((sum_all_squares_sum_yhteensa_tco2_zone_81 / sum_all_squares_pop_job_zone_81) if sum_all_squares_pop_job_zone_81 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_82 = ((sum_all_squares_sum_yhteensa_tco2_zone_82 / sum_all_squares_pop_job_zone_82) if sum_all_squares_pop_job_zone_82 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_83 = ((sum_all_squares_sum_yhteensa_tco2_zone_83 / sum_all_squares_pop_job_zone_83) if sum_all_squares_pop_job_zone_83 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_84 = ((sum_all_squares_sum_yhteensa_tco2_zone_84 / sum_all_squares_pop_job_zone_84) if sum_all_squares_pop_job_zone_84 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_85 = ((sum_all_squares_sum_yhteensa_tco2_zone_85 / sum_all_squares_pop_job_zone_85) if sum_all_squares_pop_job_zone_85 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_86 = ((sum_all_squares_sum_yhteensa_tco2_zone_86 / sum_all_squares_pop_job_zone_86) if sum_all_squares_pop_job_zone_86 > 0 else 0)
+        sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_87 = ((sum_all_squares_sum_yhteensa_tco2_zone_87 / sum_all_squares_pop_job_zone_87) if sum_all_squares_pop_job_zone_87 > 0 else 0)
+
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET chart_paastot_yhteensa_tco2_per_pop_job_by_zone = "
+        query += ("'https://quickchart.io/chart?w=600&h=300&c={type:''bar'',"
+            "data:{labels:["
+                "''1 = Keskustan jalankulkuvyöhyke'',"
+                "''10 = Alakeskuksen jalankulkuvyöhyke'',"
+                "''837101 = Hervanta (alakeskus, HLT:ssä eroja)'',"
+                "''2 = Keskustan reunavyöhyke'',"
+                "''3 = Intensiivinen joukkoliikkennevyöhyke'',"
+                "''4 = Joukkoliikkennevyöhyke'',"
+                "''5 = Autovyöhyke'',"
+                "''81 = Sisempi kaupunkialue'',"
+                "''82 = Ulompi kaupunkialue'',"
+                "''83 = Kaupungin kehysalue'',"
+                "''84 = Maaseudun paikalliskeskus'',"
+                "''85 = Kaupungin läheinen maaseutu'',"
+                "''86 = Ydinmaaseutu'',"
+                "''87 = Harvaan asuttu maaseutu''],"
+                "datasets:[{backgroundColor: ["
+                    "''rgba(117,213,205,1)'',"
+                    "''rgba(207,30,169,1)'',"
+                    "''rgba(235,102,58,1)'',"
+                    "''rgba(238,36,100,1)'',"
+                    "''rgba(119,73,226,1)'',"
+                    "''rgba(238,169,65,1)'',"
+                    "''rgba(145,222,77,1)'',"
+                    "''rgba(66,118,221,1)'',"
+                    "''rgba(21,24,155,1)'',"
+                    "''rgba(115,92,158,1)'',"
+                    "''rgba(155,155,155,1)'',"
+                    "''rgba(174,107,24,1)'',"
+                    "''rgba(213,180,60,1)'',"
+                    "''rgba(48,108,35,1)''],")
+        query += "data:[''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'']}}]}},".format(
+            round(sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_1, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_10, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_837101, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_2, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_3, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_4, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_5, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_81, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_82, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_83, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_84, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_85, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_86, 3),
+            round(sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_87, 3)
+        )
+        query += ("options:{title:{display:true,text:''Päästöt yhteensä tCO2-ekv / (as.lkm %2B tp.lkm)''},legend:{display:false},plugins:{datalabels:{padding:5,display:true,color:''black'',font:{size:6},anchor:''end'',align:''end'',offset:-5},"
+                    "scales:{xAxes:[{ticks:{fontSize:8},gridLines:{display:true}}],yAxes:[{ticks:{fontSize:8,suggestedMin:0,maxTicksLimit:5}}]},"
+                    "legend:{position:''bottom'',labels:{boxWidth:20,fontSize:8}}}}}'")
+
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        return queries
+
+
+    def createQuickchartIoPersonalEmissionsPerPopJobByZone(self, uid, outputSchemaName, outputTableName):
+        md = self.mainDialog
+
+        queries = []
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN chart_hlo_liikenne_tco2_per_pop_job_by_zone VARCHAR"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        
+        #liikenne_hlo_tco2_per_kem
+        sum_all_squares_liikenne_hlo_tco2_zone_1 = 0
+        sum_all_squares_liikenne_hlo_tco2_zone_10 = 0
+        sum_all_squares_liikenne_hlo_tco2_zone_837101 = 0
+        sum_all_squares_liikenne_hlo_tco2_zone_2 = 0
+        sum_all_squares_liikenne_hlo_tco2_zone_3 = 0
+        sum_all_squares_liikenne_hlo_tco2_zone_4 = 0
+        sum_all_squares_liikenne_hlo_tco2_zone_5 = 0
+        sum_all_squares_liikenne_hlo_tco2_zone_81 = 0
+        sum_all_squares_liikenne_hlo_tco2_zone_82 = 0
+        sum_all_squares_liikenne_hlo_tco2_zone_83 = 0
+        sum_all_squares_liikenne_hlo_tco2_zone_84 = 0
+        sum_all_squares_liikenne_hlo_tco2_zone_85 = 0
+        sum_all_squares_liikenne_hlo_tco2_zone_86 = 0
+        sum_all_squares_liikenne_hlo_tco2_zone_87 = 0
+
+        sum_all_squares_pop_job_zone_1 = 0
+        sum_all_squares_pop_job_zone_10 = 0
+        sum_all_squares_pop_job_zone_837101 = 0
+        sum_all_squares_pop_job_zone_2 = 0
+        sum_all_squares_pop_job_zone_3 = 0
+        sum_all_squares_pop_job_zone_4 = 0
+        sum_all_squares_pop_job_zone_5 = 0
+        sum_all_squares_pop_job_zone_81 = 0
+        sum_all_squares_pop_job_zone_82 = 0
+        sum_all_squares_pop_job_zone_83 = 0
+        sum_all_squares_pop_job_zone_84 = 0
+        sum_all_squares_pop_job_zone_85 = 0
+        sum_all_squares_pop_job_zone_86 = 0
+        sum_all_squares_pop_job_zone_87 = 0
+
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_1 = 0
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_10 = 0
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_837101 = 0
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_2 = 0
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_3 = 0
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_4 = 0
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_5 = 0
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_81 = 0
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_82 = 0
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_83 = 0
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_84 = 0
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_85 = 0
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_86 = 0
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_87 = 0
+
+        uri = QgsDataSourceUri()
+        uri.setConnection(self.connParams['host'], self.connParams['port'],\
+            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+        uri.setDataSource(outputSchemaName, outputTableName, 'geom')
+
+        targetLayer = QgsVectorLayer(uri.uri(False), "emissions target layer", 'postgres')
+
+        targetFeatures = targetLayer.getFeatures()
+
+        for targetFeature in targetFeatures:
+            if targetFeature['zone'] == 1:
+                sum_all_squares_liikenne_hlo_tco2_zone_1 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_1 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_1 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_1 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 10:
+                sum_all_squares_liikenne_hlo_tco2_zone_10 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_10 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_10 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_10 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 837101:
+                sum_all_squares_liikenne_hlo_tco2_zone_837101 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_837101 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_837101 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_837101 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 2:
+                sum_all_squares_liikenne_hlo_tco2_zone_2 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_2 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)  
+                else:            
+                    sum_all_squares_pop_job_zone_2 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_2 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 3:
+                sum_all_squares_liikenne_hlo_tco2_zone_3 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_3 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_3 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_3 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 4:
+                sum_all_squares_liikenne_hlo_tco2_zone_4 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_4 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_4 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_4 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 5:
+                sum_all_squares_liikenne_hlo_tco2_zone_5 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_5 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_5 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_5 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 81:
+                sum_all_squares_liikenne_hlo_tco2_zone_81 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_81 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_81 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_81 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 82:
+                sum_all_squares_liikenne_hlo_tco2_zone_82 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_82 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_82 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_82 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 83:
+                sum_all_squares_liikenne_hlo_tco2_zone_83 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_83 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_83 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_83 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 84:
+                sum_all_squares_liikenne_hlo_tco2_zone_84 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_84 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_84 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_84 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 85:
+                sum_all_squares_liikenne_hlo_tco2_zone_85 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_85 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_85 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_85 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 86:
+                sum_all_squares_liikenne_hlo_tco2_zone_86 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_86 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_86 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_86 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            elif targetFeature['zone'] == 87:
+                sum_all_squares_liikenne_hlo_tco2_zone_87 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
+                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+                    sum_all_squares_pop_job_zone_87 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                else:
+                    sum_all_squares_pop_job_zone_87 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_87 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_1 = ((sum_all_squares_liikenne_hlo_tco2_zone_1 / sum_all_squares_pop_job_zone_1) if sum_all_squares_pop_job_zone_1 > 0 else 0)
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_10 = ((sum_all_squares_liikenne_hlo_tco2_zone_10 / sum_all_squares_pop_job_zone_10) if sum_all_squares_pop_job_zone_10 > 0 else 0)
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_837101 = ((sum_all_squares_liikenne_hlo_tco2_zone_837101 / sum_all_squares_pop_job_zone_837101) if sum_all_squares_liikenne_hlo_tco2_zone_837101 > 0 else 0)
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_2 = ((sum_all_squares_liikenne_hlo_tco2_zone_2 / sum_all_squares_pop_job_zone_2) if sum_all_squares_pop_job_zone_2 > 0 else 0)
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_3 = ((sum_all_squares_liikenne_hlo_tco2_zone_3 / sum_all_squares_pop_job_zone_3) if sum_all_squares_pop_job_zone_3 > 0 else 0)
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_4 = ((sum_all_squares_liikenne_hlo_tco2_zone_4 / sum_all_squares_pop_job_zone_4) if sum_all_squares_pop_job_zone_4 > 0 else 0)
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_5 = ((sum_all_squares_liikenne_hlo_tco2_zone_5 / sum_all_squares_pop_job_zone_5) if sum_all_squares_pop_job_zone_5 > 0 else 0)
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_81 = ((sum_all_squares_liikenne_hlo_tco2_zone_81 / sum_all_squares_pop_job_zone_81) if sum_all_squares_pop_job_zone_81 > 0 else 0)
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_82 = ((sum_all_squares_liikenne_hlo_tco2_zone_82 / sum_all_squares_pop_job_zone_82) if sum_all_squares_pop_job_zone_82 > 0 else 0)
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_83 = ((sum_all_squares_liikenne_hlo_tco2_zone_83 / sum_all_squares_pop_job_zone_83) if sum_all_squares_pop_job_zone_83 > 0 else 0)
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_84 = ((sum_all_squares_liikenne_hlo_tco2_zone_84 / sum_all_squares_pop_job_zone_84) if sum_all_squares_pop_job_zone_84 > 0 else 0)
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_85 = ((sum_all_squares_liikenne_hlo_tco2_zone_85 / sum_all_squares_pop_job_zone_85) if sum_all_squares_pop_job_zone_85 > 0 else 0)
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_86 = ((sum_all_squares_liikenne_hlo_tco2_zone_86 / sum_all_squares_pop_job_zone_86) if sum_all_squares_pop_job_zone_86 > 0 else 0)
+        sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_87 = ((sum_all_squares_liikenne_hlo_tco2_zone_87 / sum_all_squares_pop_job_zone_87) if sum_all_squares_pop_job_zone_87 > 0 else 0)
+
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET chart_hlo_liikenne_tco2_per_pop_job_by_zone = "
+        query += ("'https://quickchart.io/chart?w=600&h=300&c={type:''bar'',"
+            "data:{labels:["
+                "''1 = Keskustan jalankulkuvyöhyke'',"
+                "''10 = Alakeskuksen jalankulkuvyöhyke'',"
+                "''837101 = Hervanta (alakeskus, HLT:ssä eroja)'',"
+                "''2 = Keskustan reunavyöhyke'',"
+                "''3 = Intensiivinen joukkoliikkennevyöhyke'',"
+                "''4 = Joukkoliikkennevyöhyke'',"
+                "''5 = Autovyöhyke'',"
+                "''81 = Sisempi kaupunkialue'',"
+                "''82 = Ulompi kaupunkialue'',"
+                "''83 = Kaupungin kehysalue'',"
+                "''84 = Maaseudun paikalliskeskus'',"
+                "''85 = Kaupungin läheinen maaseutu'',"
+                "''86 = Ydinmaaseutu'',"
+                "''87 = Harvaan asuttu maaseutu''],"
+                "datasets:[{backgroundColor: ["
+                    "''rgba(117,213,205,1)'',"
+                    "''rgba(207,30,169,1)'',"
+                    "''rgba(235,102,58,1)'',"
+                    "''rgba(238,36,100,1)'',"
+                    "''rgba(119,73,226,1)'',"
+                    "''rgba(238,169,65,1)'',"
+                    "''rgba(145,222,77,1)'',"
+                    "''rgba(66,118,221,1)'',"
+                    "''rgba(21,24,155,1)'',"
+                    "''rgba(115,92,158,1)'',"
+                    "''rgba(155,155,155,1)'',"
+                    "''rgba(174,107,24,1)'',"
+                    "''rgba(213,180,60,1)'',"
+                    "''rgba(48,108,35,1)''],")
+        query += "data:[''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'',''{}'']}}]}},".format(
+            round(sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_1, 3),
+            round(sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_10, 3),
+            round(sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_837101, 3),
+            round(sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_2, 3),
+            round(sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_3, 3),
+            round(sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_4, 3),
+            round(sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_5, 3),
+            round(sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_81, 3),
+            round(sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_82, 3),
+            round(sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_83, 3),
+            round(sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_84, 3),
+            round(sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_85, 3),
+            round(sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_86, 3),
+            round(sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_87, 3)
+        )
+        query += ("options:{title:{display:true,text:''Henkilöliik. päästöt yhteensä tCO2-ekv / (as.lkm %2B tp.lkm)''},legend:{display:false},plugins:{datalabels:{padding:5,display:true,color:''black'',font:{size:6},anchor:''end'',align:''end'',offset:-5},"
+                    "scales:{xAxes:[{ticks:{fontSize:8},gridLines:{display:true}}],yAxes:[{ticks:{fontSize:8,suggestedMin:0,maxTicksLimit:5}}]},"
+                    "legend:{position:''bottom'',labels:{boxWidth:20,fontSize:8}}}}}'")
+
+        QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        return queries
 
 
     def addPopulationToResultsTableIfNeeded(self, outputSchemaName, outputTableName, retriesLeft=3):
@@ -1168,6 +1888,7 @@ class YKRTool:
         conn.commit()
 
         return True
+
 
     def createUrbanDevelopmentVisualizations(self, rootGroup, uid, outputSchemaName, outputTableName):
         layerNames = []
