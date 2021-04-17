@@ -1226,17 +1226,20 @@ class YKRTool:
         provider.addAttributes([QgsField("id", QVariant.Int, "integer"),
                                 QgsField("xyind", QVariant.String, "string"),
                                 QgsField("mun", QVariant.String, "string"),
-                                QgsField("liikenne_hlo_tco2_per_as_tp", QVariant.Double, "double"),
                                 QgsField("asukkaat", QVariant.Int, "integer"),
                                 QgsField("tyopaikat", QVariant.Int, "integer"),
+                                QgsField("tiiveys_asukkaat_plus_tyopaikat_per_ha", QVariant.Double, "double"),
+                                QgsField("joukkoliikennekaup_mahd_tiiveys", QVariant.String, "string"),
+                                QgsField("kavelykaup_mahd_tiiveys", QVariant.String, "string"),
+                                QgsField("asukkaat_per_asukkaat_plus_tyopaikat", QVariant.Double, "double"),
+                                QgsField("keskustamainen_toim_seko", QVariant.String, "string"),
                                 QgsField("asuntokunta_0_autoa_pros_osuus", QVariant.Double, "double"),
                                 QgsField("asuntokunta_1_autoa_pros_osuus", QVariant.Double, "double"),
                                 QgsField("asuntokunta_2_autoa_pros_osuus", QVariant.Double, "double"),
-                                QgsField("joukkoliikennekaup_mahd_tiiveys", QVariant.String, "string"),
-                                QgsField("kavelykaup_mahd_tiiveys", QVariant.String, "string"),
-                                QgsField("keskustamainen_toim_seko", QVariant.String, "string"),
-                                QgsField("kahd_auton_omistus_suht_vahaista", QVariant.String, "string"),
                                 QgsField("autottomuus_suht_yleista", QVariant.String, "string"),
+                                QgsField("kahd_auton_omistus_suht_vahaista", QVariant.String, "string"),
+                                QgsField("liikenne_hlo_tco2", QVariant.String, "double"),
+                                QgsField("liikenne_hlo_tco2_per_as_tp", QVariant.Double, "double"),
                                 QgsField("verrat_alh_henkliik_paast", QVariant.String, "string"),
                                 QgsField("kestavan_kaupunkirakenteen_mittarit_toteutuu_yht", QVariant.Int, "integer")
                                 ])
@@ -1336,7 +1339,9 @@ class YKRTool:
             qgs_feature['tyopaikat'] = tyopaikat
             asukkaat = float(asukkaat) if asukkaat != None else 0
             tyopaikat = float(tyopaikat) if tyopaikat != None else 0
-            if ((asukkaat + tyopaikat) / 6.25 >= 35): # 6,25 hehtaaria = 250x250m
+            tiiveys_asukkaat_plus_tyopaikat_per_ha = (asukkaat + tyopaikat) / 6.25
+            qgs_feature['tiiveys_asukkaat_plus_tyopaikat_per_ha'] = tiiveys_asukkaat_plus_tyopaikat_per_ha
+            if (tiiveys_asukkaat_plus_tyopaikat_per_ha >= 35): # 6,25 hehtaaria = 250x250m
                 query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET joukkoliikennekaup_mahd_tiiveys = 'Toteutuu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
                 kestavan_kaupunkirakenteen_mittarit_toteutuu_yht += 1
                 qgs_feature['joukkoliikennekaup_mahd_tiiveys'] = 'Toteutuu'
@@ -1345,7 +1350,7 @@ class YKRTool:
                 qgs_feature['joukkoliikennekaup_mahd_tiiveys'] = 'Ei toteudu'
             # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
-            if ((asukkaat + tyopaikat) / 6.25 >= 100): # 6,25 hehtaaria = 250x250m
+            if (tiiveys_asukkaat_plus_tyopaikat_per_ha >= 100): # 6,25 hehtaaria = 250x250m
                 query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET kavelykaup_mahd_tiiveys = 'Toteutuu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
                 kestavan_kaupunkirakenteen_mittarit_toteutuu_yht += 1
                 qgs_feature['kavelykaup_mahd_tiiveys'] = 'Toteutuu'
@@ -1354,18 +1359,22 @@ class YKRTool:
                 qgs_feature['kavelykaup_mahd_tiiveys'] = 'Ei toteudu'
             # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
             queries.append(query)
-            if (asukkaat + tyopaikat > 0) and ((asukkaat / (asukkaat + tyopaikat) >= 0.2) and (asukkaat / (asukkaat + tyopaikat) <= 0.8)):
-                query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET keskustamainen_toim_seko = 'Toteutuu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
-                kestavan_kaupunkirakenteen_mittarit_toteutuu_yht += 1
-                qgs_feature['keskustamainen_toim_seko'] = 'Toteutuu'
-            else:
-                query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET keskustamainen_toim_seko = 'Ei toteudu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
-                qgs_feature['keskustamainen_toim_seko'] = 'Ei toteudu'
-            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
+            if (asukkaat + tyopaikat > 0):
+                asukkaat_per_asukkaat_plus_tyopaikat = asukkaat / (asukkaat + tyopaikat)
+                qgs_feature['asukkaat_per_asukkaat_plus_tyopaikat'] = asukkaat_per_asukkaat_plus_tyopaikat
+                if (asukkaat_per_asukkaat_plus_tyopaikat >= 0.2) and (asukkaat_per_asukkaat_plus_tyopaikat <= 0.8):
+                    query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET keskustamainen_toim_seko = 'Toteutuu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+                    kestavan_kaupunkirakenteen_mittarit_toteutuu_yht += 1
+                    qgs_feature['keskustamainen_toim_seko'] = 'Toteutuu'
+                else:
+                    query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET keskustamainen_toim_seko = 'Ei toteudu' WHERE xyind ='{}' and mun='{}'".format(xyind, mun)
+                    qgs_feature['keskustamainen_toim_seko'] = 'Ei toteudu'
+                # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+                queries.append(query)
 
             '''verrat_alh_henkliik_paast'''
 
+            qgs_feature['liikenne_hlo_tco2'] = targetFeature['liikenne_hlo_tco2']
             liikenne_hlo_tco2_per_as_tp = targetFeature['liikenne_hlo_tco2_per_as_tp']
             if liikenne_hlo_tco2_per_as_tp != None:
                 qgs_feature['liikenne_hlo_tco2_per_as_tp'] = liikenne_hlo_tco2_per_as_tp
@@ -1472,12 +1481,12 @@ class YKRTool:
         layerNames = []
 
         layerNames.append((self.tr('Sustainable Urban Structure, Count of True Value Indicators') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sustainable_urban_structure.qml')))
-        layerNames.append((self.tr('Sustainable Urban Structure, Relatively Low Personal Traffic Emissions') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_relat_low_pers_traffic_emissions.qml')))
-        layerNames.append((self.tr('Sustainable Urban Structure, Households not Owning Cars are Relatively Common') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_households_no_cars_common.qml')))
-        layerNames.append((self.tr('Sustainable Urban Structure, Households not Owning 2 or More Cars are Relatively Common') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_households_below_2_cars_common.qml')))
-        layerNames.append((self.tr('Sustainable Urban Structure, Sufficient Mix of Population and Jobs') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_sufficient_mix_pop_job.qml')))
-        layerNames.append((self.tr('Sustainable Urban Structure, Sufficient Density of Population and Jobs for Walkable City') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_sufficient_pop_job_density_walk_city.qml')))
-        layerNames.append((self.tr('Sustainable Urban Structure, Sufficient Density of Population and Jobs for Public Transport') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_sufficient_pop_job_density_pub_transport.qml')))
+        layerNames.append((self.tr('Sufficient Density of Population and Jobs for Public Transport - Sustainable Urban Structure') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_sufficient_pop_job_density_pub_transport.qml')))
+        layerNames.append((self.tr('Sufficient Density of Population and Jobs for Walkable City - Sustainable Urban Structure') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_sufficient_pop_job_density_walk_city.qml')))
+        layerNames.append((self.tr('Sufficient Mix of Population and Jobs - Sustainable Urban Structure') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_sufficient_mix_pop_job.qml')))
+        layerNames.append((self.tr('Density Induced Households Car Owning; More Households Owning 1 Car than 2 or More Cars; Portion of Households Owning 2 or More Cars < 30% - Sustainable Urban Structure') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_households_below_2_cars_common.qml')))
+        layerNames.append((self.tr('Density Induced Households Car Owning; More Households Not Owning Car than Owning 1 Car; Portion of Households Not Owning Car > 40% - Sustainable Urban Structure') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_households_no_cars_common.qml')))
+        layerNames.append((self.tr('Relatively Low Personal Traffic Emissions - Sustainable Urban Structure') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_relat_low_pers_traffic_emissions.qml')))
 
         for name in layerNames:
             layer = tempLayer.clone()

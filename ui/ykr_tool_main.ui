@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>573</width>
+    <width>705</width>
     <height>849</height>
    </rect>
   </property>
@@ -45,7 +45,7 @@
              <bool>true</bool>
             </property>
             <property name="text">
-             <string>Use a Map Layer</string>
+             <string>Use a Map Layer (and upload if not in the database)</string>
             </property>
             <attribute name="buttonGroup">
              <string notr="true">buttonGroupAreaOfInterest</string>
@@ -466,7 +466,7 @@
                <bool>true</bool>
               </property>
               <property name="text">
-               <string>Load from a map layer</string>
+               <string>Use a map layer and upload if not in the database</string>
               </property>
              </widget>
             </item>
@@ -497,7 +497,7 @@
                <bool>true</bool>
               </property>
               <property name="text">
-               <string>Load from a map layer</string>
+               <string>Use a map layer and upload if not in the database</string>
               </property>
              </widget>
             </item>
