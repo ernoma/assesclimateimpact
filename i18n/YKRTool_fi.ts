@@ -271,7 +271,7 @@
     <message>
         <location filename="../ui/ykr_tool_main.ui" line="602"/>
         <source>Visualize Sustainable Urban Structure Using YRK Car Ownership Data:</source>
-        <translation>Vísualisoi kestävän kaupunkirakenteen lubut SYKE:n Asuntokunnat ja autonomistus aineistolla:</translation>
+        <translation>Vísualisoi kestävän kaupunkirakenteen luvut SYKE:n Asuntokunnat ja autonomistus aineistolla:</translation>
     </message>
     <message>
         <location filename="../ui/ykr_tool_main.ui" line="622"/>
