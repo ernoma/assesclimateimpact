@@ -357,6 +357,7 @@ class YKRTool:
             pass
         else:
             self.mainDialog.checkBoxVisualizeSustainableUrbanStructure.setChecked(False)
+            self.mainDialog.checkBoxAllowOtherUsersToUseSustainableUrbanStructureTable.setEnabled(False)
             self.mainDialog.mMapLayerComboBoxYKRCarOwnershipData.setEnabled(False)
             self.mainDialog.checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone.setChecked(False)
 
@@ -365,8 +366,10 @@ class YKRTool:
         if checked:
             self.mainDialog.mMapLayerComboBoxYKRCarOwnershipData.setEnabled(True)
             self.mainDialog.checkBoxVisualizeTrafficEmissions.setChecked(True)
+            self.mainDialog.checkBoxAllowOtherUsersToUseSustainableUrbanStructureTable.setEnabled(True)
         else:
             self.mainDialog.mMapLayerComboBoxYKRCarOwnershipData.setEnabled(False)
+            self.mainDialog.checkBoxAllowOtherUsersToUseSustainableUrbanStructureTable.setEnabled(False)
 
 
     def handleCalculateEmissionsPerPersonToggle(self, checked):
@@ -2450,31 +2453,98 @@ class YKRTool:
             group.addLayer(layer)
 
 
-    def createSustainableUrbanStructureResultLayer(self):
-        layer = QgsVectorLayer("Polygon?crs=epsg:3067", "Sustainable Urban Structure", "memory")
+    def createSustainableUrbanStructureResultLayer(self, uid, outputSchemaName, outputTableName, retriesLeft=3):
+        queries = []
+        # if self.mainDialog.checkBoxStoreSustainableUrbanStructureDataToDatabase.isChecked():
+        tableName = "output_sustainable_urban_structure_{}".format(uid)
+
+        query = """CREATE TABLE \"{}\".\"{}\"(
+        id integer PRIMARY KEY,
+        geom geometry(MultiPolygon, 3067),
+        xyind varchar,
+        mun varchar,
+        asukkaat integer,
+        tyopaikat integer,
+        tiiveys_asukkaat_plus_tyopaikat_per_ha real,
+        joukkoliikennekaup_mahd_tiiveys varchar,
+        kavelykaup_mahd_tiiveys varchar,
+        asukkaat_per_asukkaat_plus_tyopaikat real,
+        keskustamainen_toim_seko varchar,
+        asuntokunta_0_autoa_pros_osuus real,
+        asuntokunta_1_autoa_pros_osuus real,
+        asuntokunta_2_autoa_pros_osuus real,
+        autottomuus_suht_yleista varchar,
+        kahd_auton_omistus_suht_vahaista varchar,
+        liikenne_hlo_tco2 real,
+        liikenne_hlo_tco2_per_as_tp real,
+        verrat_alh_henkliik_paast varchar,
+        kestavan_kaupunkirakenteen_mittarit_toteutuu_yht integer
+        )
+        """.format(outputSchemaName.replace('"', ''), tableName)
+
+        queries.append(query)
+
+        if self.mainDialog.checkBoxAllowOtherUsersToUseSustainableUrbanStructureTable.isChecked():
+            query = "GRANT SELECT ON \"{}\".\"{}\" TO public".format(outputSchemaName.replace('"', ''), tableName)
+
+        conn = None
+
+        try:
+            conn = createDbConnection(self.connParams)
+        except Exception as e:
+            if retriesLeft > 0:
+                self.createSustainableUrbanStructureResultLayer(uid, outputSchemaName, outputTableName, retriesLeft - 1)
+            else:
+                self.iface.messageBar().pushMessage(
+                    self.tr('Error in connecting to the database'),
+                    str(e), Qgis.Warning, duration=0)
+
+        try:
+            cur = conn.cursor()
+            for query in queries:
+                cur.execute(query)
+                conn.commit()
+        except Exception as e:
+            self.iface.messageBar().pushMessage(
+                self.tr('Error in modifying the results table ') + "{}".format(query),
+                str(e), Qgis.Warning, duration=0)
+            conn.rollback()
+            conn.close()
+
+
+        uri = QgsDataSourceUri()
+        uri.setConnection(self.connParams['host'], self.connParams['port'],\
+            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+        
+        uri.setDataSource(outputSchemaName.replace('"', ''), tableName, 'geom')
+        layer = QgsVectorLayer(uri.uri(False), tableName, 'postgres')
         provider = layer.dataProvider()
-        layer.startEditing()
-        provider.addAttributes([QgsField("id", QVariant.Int, "integer"),
-                                QgsField("xyind", QVariant.String, "string"),
-                                QgsField("mun", QVariant.String, "string"),
-                                QgsField("asukkaat", QVariant.Int, "integer"),
-                                QgsField("tyopaikat", QVariant.Int, "integer"),
-                                QgsField("tiiveys_asukkaat_plus_tyopaikat_per_ha", QVariant.Double, "double"),
-                                QgsField("joukkoliikennekaup_mahd_tiiveys", QVariant.String, "string"),
-                                QgsField("kavelykaup_mahd_tiiveys", QVariant.String, "string"),
-                                QgsField("asukkaat_per_asukkaat_plus_tyopaikat", QVariant.Double, "double"),
-                                QgsField("keskustamainen_toim_seko", QVariant.String, "string"),
-                                QgsField("asuntokunta_0_autoa_pros_osuus", QVariant.Double, "double"),
-                                QgsField("asuntokunta_1_autoa_pros_osuus", QVariant.Double, "double"),
-                                QgsField("asuntokunta_2_autoa_pros_osuus", QVariant.Double, "double"),
-                                QgsField("autottomuus_suht_yleista", QVariant.String, "string"),
-                                QgsField("kahd_auton_omistus_suht_vahaista", QVariant.String, "string"),
-                                QgsField("liikenne_hlo_tco2", QVariant.String, "double"),
-                                QgsField("liikenne_hlo_tco2_per_as_tp", QVariant.Double, "double"),
-                                QgsField("verrat_alh_henkliik_paast", QVariant.String, "string"),
-                                QgsField("kestavan_kaupunkirakenteen_mittarit_toteutuu_yht", QVariant.Int, "integer")
-                                ])
-        layer.commitChanges()
+        # else:
+        #     layer = QgsVectorLayer("Polygon?crs=epsg:3067", "Sustainable Urban Structure", "memory")
+
+        #     provider = layer.dataProvider()
+        #     layer.startEditing()
+        #     provider.addAttributes([QgsField("id", QVariant.Int, "integer"),
+        #                             QgsField("xyind", QVariant.String, "string"),
+        #                             QgsField("mun", QVariant.String, "string"),
+        #                             QgsField("asukkaat", QVariant.Int, "integer"),
+        #                             QgsField("tyopaikat", QVariant.Int, "integer"),
+        #                             QgsField("tiiveys_asukkaat_plus_tyopaikat_per_ha", QVariant.Double, "double"),
+        #                             QgsField("joukkoliikennekaup_mahd_tiiveys", QVariant.String, "string"),
+        #                             QgsField("kavelykaup_mahd_tiiveys", QVariant.String, "string"),
+        #                             QgsField("asukkaat_per_asukkaat_plus_tyopaikat", QVariant.Double, "double"),
+        #                             QgsField("keskustamainen_toim_seko", QVariant.String, "string"),
+        #                             QgsField("asuntokunta_0_autoa_pros_osuus", QVariant.Double, "double"),
+        #                             QgsField("asuntokunta_1_autoa_pros_osuus", QVariant.Double, "double"),
+        #                             QgsField("asuntokunta_2_autoa_pros_osuus", QVariant.Double, "double"),
+        #                             QgsField("autottomuus_suht_yleista", QVariant.String, "string"),
+        #                             QgsField("kahd_auton_omistus_suht_vahaista", QVariant.String, "string"),
+        #                             QgsField("liikenne_hlo_tco2", QVariant.String, "double"),
+        #                             QgsField("liikenne_hlo_tco2_per_as_tp", QVariant.Double, "double"),
+        #                             QgsField("verrat_alh_henkliik_paast", QVariant.String, "string"),
+        #                             QgsField("kestavan_kaupunkirakenteen_mittarit_toteutuu_yht", QVariant.Int, "integer")
+        #                             ])
+        #     layer.commitChanges()
 
         return (layer, provider)
 
@@ -2491,7 +2561,19 @@ class YKRTool:
             raise Exception(self.tr("YRK Car Ownership Data layer has not been selected"))
         elif not carOwnershipMapLayer.isValid():
             raise Exception(self.tr("YRK Car Ownership Data layer is not valid"))
-        # (TODO check that contains expected data) 
+        else:
+            # (TODO check that contains all expected data) 
+            fields = carOwnershipMapLayer.fields()
+            if fields.indexOf('xyind') == -1:
+                raise Exception(self.tr("YRK Car Ownership Data layer does not contain field xyind"))
+            if fields.indexOf('kunta') == -1:
+                raise Exception(self.tr("YRK Car Ownership Data layer does not contain field kunta"))
+            if fields.indexOf('kunta') == -1:
+                raise Exception(self.tr("YRK Car Ownership Data layer does not contain field autoja_1"))
+            if fields.indexOf('kunta') == -1:
+                raise Exception(self.tr("YRK Car Ownership Data layer does not contain field autoja_2"))
+            if fields.indexOf('kunta') == -1:
+                raise Exception(self.tr("YRK Car Ownership Data layer does not contain field ak_yht"))
 
         queries = []
         if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
@@ -2499,32 +2581,32 @@ class YKRTool:
         else:
             ykrPopTableName = self.ykrUploadedPopTableName
 
-        (tempLayer, tempProvider) = self.createSustainableUrbanStructureResultLayer()
+        (tempLayer, tempProvider) = self.createSustainableUrbanStructureResultLayer(uid, outputSchemaName, outputTableName)
         tempLayer.startEditing()
 
         features = []
 
-        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN joukkoliikennekaup_mahd_tiiveys varchar"
-        # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-        queries.append(query)
-        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN kavelykaup_mahd_tiiveys varchar"
-        # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-        queries.append(query)
-        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN keskustamainen_toim_seko varchar"
-        # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-        queries.append(query)
-        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN kahd_auton_omistus_suht_vahaista varchar"
-        # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-        queries.append(query)
-        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN autottomuus_suht_yleista varchar"
-        # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-        queries.append(query)
-        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN verrat_alh_henkliik_paast varchar"
-        # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-        queries.append(query)
-        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN kestavan_kaupunkirakenteen_mittarit_toteutuu_yht int4"
-        # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-        queries.append(query)
+        # query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN joukkoliikennekaup_mahd_tiiveys varchar"
+        # # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # queries.append(query)
+        # query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN kavelykaup_mahd_tiiveys varchar"
+        # # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # queries.append(query)
+        # query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN keskustamainen_toim_seko varchar"
+        # # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # queries.append(query)
+        # query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN kahd_auton_omistus_suht_vahaista varchar"
+        # # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # queries.append(query)
+        # query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN autottomuus_suht_yleista varchar"
+        # # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # queries.append(query)
+        # query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN verrat_alh_henkliik_paast varchar"
+        # # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # queries.append(query)
+        # query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN kestavan_kaupunkirakenteen_mittarit_toteutuu_yht int4"
+        # # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # queries.append(query)
 
         # Get result layer (to calculate only for xyind sqaures on the investigation area)
         uri = QgsDataSourceUri()

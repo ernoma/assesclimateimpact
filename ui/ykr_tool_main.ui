@@ -633,7 +633,7 @@
             </property>
            </widget>
           </item>
-          <item row="19" column="0">
+          <item row="20" column="0">
            <widget class="QCheckBox" name="checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone">
             <property name="text">
              <string>Add Quickchart.io Links of Relative Emissions By Zone to the Results Table</string>
@@ -643,13 +643,26 @@
             </property>
            </widget>
           </item>
-          <item row="20" column="0">
+          <item row="21" column="0">
            <widget class="QCheckBox" name="checkBoxAddQuickchartIoLinksOfZoneSquaresAndPopJobPercentagesOfTotalByZone">
             <property name="text">
              <string>Add Quickchart.io Links of Zone Squares and Pop + Job as Percentages of Total By Zone</string>
             </property>
             <property name="checked">
              <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="19" column="0">
+           <widget class="QCheckBox" name="checkBoxAllowOtherUsersToUseSustainableUrbanStructureTable">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Allow other users access to the urban structure data table in the database</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
