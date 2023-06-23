@@ -950,27 +950,38 @@ class YKRTool:
         '''Generate queries to call processing functions in database'''
         vals = {
             'uuid': self.sessionParams['uuid'],
+            'municipalities': [837],
             'aoi': self.predefinedAreaDBTableName,
+            'includeLongDistance': False,
+            'includeBusinessTravel': True,
+            'calculationYears': [2023, 2023, 2023],
             # 'geomArea': self.geomArea,
             # 'popTable': (self.tableNames[self.ykrPopLayer]).lower(),
             # 'jobTable': (self.tableNames[self.ykrJobsLayer]).lower(),
             # 'buildingTable': (self.tableNames[self.ykrBuildingsLayer]).lower(),
-            'calcYear': self.sessionParams['baseYear'],
-            'baseYear': self.sessionParams['baseYear'],
+            # 'calcYear': 2023, #self.sessionParams['baseYear'],
             'pitkoScenario': self.pitkoScenario,
             'emissionsAllocation': self.emissionsAllocation,
-            'elecEmissionType': self.elecEmissionType
+            'elecEmissionType': self.elecEmissionType,
+            'baseYear': 2023, #self.sessionParams['baseYear'],
+            'targetYear': 2023, #self.sessionParams['baseYear'],
         }
         queries = []
         if not self.calculateFuture:
-            queries.append('''CREATE TABLE user_output."output_{uuid}" AS
-            SELECT * FROM CO2_CalculateEmissions('{aoi}', '{calcYear}', '{pitkoScenario}',
-            '{emissionsAllocation}', '{elecEmissionType}')'''.format(**vals))
+            query = '''CREATE TABLE user_output."output_{0}" AS SELECT * FROM CO2_CalculateEmissions(array{1}, '{2}', {3}, {4}, array{5}, '{6}', '{7}', '{8}', {9}, {10});'''.format(self.sessionParams['uuid'], [837], self.predefinedAreaDBTableName, 'false' ,'true', [2023, 2023, 2023], self.pitkoScenario, self.emissionsAllocation, self.elecEmissionType, 2023, 2023)
+            # query = '''CREATE TABLE user_output."output_{uuid}" AS
+            #     SELECT * FROM CO2_CalculateEmissions('{municipalities}', '{aoi}', '{includeLongDistance}', '{includeBusinessTravel}', '{calculationYears}', '{pitkoScenario}',
+            #     '{emissionsAllocation}', '{elecEmissionType}', '{baseYear}', '{targetYear}')'''.format(**vals)
+            QgsMessageLog.logMessage(query, 'YKRTool', Qgis.Info)
+            queries.append(query)
             # queries.append('''CREATE TABLE user_output."output_{uuid}" AS
-            # SELECT * FROM il_calculate_emissions('{popTable}', '{jobTable}',
-            # '{buildingTable}', '{aoi}', '{calcYear}', '{pitkoScenario}',
-            # '{emissionsAllocation}', '{elecEmissionType}', '{geomArea}',
-            # '{baseYear}')'''.format(**vals))
+            # SELECT * FROM CO2_CalculateEmissions('{aoi}', '{calcYear}', '{pitkoScenario}',
+            # '{emissionsAllocation}', '{elecEmissionType}')'''.format(**vals))
+            # # queries.append('''CREATE TABLE user_output."output_{uuid}" AS
+            # # SELECT * FROM il_calculate_emissions('{popTable}', '{jobTable}',
+            # # '{buildingTable}', '{aoi}', '{calcYear}', '{pitkoScenario}',
+            # # '{emissionsAllocation}', '{elecEmissionType}', '{geomArea}',
+            # # '{baseYear}')'''.format(**vals))
             QgsMessageLog.logMessage("getCalculationQueries, not self.calculateFuture", 'YKRTool', Qgis.Info)
         else:
             futureQuery = self.generateFutureQuery(vals)
@@ -1006,7 +1017,7 @@ class YKRTool:
     def postCalculation(self):
         '''Called after QueryTask finishes. Writes session info to sessions table and closes session'''
         try:
-            self.writeSessionInfo()
+            # self.writeSessionInfo()
             self.iface.messageBar().pushMessage(self.tr('Ready'), self.tr('Emission calculation ') +\
                 str(self.sessionParams['uuid']) + self.tr(' is ready'), Qgis.Success, duration=0)
         except Exception as e:
