@@ -307,8 +307,12 @@ class YKRTool:
         names = self.ykrToolDictionaries.getPredefinedFutureZoningAreasUserFriendlyNames()
         md.comboBoxPredefinedFutureAreas.addItems(names)
 
-        # names = self.ykrToolDictionaries.getPredefinedUrbanCenterLayersUserFriendlyNames()
-        # md.comboBoxPredefinedFutureNetwork.addItems(names)
+        urbanCenterNames = self.ykrToolDictionaries.getPredefinedUrbanCenterLayersUserFriendlyNames()
+        md.comboBoxPredefinedFutureNetwork.addItems(urbanCenterNames)
+
+        publicTransportStopsNames = self.ykrToolDictionaries.getPredefinedFuturePublicTransportStopsUserFriendlyNames()
+        md.comboBoxPredefinedFutureStops.addItems(publicTransportStopsNames)
+
 
         # names = self.ykrToolDictionaries.getYkrPopUserFriendlyNames()
         # md.comboBoxYkrPop.addItems(names)
@@ -418,15 +422,15 @@ class YKRTool:
         if checked:
             md.comboBoxMapLayer.setEnabled(True)
             md.mapLayerLabel.setEnabled(True)
-            md.checkBoxAllowOtherUsersToUseUploadedMapLayer.setEnabled(True)
-            md.checkBoxUploadOnlySelectedFeatures.setEnabled(True)
+            # md.checkBoxAllowOtherUsersToUseUploadedMapLayer.setEnabled(True)
+            # md.checkBoxUploadOnlySelectedFeatures.setEnabled(True)
             md.comboBoxPredefinedArea.setEnabled(False)
             md.predefinedAreaLabel.setEnabled(False)
         else:
             md.comboBoxMapLayer.setEnabled(False)
             md.mapLayerLabel.setEnabled(False)
-            md.checkBoxAllowOtherUsersToUseUploadedMapLayer.setEnabled(False)
-            md.checkBoxUploadOnlySelectedFeatures.setEnabled(False)
+            # md.checkBoxAllowOtherUsersToUseUploadedMapLayer.setEnabled(False)
+            # md.checkBoxUploadOnlySelectedFeatures.setEnabled(False)
             md.comboBoxPredefinedArea.setEnabled(True)
             md.predefinedAreaLabel.setEnabled(True)
 
@@ -437,15 +441,15 @@ class YKRTool:
         if checked:
             md.comboBoxMapLayer.setEnabled(False)
             md.mapLayerLabel.setEnabled(False)
-            md.checkBoxAllowOtherUsersToUseUploadedMapLayer.setEnabled(False)
-            md.checkBoxUploadOnlySelectedFeatures.setEnabled(False)
+            # md.checkBoxAllowOtherUsersToUseUploadedMapLayer.setEnabled(False)
+            # md.checkBoxUploadOnlySelectedFeatures.setEnabled(False)
             md.comboBoxPredefinedArea.setEnabled(True)
             md.predefinedAreaLabel.setEnabled(True)
         else:
             md.comboBoxMapLayer.setEnabled(True)
             md.mapLayerLabel.setEnabled(True)
-            md.checkBoxAllowOtherUsersToUseUploadedMapLayer.setEnabled(True)
-            md.checkBoxUploadOnlySelectedFeatures.setEnabled(True)
+            # md.checkBoxAllowOtherUsersToUseUploadedMapLayer.setEnabled(True)
+            # md.checkBoxUploadOnlySelectedFeatures.setEnabled(True)
             md.comboBoxPredefinedArea.setEnabled(False)
             md.predefinedAreaLabel.setEnabled(False)
 
@@ -776,8 +780,13 @@ class YKRTool:
                     self.futureNetworkLayerDBTableName = uri.quotedTablename()
             # self.inputLayers.append(self.futureNetworkLayer)
         else:
-            self.futureNetworkLayer = None
-            self.futureNetworkLayerDBTableName = None
+            futureUrbanCenterTableName = self.ykrToolDictionaries.getPredefinedUrbanCenterLayersDatabaseTableName(md.comboBoxPredefinedFutureNetwork.currentText())
+            schemaName, tableName = futureUrbanCenterTableName.split('.')
+            uri = QgsDataSourceUri()
+            uri.setConnection(self.connParams['host'], self.connParams['port'],\
+            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+            uri.setDataSource(schemaName, tableName, 'geom')
+            self.futureNetworkLayer = QgsVectorLayer(uri.uri(False), "keskusverkko_tulevaisuus", 'postgres')
 
         if md.futureStopsLoadLayer.isChecked():
             self.futureStopsLayer = md.futureStopsLayerList.currentLayer()
@@ -807,8 +816,13 @@ class YKRTool:
                     QgsMessageLog.logMessage("quotedTablename: {}".format(uri.quotedTablename()) , 'YKRTool', Qgis.Info)
                     self.futureStopsLayerDBTableName = uri.quotedTablename()
         else:
-             self.futureStopsLayer = None
-             self.futureStopsLayerDBTableName = None
+            futureStopsLayerDBTableName = self.ykrToolDictionaries.getPredefinedFuturePublicTransportStopsDatabaseTableName(md.comboBoxPredefinedFutureStops.currentText())
+            schemaName, tableName = futureStopsLayerDBTableName.split('.')
+            uri = QgsDataSourceUri()
+            uri.setConnection(self.connParams['host'], self.connParams['port'],\
+            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+            uri.setDataSource(schemaName, tableName, 'geom')
+            self.futureStopsLayer = QgsVectorLayer(uri.uri(False), "pysakkiverkko_tulevaisuus", 'postgres')
 
         self.targetYear = md.targetYear.value()
 

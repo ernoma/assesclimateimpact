@@ -47,7 +47,7 @@
                <bool>true</bool>
               </property>
               <property name="text">
-               <string>Use a Map Layer (and upload if not in the database)</string>
+               <string>Use a Map Layer (already in the ilmakaludb user_input schema)</string>
               </property>
               <attribute name="buttonGroup">
                <string notr="true">buttonGroupAreaOfInterest</string>
@@ -342,7 +342,7 @@
                <item>
                 <widget class="QCheckBox" name="futureAreasLoadLayer">
                  <property name="text">
-                  <string>Load from a map layer</string>
+                  <string>Use a Map Layer (already in the ilmakaludb user_input schema)</string>
                  </property>
                 </widget>
                </item>
@@ -403,7 +403,7 @@
                <item>
                 <widget class="QCheckBox" name="futureNetworkLoadLayer">
                  <property name="text">
-                  <string>Load from a map layer</string>
+                  <string>Use a Map Layer (already in the ilmakaludb user_input schema)</string>
                  </property>
                 </widget>
                </item>
@@ -430,7 +430,7 @@
                <item>
                 <widget class="QCheckBox" name="futureStopsLoadLayer">
                  <property name="text">
-                  <string>Load from a map layer</string>
+                  <string>Use a Map Layer (already in the ilmakaludb user_input schema)</string>
                  </property>
                 </widget>
                </item>

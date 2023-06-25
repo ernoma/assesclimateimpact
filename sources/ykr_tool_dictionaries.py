@@ -69,14 +69,17 @@ class YKRToolDictionaries:
 
         self.PredefinedFutureZoningAreas = {
             "fi": {
-                'Kantakaupunki (yk049, valtuustokausi 2017-2021) - ehdotus': 'user_input.kt_bau_kaavaehdotus',
-                'Nurmi-Sorila (yk049, valtuustokausi 2017-2021) - luonnos': 'user_input.kt_nurmi_sorila'
+                'Tre kantakaupunki - yk049, valtuustokausi 2017-2021 - kaavaehdotus': 'user_input.kt_bau_kaavaehdotus',
+                'Tre asemakaavoitusohjelma 2023-2027 (13.12.2022)': 'user_input.kt_ak_23_27_20221213_dev',
+                'Nurmi-Sorila - yk049, valtuustokausi 2017-2021 - kaavaluonnos': 'user_input.kt_nurmi_sorila'
             },
             "en": {
-                'Tampere downtown (Local master plan, City Council’s term 2017-2021) - proposal': 'user_input.kt_bau_kaavaehdotus',
-                'Tampere Nurmi-Sorila (Local master plan, City Council’s term 2017-2021) - draft': 'user_input.kt_nurmi_sorila'
+                'Tampere downtown - Local master plan, City Council’s term 2017-2021 - plan proposal': 'user_input.kt_bau_kaavaehdotus',
+                'Tre detailed land use planning program 2023-2027 (13.12.2022)': 'user_input.kt_ak_23_27_20221213_dev',
+                'Tampere Nurmi-Sorila - Local master plan, City Council’s term 2017-2021 - plan draft': 'user_input.kt_nurmi_sorila'
             }
         }
+
 
         self.PITKOScenarios = {
             "fi": {
@@ -131,12 +134,27 @@ class YKRToolDictionaries:
         
         self.PredefinedUrbanCenterLayers = {
             "fi": {
-                'Keskusverkko kaupunkiseutu ja kantakaupunki (yk049, valtuustokausi 2017-2021) - ehdotus': 'user_input.keskusverkko_tre_seutu_ve_yk049_vaihekaava_ehdotus'
+                'Keskusverkko kaupunkiseutu ja kantakaupunki - yk049, valtuustokausi 2017-2021 - kaavaehdotus': 'user_input.keskusverkko_tre_seutu_ve_yk049_vaihekaava_ehdotus',
+                'Tre keskusverkko - yk049, valtuustokausi 2017-2021 - kaavaehdotus': 'user_input.kv_ehdotus_ve3'
             },
             "en": {
-                'Urban centers of Tampere city region and downtown (Local master plan, City Council’s term 2017-2021) - proposal': 'user_input.keskusverkko_tre_seutu_ve_yk049_vaihekaava_ehdotus'
+                'Urban centers of Tampere city region and downtown - Local master plan, City Council’s term 2017-2021 - plan proposal': 'user_input.keskusverkko_tre_seutu_ve_yk049_vaihekaava_ehdotus',
+                'Tre centers - Local master plan, City Council’s term 2017-2021 - plan proposal': 'user_input.kv_ehdotus_ve3'
             }
         }
+
+
+        self.PredefinedFuturePublicTransportStopsLayers = {
+            "fi": {
+                'Juna-asema- ja raitiotiepysäkkiverkko - Tre asemakaavoitusohjelma 2023-2027': 'user_input.joli_lahijuna_ja_raitiotie_ak_23_27_v2',
+                'Juna-asema- ja raitiotiepysäkkiverkko kaupunkiseutu ja kantakaupunki - yk049, valtuustokausi 2017-2021 - kaavaehdotus': 'user_input.joli_lahijuna_ja_raitiotie_tre_seutu_ve_yk049_vaihekaava_ehdotu'
+            },
+            "en": {
+                'Railway and tram station transport stops - Tre detailed land use planning program 2023-2027': 'user_input.joli_lahijuna_ja_raitiotie_ak_23_27_v2',
+                'Railway and tram station transport stops of Tampere city region and downtown - Local master plan, City Council’s term 2017-2021 - plan proposal': 'user_input.joli_lahijuna_ja_raitiotie_tre_seutu_ve_yk049_vaihekaava_ehdotu'
+            }
+        }
+
 
     def getPITKOScenarioNames(self):
         if self.locale not in self.PITKOScenarios:
@@ -240,6 +258,23 @@ class YKRToolDictionaries:
             return self.PredefinedFutureZoningAreas["en"][predefinedFutureZoningAreasUserFriendlyName]
         else:
             return self.PredefinedFutureZoningAreas[self.locale][predefinedFutureZoningAreasUserFriendlyName]
+
+
+    # getPredefinedFuturePublicTransportStopsDatabaseTableName
+    # PredefinedFuturePublicTransportStopsLayers
+
+    def getPredefinedFuturePublicTransportStopsUserFriendlyNames(self):
+        if self.locale not in self.PredefinedFuturePublicTransportStopsLayers:
+            return self.PredefinedFuturePublicTransportStopsLayers["en"].keys()
+        else:
+            return self.PredefinedFuturePublicTransportStopsLayers[self.locale].keys()
+
+
+    def getPredefinedFuturePublicTransportStopsDatabaseTableName(self, predefinedFuturePublicTransportStopsUserFriendlyName):
+        if self.locale not in self.PredefinedFuturePublicTransportStopsLayers:
+            return self.PredefinedFuturePublicTransportStopsLayers["en"][predefinedFuturePublicTransportStopsUserFriendlyName]
+        else:
+            return self.PredefinedFuturePublicTransportStopsLayers[self.locale][predefinedFuturePublicTransportStopsUserFriendlyName]
 
 
     def getEmissionAllocationMethodNames(self):

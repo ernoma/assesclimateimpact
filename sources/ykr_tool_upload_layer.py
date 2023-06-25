@@ -46,7 +46,7 @@ class YKRToolUploadLayer:
             conn = createDbConnection(connParams)
         except Exception as e:
             if retriesLeft > 0:
-                return self.copySourceLayerFeaturesToTargetTable(connParams, sourceLayer, targetTableName, checkBoxAllowOtherUsersToUseUploadedMapLayer, copyOnlySelectedFeatures, retriesLeft - 1)
+                return self.copySourceLayerFeaturesToTargetTable(connParams, sourceLayer, targetTableName, allowOtherUsersToUseUploadedMapLayer, copyOnlySelectedFeatures, retriesLeft - 1)
             else:
                 self.iface.messageBar().pushMessage(
                     self.tr('Error in connecting to the database'),
