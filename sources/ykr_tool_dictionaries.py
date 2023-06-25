@@ -105,23 +105,23 @@ class YKRToolDictionaries:
 
         self.electricityEmissionClasses = {
             "fi": {
-                "hankinta": "hankinta",
-                "tuotanto": "tuotanto"
+                "tuotanto": "tuotanto",
+                "hankinta": "hankinta"
             },
             "en": {
-                "purchase": "hankinta",
-                "production": "tuotanto"
+                "production": "tuotanto",
+                "purchase": "hankinta"
             }
         }
 
         self.emissionAllocationMethod = {
             "fi": {
-                'Hyödynjakomenetelmä': 'hjm',
-                'Energiamenetelmä': 'em'
+                'Energiamenetelmä': 'em',
+                'Hyödynjakomenetelmä': 'hjm'
             },
             "en": {
-                'Benefits division method': 'hjm',
-                'Energy method': 'em'
+                'Energy method': 'em',
+                'Benefits division method': 'hjm'
             },
         }
 

@@ -109,12 +109,14 @@ class YKRTool:
         self.ykrToolDictionaries = YKRToolDictionaries(self.iface, locale)
         self.ykrToolUploadLayer = YKRToolUploadLayer(self.iface)
 
-        self.futureAreasLayer = None
         self.investigatedAreaMapLayer = None
         self.predefinedAreaDBTableName = None
+        self.municipalitiesArrayString = 'array[837]'
 
+        self.futureAreasLayer = None
         self.futureNetworkLayer = None
         self.futureStopsLayer = None
+        self.futureZoningAreasTableName = None
         self.futureNetworkLayerDBTableName = None
         self.futureStopsLayerDBTableName = None
 
@@ -740,9 +742,10 @@ class YKRTool:
 
         if md.futureAreasLoadLayer.isChecked():
             self.futureAreasLayer = md.futureAreasLayerList.currentLayer()
+            self.futureZoningAreasTableName = 'user_input.' + '"' + self.futureAreasLayer.name()[:YKRTool.MAX_TABLE_NAME_LENGTH] + '"'
         else:
-            futureZoningAreasTableName = self.ykrToolDictionaries.getPredefinedFutureZoningAreasDatabaseTableName(md.comboBoxPredefinedFutureAreas.currentText())
-            schemaName, tableName = futureZoningAreasTableName.split('.')
+            self.futureZoningAreasTableName = self.ykrToolDictionaries.getPredefinedFutureZoningAreasDatabaseTableName(md.comboBoxPredefinedFutureAreas.currentText())
+            schemaName, tableName = self.futureZoningAreasTableName.split('.')
             uri = QgsDataSourceUri()
             uri.setConnection(self.connParams['host'], self.connParams['port'],\
             self.connParams['database'], self.connParams['user'], self.connParams['password'])
@@ -780,8 +783,8 @@ class YKRTool:
                     self.futureNetworkLayerDBTableName = uri.quotedTablename()
             # self.inputLayers.append(self.futureNetworkLayer)
         else:
-            futureUrbanCenterTableName = self.ykrToolDictionaries.getPredefinedUrbanCenterLayersDatabaseTableName(md.comboBoxPredefinedFutureNetwork.currentText())
-            schemaName, tableName = futureUrbanCenterTableName.split('.')
+            self.futureNetworkLayerDBTableName = self.ykrToolDictionaries.getPredefinedUrbanCenterLayersDatabaseTableName(md.comboBoxPredefinedFutureNetwork.currentText())
+            schemaName, tableName = self.futureNetworkLayerDBTableName.split('.')
             uri = QgsDataSourceUri()
             uri.setConnection(self.connParams['host'], self.connParams['port'],\
             self.connParams['database'], self.connParams['user'], self.connParams['password'])
@@ -816,8 +819,8 @@ class YKRTool:
                     QgsMessageLog.logMessage("quotedTablename: {}".format(uri.quotedTablename()) , 'YKRTool', Qgis.Info)
                     self.futureStopsLayerDBTableName = uri.quotedTablename()
         else:
-            futureStopsLayerDBTableName = self.ykrToolDictionaries.getPredefinedFuturePublicTransportStopsDatabaseTableName(md.comboBoxPredefinedFutureStops.currentText())
-            schemaName, tableName = futureStopsLayerDBTableName.split('.')
+            self.futureStopsLayerDBTableName = self.ykrToolDictionaries.getPredefinedFuturePublicTransportStopsDatabaseTableName(md.comboBoxPredefinedFutureStops.currentText())
+            schemaName, tableName = self.futureStopsLayerDBTableName.split('.')
             uri = QgsDataSourceUri()
             uri.setConnection(self.connParams['host'], self.connParams['port'],\
             self.connParams['database'], self.connParams['user'], self.connParams['password'])
@@ -970,11 +973,11 @@ class YKRTool:
     def getCalculationQueries(self):
         '''Generate queries to call processing functions in database'''
 
-        municipalitiesArrayString = self.createMunicipalitiesArrayString()
+        self.municipalitiesArrayString = self.createMunicipalitiesArrayString()
 
         vals = {
             'uuid': self.sessionParams['uuid'],
-            'municipalities': municipalitiesArrayString,
+            'municipalities': self.municipalitiesArrayString,
             'aoi': self.predefinedAreaDBTableName,
             'includeLongDistance': 'true' if self.includeLongDistance else 'false',
             'includeBusinessTravel': 'true' if self.includeBusinessTravel else 'false',
@@ -1022,7 +1025,7 @@ class YKRTool:
 
     def generateFutureQuery(self, vals):
         '''Constructs a query for future calculation'''
-        futureZoningAreasTableName = self.ykrToolDictionaries.getPredefinedFutureZoningAreasDatabaseTableName(self.mainDialog.comboBoxPredefinedFutureAreas.currentText())
+        futureZoningAreasTableName = self.futureZoningAreasTableName
         futureVals = {
             #'fAreas': (self.tableNames[self.futureAreasLayer]).lower(),
             'calculationYears': 'array[{0}, {0}, {1}]'.format(self.sessionParams["baseYear"], self.targetYear),
@@ -1078,9 +1081,9 @@ class YKRTool:
 
 
     def postCalculation(self):
-        '''Called after QueryTask finishes. Writes session info to sessions table and closes session'''
+        '''Called after QueryTask finishes. Writes session info to sessions_v2 table and closes session'''
         try:
-            # self.writeSessionInfo()
+            self.writeSessionInfo()
             self.iface.messageBar().pushMessage(self.tr('Ready'), self.tr('Emission calculation ') +\
                 str(self.sessionParams['uuid']) + self.tr(' is ready'), Qgis.Success, duration=0)
         except Exception as e:
@@ -1099,10 +1102,14 @@ class YKRTool:
 
 
     def writeSessionInfo(self):
-        '''Writes session info to user_output.sessions table'''
+        '''Writes session info to user_output.sessions_v2 table'''
+        predefinedAreaName = self.ykrToolDictionaries.getPredefinedAreaNameFromDatabaseTableName(self.predefinedAreaDBTableName)
+        municipalitiesArrayString = self.municipalitiesArrayString
+        futureZoningAreasTableName = self.futureZoningAreasTableName
+        futureNetworkLayerDBTableName = self.futureNetworkLayerDBTableName
+        futureStopsLayerDBTableName = self.futureStopsLayerDBTableName
         uuid = self.sessionParams['uuid']
         user = self.sessionParams['user']
-        predefinedAreaName = self.ykrToolDictionaries.getPredefinedAreaNameFromDatabaseTableName(self.predefinedAreaDBTableName)
         startTime = self.sessionParams['startTime']
         baseYear = self.sessionParams['baseYear']
         targetYear = self.targetYear
@@ -1110,9 +1117,9 @@ class YKRTool:
         emissionsAllocation = self.emissionsAllocation
         elecEmissionType = self.elecEmissionType
 
-        self.cur.execute('''INSERT INTO user_output.sessions VALUES (%s, %s, %s, %s, %s,
-        %s, %s, %s, %s)''', (uuid, user, startTime, baseYear, targetYear,\
-            pitkoScenario, emissionsAllocation, elecEmissionType, predefinedAreaName))
+        self.cur.execute('''INSERT INTO user_output.sessions_v2(aoi, municipalities, kt_table_name, kv_table_name, joli_table_name, sid, usr, starttime, baseyear, targetyear, calculationScenario, metodi, paastolaji) VALUES (%s, %s, %s, %s, %s,
+        %s, %s, %s, %s, %s, %s, %s, %s)''', (predefinedAreaName, municipalitiesArrayString, futureZoningAreasTableName, futureNetworkLayerDBTableName, futureStopsLayerDBTableName, uuid, user, startTime, baseYear, targetYear,\
+            pitkoScenario, emissionsAllocation, elecEmissionType, ))
         self.conn.commit()
 
 
