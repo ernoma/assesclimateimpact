@@ -1466,103 +1466,55 @@ class YKRTool:
         targetFeatures = targetLayer.getFeatures()
 
         for targetFeature in targetFeatures:
-            if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                sum_of_pop_all_squares += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-            else:
-                sum_of_pop_all_squares += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-            sum_of_job_all_squares += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+            sum_of_pop_all_squares += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+            sum_of_job_all_squares += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
 
             if targetFeature['zone'] in good_zones:
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_pop_job_on_good_zones += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_pop_job_on_good_zones += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_pop_job_on_good_zones += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_pop_job_on_good_zones += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_pop_job_on_good_zones += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
 
             if targetFeature['zone'] == 1:
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_pop_job_on_zone_1 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_pop_job_on_zone_1 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_pop_job_on_zone_1 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_pop_job_on_zone_1 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_pop_job_on_zone_1 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 10:
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_pop_job_on_zone_10 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_pop_job_on_zone_10 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_pop_job_on_zone_10 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_pop_job_on_zone_10 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_pop_job_on_zone_10 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 837101:
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_pop_job_on_zone_837101 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_pop_job_on_zone_837101 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_pop_job_on_zone_837101 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_pop_job_on_zone_837101 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_pop_job_on_zone_837101 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 2:
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_pop_job_on_zone_2 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)  
-                else:            
-                    sum_pop_job_on_zone_2 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_pop_job_on_zone_2 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_pop_job_on_zone_2 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_pop_job_on_zone_2 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 3:
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_pop_job_on_zone_3 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_pop_job_on_zone_3 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_pop_job_on_zone_3 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_pop_job_on_zone_3 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_pop_job_on_zone_3 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 4:
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_pop_job_on_zone_4 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_pop_job_on_zone_4 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_pop_job_on_zone_4 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_pop_job_on_zone_4 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_pop_job_on_zone_4 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 5:
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_pop_job_on_zone_5 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_pop_job_on_zone_5 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_pop_job_on_zone_5 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_pop_job_on_zone_5 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_pop_job_on_zone_5 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 81:
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_pop_job_on_zone_81 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_pop_job_on_zone_81 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_pop_job_on_zone_81 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_pop_job_on_zone_81 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_pop_job_on_zone_81 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 82:
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_pop_job_on_zone_82 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_pop_job_on_zone_82 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_pop_job_on_zone_82 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_pop_job_on_zone_82 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_pop_job_on_zone_82 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 83:
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_pop_job_on_zone_83 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_pop_job_on_zone_83 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_pop_job_on_zone_83 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_pop_job_on_zone_83 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_pop_job_on_zone_83 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 84:
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_pop_job_on_zone_84 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_pop_job_on_zone_84 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_pop_job_on_zone_84 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_pop_job_on_zone_84 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_pop_job_on_zone_84 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 85:
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_pop_job_on_zone_85 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_pop_job_on_zone_85 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_pop_job_on_zone_85 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_pop_job_on_zone_85 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_pop_job_on_zone_85 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 86:
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_pop_job_on_zone_86 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_pop_job_on_zone_86 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_pop_job_on_zone_86 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_pop_job_on_zone_86 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_pop_job_on_zone_86 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 87:
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_pop_job_on_zone_87 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_pop_job_on_zone_87 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_pop_job_on_zone_87 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_pop_job_on_zone_87 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_pop_job_on_zone_87 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
 
         sum_of_pop_job_all_squares = sum_of_pop_all_squares + sum_of_job_all_squares
 
@@ -1923,102 +1875,60 @@ class YKRTool:
         for targetFeature in targetFeatures:
             if targetFeature['zone'] == 1:
                 sum_all_squares_sum_yhteensa_tco2_zone_1 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_1 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_1 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_1 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_1 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_1 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 10:
                 sum_all_squares_sum_yhteensa_tco2_zone_10 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_10 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_10 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_10 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_10 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_10 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 837101:
                 sum_all_squares_sum_yhteensa_tco2_zone_837101 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_837101 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_837101 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_837101 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_837101 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_837101 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 2:
                 sum_all_squares_sum_yhteensa_tco2_zone_2 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_2 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)  
-                else:            
-                    sum_all_squares_pop_job_zone_2 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_2 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_2 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)  
+                sum_all_squares_pop_job_zone_2 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 3:
                 sum_all_squares_sum_yhteensa_tco2_zone_3 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_3 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_3 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_3 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_3 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_3 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 4:
                 sum_all_squares_sum_yhteensa_tco2_zone_4 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_4 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_4 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_4 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_4 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_4 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 5:
                 sum_all_squares_sum_yhteensa_tco2_zone_5 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_5 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_5 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_5 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_5 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_5 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 81:
                 sum_all_squares_sum_yhteensa_tco2_zone_81 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_81 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_81 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_81 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_81 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_81 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 82:
                 sum_all_squares_sum_yhteensa_tco2_zone_82 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_82 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_82 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_82 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_82 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_82 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 83:
                 sum_all_squares_sum_yhteensa_tco2_zone_83 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_83 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_83 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_83 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_83 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_83 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 84:
                 sum_all_squares_sum_yhteensa_tco2_zone_84 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_84 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_84 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_84 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_84 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_84 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 85:
                 sum_all_squares_sum_yhteensa_tco2_zone_85 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_85 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_85 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_85 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_85 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_85 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 86:
                 sum_all_squares_sum_yhteensa_tco2_zone_86 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_86 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_86 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_86 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_86 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_86 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 87:
                 sum_all_squares_sum_yhteensa_tco2_zone_87 += (targetFeature['sum_yhteensa_tco2'] if targetFeature['sum_yhteensa_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_87 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_87 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_87 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_87 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_87 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
 
         sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_1 = ((sum_all_squares_sum_yhteensa_tco2_zone_1 / sum_all_squares_pop_job_zone_1) if sum_all_squares_pop_job_zone_1 > 0 else 0)
         sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_10 = ((sum_all_squares_sum_yhteensa_tco2_zone_10 / sum_all_squares_pop_job_zone_10) if sum_all_squares_pop_job_zone_10 > 0 else 0)
@@ -2159,102 +2069,60 @@ class YKRTool:
         for targetFeature in targetFeatures:
             if targetFeature['zone'] == 1:
                 sum_all_squares_liikenne_hlo_tco2_zone_1 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_1 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_1 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_1 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_1 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_1 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 10:
                 sum_all_squares_liikenne_hlo_tco2_zone_10 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_10 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_10 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_10 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_10 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_10 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 837101:
                 sum_all_squares_liikenne_hlo_tco2_zone_837101 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_837101 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_837101 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_837101 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_837101 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_837101 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 2:
                 sum_all_squares_liikenne_hlo_tco2_zone_2 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_2 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)  
-                else:            
-                    sum_all_squares_pop_job_zone_2 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_2 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_2 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_2 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 3:
                 sum_all_squares_liikenne_hlo_tco2_zone_3 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_3 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_3 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_3 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_3 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_3 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 4:
                 sum_all_squares_liikenne_hlo_tco2_zone_4 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_4 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_4 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_4 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_4 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_4 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 5:
                 sum_all_squares_liikenne_hlo_tco2_zone_5 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_5 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_5 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_5 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_5 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_5 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 81:
                 sum_all_squares_liikenne_hlo_tco2_zone_81 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_81 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_81 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_81 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_81 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_81 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 82:
                 sum_all_squares_liikenne_hlo_tco2_zone_82 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_82 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_82 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_82 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_82 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_82 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 83:
                 sum_all_squares_liikenne_hlo_tco2_zone_83 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_83 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_83 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_83 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_83 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_83 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 84:
                 sum_all_squares_liikenne_hlo_tco2_zone_84 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_84 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_84 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_84 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_84 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_84 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 85:
                 sum_all_squares_liikenne_hlo_tco2_zone_85 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_85 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_85 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_85 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_85 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_85 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 86:
                 sum_all_squares_liikenne_hlo_tco2_zone_86 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_86 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_86 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_86 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_86 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_86 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
             elif targetFeature['zone'] == 87:
                 sum_all_squares_liikenne_hlo_tco2_zone_87 += (targetFeature['liikenne_hlo_tco2'] if targetFeature['liikenne_hlo_tco2'] != None else 0)
-                if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    sum_all_squares_pop_job_zone_87 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
-                else:
-                    sum_all_squares_pop_job_zone_87 += (targetFeature['v_yht'] if targetFeature['v_yht'] != None else 0)
-                sum_all_squares_pop_job_zone_87 += (targetFeature['tp_yht'] if targetFeature['tp_yht'] != None else 0)
+                sum_all_squares_pop_job_zone_87 += (targetFeature['pop'] if targetFeature['pop'] != None else 0)
+                sum_all_squares_pop_job_zone_87 += (targetFeature['employ'] if targetFeature['employ'] != None else 0)
 
         sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_1 = ((sum_all_squares_liikenne_hlo_tco2_zone_1 / sum_all_squares_pop_job_zone_1) if sum_all_squares_pop_job_zone_1 > 0 else 0)
         sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_10 = ((sum_all_squares_liikenne_hlo_tco2_zone_10 / sum_all_squares_pop_job_zone_10) if sum_all_squares_pop_job_zone_10 > 0 else 0)
@@ -2440,14 +2308,7 @@ class YKRTool:
         if self.mainDialog.checkBoxVisualizePopJobMix.isChecked():
             success = self.calculatePopJobMix(outputSchemaName, outputTableName)
             if success:
-                if not self.mainDialog.checkBoxLoadYkrPopFromMapLayer.isChecked():
-                    ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(self.mainDialog.comboBoxYkrPop.currentText())
-                else:
-                    ykrPopTableName = self.ykrUploadedPopTableName
-                if ykrPopTableName == '-':
-                    layerNames.append((self.tr('pop job mix grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/pop_job_mix_grid.qml')))
-                else:
-                    layerNames.append((self.tr('v_yht job mix grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/pop_job_mix_grid.qml')))
+                layerNames.append((self.tr('pop employ mix grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/pop_job_mix_grid.qml')))
 
         if self.mainDialog.checkBoxVisualizeGoodZonesForPopJobDensityAndSustainableTransport.isChecked():
             layerNames.append((self.tr('good UZ zones for population, jobs and sustainable transport grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/good_uz_zones_grid.qml')))
@@ -2605,10 +2466,6 @@ class YKRTool:
                 raise Exception(self.tr("YRK Car Ownership Data layer does not contain field ak_yht"))
 
         queries = []
-        if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-            ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
-        else:
-            ykrPopTableName = self.ykrUploadedPopTableName
 
         (tempLayer, tempProvider) = self.createSustainableUrbanStructureResultLayer(uid, outputSchemaName, outputTableName)
         tempLayer.startEditing()
@@ -2672,11 +2529,8 @@ class YKRTool:
             qgs_feature['mun'] = mun
 
             '''joukkoliikennekaup_mahd_tiiveys, kavelykaup_mahd_tiiveys ja keskustamainen_toim_seko'''
-            if ykrPopTableName == '-':
-                asukkaat = targetFeature['pop']
-            else:
-                asukkaat = targetFeature['v_yht']
-            tyopaikat = targetFeature['tp_yht']
+            asukkaat = targetFeature['pop']
+            tyopaikat = targetFeature['employ']
             qgs_feature['asukkaat'] = asukkaat
             qgs_feature['tyopaikat'] = tyopaikat
             asukkaat = float(asukkaat) if asukkaat != None else 0
@@ -2907,16 +2761,9 @@ class YKRTool:
 
     def calculateRelativeElectricityEmissions(self, uid, outputSchemaName, outputTableName):
         layerNames = []
-        if not self.mainDialog.checkBoxLoadYkrPopFromMapLayer.isChecked():
-            ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(self.mainDialog.comboBoxYkrPop.currentText())
-        else:
-            ykrPopTableName = self.ykrUploadedPopTableName
         success = self.calculateElectricityEmissionsPerPerson(outputSchemaName, outputTableName)
         if success:
-            if ykrPopTableName == '-':
-                layerNames.append((self.tr('CO2 electricity emissions / pop grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/electricity/CO2_electricity_pop_grid.qml')))
-            else:
-                layerNames.append((self.tr('CO2 electricity emissions / v_yht grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/electricity/CO2_electricity_pop_grid.qml')))
+            layerNames.append((self.tr('CO2 electricity emissions / pop grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/electricity/CO2_electricity_pop_grid.qml')))
 
         return layerNames
 
@@ -2954,16 +2801,9 @@ class YKRTool:
 
     def calculateRelativeThermoEmissions(self, uid, outputSchemaName, outputTableName):
         layerNames = []
-        if not self.mainDialog.checkBoxLoadYkrPopFromMapLayer.isChecked():
-            ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(self.mainDialog.comboBoxYkrPop.currentText())
-        else:
-            ykrPopTableName = self.ykrUploadedPopTableName
         success = self.calculateThermoEmissionsPerPerson(outputSchemaName, outputTableName)
         if success:
-            if ykrPopTableName == '-':
-                layerNames.append((self.tr('CO2 buildings thermo emissions / pop grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/thermo/CO2_buildings_thermo_pop_grid.qml')))
-            else:
-                layerNames.append((self.tr('CO2 buildings thermo emissions / v_yht grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/thermo/CO2_buildings_thermo_pop_grid.qml')))
+            layerNames.append((self.tr('CO2 buildings thermo emissions / pop grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/thermo/CO2_buildings_thermo_pop_grid.qml')))
 
         return layerNames
 
@@ -2972,46 +2812,43 @@ class YKRTool:
         layerNames = []
     
         if self.mainDialog.checkBoxVisualizeTrafficEmissions.isChecked():
-            layerNames.append((self.tr('CO2 traffic sources grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_traffic_sources_grid.qml')))
-            layerNames.append((self.tr('CO2 traffic total grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_traffic_grid.qml')))
-            layerNames.append((self.tr('CO2 commuter and other population traffic grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_personal_traffic_grid.qml')))
-            layerNames.append((self.tr('CO2 industry and warehouses traffic grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_iwhs_traffic_grid.qml')))
-            layerNames.append((self.tr('CO2 amenities traffic grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_amenities_traffic_grid.qml')))
+            success = self.calculateSumOfPersonalTraffic(outputSchemaName, outputTableName)
 
-            layerNames.extend(self.calculateRelativeTrafficEmissions(uid, outputSchemaName, outputTableName))
+            if success:
+                layerNames.append((self.tr('CO2 traffic sources grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_traffic_sources_grid.qml')))
+                layerNames.append((self.tr('CO2 traffic total grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_traffic_grid.qml')))
+                layerNames.append((self.tr('CO2 commuter and other population traffic grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_personal_traffic_grid.qml')))
+                layerNames.append((self.tr('CO2 industry and warehouses traffic grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_iwhs_traffic_grid.qml')))
+                layerNames.append((self.tr('CO2 amenities traffic grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_amenities_traffic_grid.qml')))
+
+                layerNames.extend(self.calculateRelativeTrafficEmissions(uid, outputSchemaName, outputTableName))
 
 
-            groupName = self.tr("traffic emissions")
-            group = rootGroup.addGroup(groupName)
+                groupName = self.tr("traffic emissions")
+                group = rootGroup.addGroup(groupName)
 
-            uri = QgsDataSourceUri()
-            uri.setConnection(self.connParams['host'], self.connParams['port'],\
-                self.connParams['database'], self.connParams['user'], self.connParams['password'])
-            uri.setDataSource(outputSchemaName, outputTableName, 'geom')
+                uri = QgsDataSourceUri()
+                uri.setConnection(self.connParams['host'], self.connParams['port'],\
+                    self.connParams['database'], self.connParams['user'], self.connParams['password'])
+                uri.setDataSource(outputSchemaName, outputTableName, 'geom')
 
-            for name in layerNames:
-                layer = QgsVectorLayer(uri.uri(False), name[0], 'postgres')
-                layer.loadNamedStyle(name[1])
-                renderer = layer.renderer()
-                if renderer.type() == 'graduatedSymbol':
-                    renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
-                self.layers.append(layer)
-                QgsProject.instance().addMapLayer(layer, False)
-                group.addLayer(layer)
+                for name in layerNames:
+                    layer = QgsVectorLayer(uri.uri(False), name[0], 'postgres')
+                    layer.loadNamedStyle(name[1])
+                    renderer = layer.renderer()
+                    if renderer.type() == 'graduatedSymbol':
+                        renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
+                    self.layers.append(layer)
+                    QgsProject.instance().addMapLayer(layer, False)
+                    group.addLayer(layer)
 
 
     def calculateRelativeTrafficEmissions(self, uid, outputSchemaName, outputTableName):
         layerNames = []
-        if not self.mainDialog.checkBoxLoadYkrPopFromMapLayer.isChecked():
-            ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(self.mainDialog.comboBoxYkrPop.currentText())
-        else:
-            ykrPopTableName = self.ykrUploadedPopTableName
+
         success = self.calculateRelativeTrafficEmissionsToDatabase(outputSchemaName, outputTableName)
         if success:
-            if ykrPopTableName == '-':
-                layerNames.append((self.tr('CO2 traffic emissions / pop grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_traffic_pop_grid.qml')))
-            else:
-                layerNames.append((self.tr('CO2 traffic emissions / v_yht grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_traffic_pop_grid.qml')))
+            layerNames.append((self.tr('CO2 traffic emissions / pop grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/traffic/CO2_traffic_pop_grid.qml')))
 
         return layerNames
 
@@ -3046,10 +2883,6 @@ class YKRTool:
     def calculateElectricityEmissionsPerPerson(self, outputSchemaName, outputTableName, retriesLeft=3):
         md = self.mainDialog
         queries = []
-        if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-            ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
-        else:
-            ykrPopTableName = self.ykrUploadedPopTableName
 
         query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_sahko_tco2_per_sum_yhteensa_tco2 real"
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
@@ -3063,15 +2896,9 @@ class YKRTool:
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
-        if ykrPopTableName == '-':
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_sahko_tco2_per_asukas = (sum_sahko_tco2 / NULLIF(pop, 0))"
-            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
-
-        elif ykrPopTableName != None:
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_sahko_tco2_per_asukas = (sum_sahko_tco2 / NULLIF(v_yht, 0))"
-            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_sahko_tco2_per_asukas = (sum_sahko_tco2 / NULLIF(pop, 0))"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
 
         conn = None
 
@@ -3106,10 +2933,6 @@ class YKRTool:
     def calculateThermoEmissionsPerPerson(self, outputSchemaName, outputTableName, retriesLeft=3):
         md = self.mainDialog
         queries = []
-        if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-            ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
-        else:
-            ykrPopTableName = self.ykrUploadedPopTableName
 
         query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_lammonsaato_tco2_per_sum_yhteensa_tco2 real"
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
@@ -3123,14 +2946,9 @@ class YKRTool:
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
-        if ykrPopTableName == '-':
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_lammonsaato_tco2_per_asukas = (sum_lammonsaato_tco2 / NULLIF(pop, 0))"
-            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
-        elif ykrPopTableName != None:
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_lammonsaato_tco2_per_asukas = (sum_lammonsaato_tco2 / NULLIF(v_yht, 0))"
-            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_lammonsaato_tco2_per_asukas = (sum_lammonsaato_tco2 / NULLIF(pop, 0))"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
 
         conn = None
 
@@ -3165,10 +2983,6 @@ class YKRTool:
     def calculateRelativeTrafficEmissionsToDatabase(self, outputSchemaName, outputTableName, retriesLeft=3):
         md = self.mainDialog
         queries = []
-        if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-            ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
-        else:
-            ykrPopTableName = self.ykrUploadedPopTableName
 
         query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_liikenne_tco2_per_sum_yhteensa_tco2 real"
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
@@ -3198,14 +3012,9 @@ class YKRTool:
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
-        if ykrPopTableName == '-':
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_liikenne_tco2_per_asukas = (sum_liikenne_tco2 / NULLIF(pop, 0))"
-            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
-        elif ykrPopTableName != None:
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_liikenne_tco2_per_asukas = (sum_liikenne_tco2 /  NULLIF(v_yht, 0))"
-            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_liikenne_tco2_per_asukas = (sum_liikenne_tco2 / NULLIF(pop, 0))"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
 
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET liikenne_hlo_tco2_per_sum_liikenne_tco2 = (liikenne_hlo_tco2 / NULLIF(sum_liikenne_tco2, 0))"
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
@@ -3215,27 +3024,17 @@ class YKRTool:
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
-        if ykrPopTableName == '-':
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET liikenne_hlo_tco2_per_asukas = (liikenne_hlo_tco2 / NULLIF(pop, 0))"
-            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
-        elif ykrPopTableName != None:
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET liikenne_hlo_tco2_per_asukas = (liikenne_hlo_tco2 /  NULLIF(v_yht, 0))"
-            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET liikenne_hlo_tco2_per_asukas = (liikenne_hlo_tco2 / NULLIF(pop, 0))"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
 
-        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET liikenne_hlo_tco2_per_tp = (liikenne_hlo_tco2 / NULLIF(tp_yht, 0))"
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET liikenne_hlo_tco2_per_tp = (liikenne_hlo_tco2 / NULLIF(employ, 0))"
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
    
-        if ykrPopTableName == '-':
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET liikenne_hlo_tco2_per_as_tp = (liikenne_hlo_tco2 / NULLIF(COALESCE(pop, 0) + COALESCE(tp_yht, 0), 0))"
-            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
-        elif ykrPopTableName != None:
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET liikenne_hlo_tco2_per_as_tp = (liikenne_hlo_tco2 / NULLIF(COALESCE(v_yht, 0) + COALESCE(tp_yht, 0), 0))"
-            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET liikenne_hlo_tco2_per_as_tp = (liikenne_hlo_tco2 / NULLIF(COALESCE(pop, 0) + COALESCE(employ, 0), 0))"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
 
         conn = None
 
@@ -3274,18 +3073,9 @@ class YKRTool:
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
-        if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-            ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
-        else:
-            ykrPopTableName = self.ykrUploadedPopTableName
-        if ykrPopTableName == '-':
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET pop_per_popjob_percentage = (COALESCE(pop, 0)::real / NULLIF(COALESCE(pop, 0) + COALESCE(tp_yht, 0), 0) * 100)"
-            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
-        else:
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET pop_per_popjob_percentage = (COALESCE(v_yht, 0)::real / NULLIF(COALESCE(v_yht, 0) + COALESCE(tp_yht, 0), 0) * 100)"
-            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET pop_per_popjob_percentage = (COALESCE(pop, 0)::real / NULLIF(COALESCE(pop, 0) + COALESCE(employ, 0), 0) * 100)"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
 
 
         conn = None
@@ -3369,18 +3159,9 @@ class YKRTool:
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
-        if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-            ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
-        else:
-            ykrPopTableName = self.ykrUploadedPopTableName
-        if ykrPopTableName == '-':
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_as_tp = (sum_yhteensa_tco2 / NULLIF(COALESCE(pop, 0) + COALESCE(tp_yht, 0), 0))"
-            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
-        else:
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_as_tp = (sum_yhteensa_tco2 / NULLIF(COALESCE(v_yht, 0) + COALESCE(tp_yht, 0), 0))"
-            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_as_tp = (sum_yhteensa_tco2 / NULLIF(COALESCE(pop, 0) + COALESCE(employ, 0), 0))"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
         
         conn = None
 
@@ -3631,14 +3412,22 @@ class YKRTool:
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET sahko_tv_tco2 = 0 WHERE xyind = '3141256822125'"
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
-        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET liikenne_hlo_tco2 = 0 WHERE xyind = '3141256822125'"
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET liikenne_as_tco2 = 0 WHERE xyind = '3141256822125'"
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET liikenne_tp_tco2 = 0 WHERE xyind = '3141256822125'"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        # query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET liikenne_hlo_tco2 = 0 WHERE xyind = '3141256822125'"
+        # # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        # queries.append(query)
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET liikenne_tv_tco2 = 0 WHERE xyind = '3141256822125'"
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET liikenne_palv_tco2 = 0 WHERE xyind = '3141256822125'"
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET rak_korjaussaneeraus_tco2 = 0 WHERE xyind = '3141256822125'"
         queries.append(query)
         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET rak_korjaussaneeraus_tco2 = 0 WHERE xyind = '3141256822125'"
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
@@ -3675,9 +3464,17 @@ class YKRTool:
         return True
 
 
-    def updateYearToResultTable(self, outputSchemaName, outputTableName, retriesLeft=3):
-        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" SET year = to_date('{}-01-01', 'YYYY-MM-DD')".format(self.targetYear)
+    def calculateSumOfPersonalTraffic(self, outputSchemaName, outputTableName, retriesLeft=3):
+        md = self.mainDialog
+        queries = []
+
+        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN liikenne_hlo_tco2 real"
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
+
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET liikenne_hlo_tco2 = (liikenne_as_tco2 + liikenne_tp_tco2)"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
 
         conn = None
 
@@ -3685,7 +3482,7 @@ class YKRTool:
             conn = createDbConnection(self.connParams)
         except Exception as e:
             if retriesLeft > 0:
-                return self.updateYearToResultTable(outputSchemaName, outputTableName, retriesLeft - 1)
+                return self.calculateSumOfPersonalTraffic(outputSchemaName, outputTableName, retriesLeft - 1)
             else:
                 self.iface.messageBar().pushMessage(
                     self.tr('Error in connecting to the database'),
@@ -3694,7 +3491,9 @@ class YKRTool:
 
         try:
             cur = conn.cursor()
-            cur.execute(query)
+            for query in queries:
+                cur.execute(query)
+                conn.commit()
         except Exception as e:
             self.iface.messageBar().pushMessage(
                 self.tr('Error in modifying the results table ') + "{}".format(query),
@@ -3703,8 +3502,6 @@ class YKRTool:
             conn.close()
 
             return False
-
-        conn.commit()
 
         return True
 

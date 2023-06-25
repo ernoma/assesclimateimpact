@@ -392,6 +392,9 @@
             <property name="text">
              <string>include over 100 km domestic trips to traffic calculation</string>
             </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item row="2" column="0">
@@ -400,7 +403,7 @@
              <string>Allocate business errand trips (commuting trips included in any case)</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -450,7 +453,7 @@
              <string>Allocate Zero Emissions for Nokian Mylly Square</string>
             </property>
             <property name="checked">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -469,7 +472,7 @@
              <string>Visualize Emissions Per Capita</string>
             </property>
             <property name="checked">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -479,7 +482,7 @@
              <string>Visualize Emissions Per Worker</string>
             </property>
             <property name="checked">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -489,7 +492,7 @@
              <string>Visualize Emissions Per Floor Squares (m2)</string>
             </property>
             <property name="checked">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -499,7 +502,7 @@
              <string>Visualize Traffic Emissions</string>
             </property>
             <property name="checked">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -529,7 +532,7 @@
              <string>Visualize Mix of Population and Jobs</string>
             </property>
             <property name="checked">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -539,7 +542,7 @@
              <string>Visualize Good Zones for Population+Job Density and for Sustainable Transport</string>
             </property>
             <property name="checked">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -556,7 +559,7 @@
           <item row="18" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeSustainableUrbanStructure">
             <property name="enabled">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="text">
              <string>Visualize Sustainable Urban Structure Using YRK Car Ownership Data:</string>
@@ -592,7 +595,7 @@
              <string>Add Quickchart.io Links of Relative Emissions By Zone to the Results Table</string>
             </property>
             <property name="checked">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>
