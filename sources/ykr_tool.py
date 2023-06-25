@@ -955,9 +955,12 @@ class YKRTool:
 
     def getCalculationQueries(self):
         '''Generate queries to call processing functions in database'''
+
+        municipalitiesArrayString = self.createMunicipalitiesArrayString()
+
         vals = {
             'uuid': self.sessionParams['uuid'],
-            'municipalities': 'array[837]',
+            'municipalities': municipalitiesArrayString,
             'aoi': self.predefinedAreaDBTableName,
             'includeLongDistance': 'true' if self.includeLongDistance else 'false',
             'includeBusinessTravel': 'true' if self.includeBusinessTravel else 'false',
@@ -1030,6 +1033,34 @@ class YKRTool:
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         QgsMessageLog.logMessage(query, 'YKRTool', Qgis.Info)
         return query
+
+
+
+    def createMunicipalitiesArrayString(self):
+        municipalitiesArrayString = '' #'array[837]',
+
+        if self.mainDialog.checkBoxMunicipalitiesKangasala.isChecked():
+            municipalitiesArrayString += self.ykrToolDictionaries.getMunicipalityCode('Kangasala') + ','
+        if self.mainDialog.checkBoxMunicipalitiesLempaala.isChecked():
+            municipalitiesArrayString += self.ykrToolDictionaries.getMunicipalityCode('Lempaala') + ','
+        if self.mainDialog.checkBoxMunicipalitiesNokia.isChecked():
+            municipalitiesArrayString += self.ykrToolDictionaries.getMunicipalityCode('Nokia') + ','
+        if self.mainDialog.checkBoxMunicipalitiesOrivesi.isChecked():
+            municipalitiesArrayString += self.ykrToolDictionaries.getMunicipalityCode('Orivesi') + ','
+        if self.mainDialog.checkBoxMunicipalitiesPirkkala.isChecked():
+            municipalitiesArrayString += self.ykrToolDictionaries.getMunicipalityCode('Pirkkala') + ','
+        if self.mainDialog.checkBoxMunicipalitiesTampere.isChecked():
+            municipalitiesArrayString += self.ykrToolDictionaries.getMunicipalityCode('Tampere') + ','
+        if self.mainDialog.checkBoxMunicipalitiesVesilahti.isChecked():
+            municipalitiesArrayString += self.ykrToolDictionaries.getMunicipalityCode('Vesilahti') + ','
+        if self.mainDialog.checkBoxMunicipalitiesYlojarvi.isChecked():
+            municipalitiesArrayString += self.ykrToolDictionaries.getMunicipalityCode('Ylojarvi') + ','
+
+        if municipalitiesArrayString == '':
+            municipalitiesArrayString = '211,418,536,562,604,837,922,980,'
+
+        return 'array[' + municipalitiesArrayString[:-1] + ']'
+    
 
 
     def postCalculation(self):

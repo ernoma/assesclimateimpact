@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>860</width>
+    <width>1112</width>
     <height>1092</height>
    </rect>
   </property>
@@ -38,110 +38,207 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <layout class="QFormLayout" name="formLayout_3">
-          <item row="0" column="0">
-           <widget class="QRadioButton" name="radioButtonUseMapLayerForInvestigatedArea">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="text">
-             <string>Use a Map Layer (and upload if not in the database)</string>
-            </property>
-            <attribute name="buttonGroup">
-             <string notr="true">buttonGroupAreaOfInterest</string>
-            </attribute>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="mapLayerLabel">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Map Layer:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QRadioButton" name="radioButtonUsePredefinedAreaForInvestigatedArea">
-            <property name="text">
-             <string>Use Predefined Area</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-            <attribute name="buttonGroup">
-             <string notr="true">buttonGroupAreaOfInterest</string>
-            </attribute>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="predefinedAreaLabel">
-            <property name="text">
-             <string>Predefined Area:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QComboBox" name="comboBoxPredefinedArea">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>23</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>Choose the predefined area. Default: Tampere City Region</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <layout class="QHBoxLayout" name="horizontalLayout">
-            <item>
-             <widget class="QgsMapLayerComboBox" name="comboBoxMapLayer">
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <layout class="QFormLayout" name="formLayout_3">
+            <item row="0" column="0">
+             <widget class="QRadioButton" name="radioButtonUseMapLayerForInvestigatedArea">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Use a Map Layer (and upload if not in the database)</string>
+              </property>
+              <attribute name="buttonGroup">
+               <string notr="true">buttonGroupAreaOfInterest</string>
+              </attribute>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="mapLayerLabel">
               <property name="enabled">
                <bool>false</bool>
               </property>
+              <property name="text">
+               <string>Map Layer:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <layout class="QHBoxLayout" name="horizontalLayout">
+              <item>
+               <widget class="QgsMapLayerComboBox" name="comboBoxMapLayer">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="2" column="0">
+             <widget class="QCheckBox" name="checkBoxAllowOtherUsersToUseUploadedMapLayer">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Allow other users access (if not already)</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QCheckBox" name="checkBoxUploadOnlySelectedFeatures">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Use Only Selected Features</string>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0">
+             <widget class="QRadioButton" name="radioButtonUsePredefinedAreaForInvestigatedArea">
+              <property name="text">
+               <string>Use Predefined Area</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+              <attribute name="buttonGroup">
+               <string notr="true">buttonGroupAreaOfInterest</string>
+              </attribute>
+             </widget>
+            </item>
+            <item row="5" column="0">
+             <widget class="QLabel" name="predefinedAreaLabel">
+              <property name="text">
+               <string>Predefined Area:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QComboBox" name="comboBoxPredefinedArea">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>23</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Choose the predefined area. Default: Tampere City Region</string>
               </property>
              </widget>
             </item>
            </layout>
           </item>
-          <item row="3" column="0">
-           <widget class="QCheckBox" name="checkBoxUploadOnlySelectedFeatures">
-            <property name="enabled">
-             <bool>false</bool>
+          <item>
+           <widget class="QGroupBox" name="groupBox">
+            <property name="title">
+             <string>Choose municipalities:</string>
             </property>
-            <property name="text">
-             <string>Use Only Selected Features</string>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QCheckBox" name="checkBoxAllowOtherUsersToUseUploadedMapLayer">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Allow other users access (if not already)</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_3">
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout">
+               <item>
+                <widget class="QCheckBox" name="checkBoxMunicipalitiesKangasala">
+                 <property name="text">
+                  <string>Kangasala</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxMunicipalitiesLempaala">
+                 <property name="text">
+                  <string>Lempäälä</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxMunicipalitiesNokia">
+                 <property name="text">
+                  <string>Nokia</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxMunicipalitiesOrivesi">
+                 <property name="text">
+                  <string>Orivesi</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxMunicipalitiesPirkkala">
+                 <property name="text">
+                  <string>Pirkkala</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxMunicipalitiesTampere">
+                 <property name="text">
+                  <string>Tampere</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxMunicipalitiesVesilahti">
+                 <property name="text">
+                  <string>Vesilahti</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxMunicipalitiesYlojarvi">
+                 <property name="text">
+                  <string>Ylöjärvi</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>
@@ -595,7 +692,7 @@
              <string>Add Quickchart.io Links of Relative Emissions By Zone to the Results Table</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>

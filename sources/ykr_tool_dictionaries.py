@@ -56,6 +56,16 @@ class YKRToolDictionaries:
             }
         }
 
+        self.municipalitiesWithCodes = {
+            'Kangasala': '211',
+            'Lempaala': '418',
+            'Nokia': '536',
+            'Orivesi': '562',
+            'Pirkkala': '604',
+            'Tampere': '837',
+            'Vesilahti': '922',
+            'Ylojarvi': '980'
+        }
 
         self.PredefinedFutureZoningAreas = {
             "fi": {
@@ -128,8 +138,6 @@ class YKRToolDictionaries:
             }
         }
 
-
-
     def getPITKOScenarioNames(self):
         if self.locale not in self.PITKOScenarios:
             return self.PITKOScenarios["en"].keys()
@@ -155,6 +163,10 @@ class YKRToolDictionaries:
             return self.electricityEmissionClasses["en"][userFriendlyName]
         else:
             return self.electricityEmissionClasses[self.locale][userFriendlyName]
+
+
+    def getMunicipalityCode(self, municipalityName):
+        return self.municipalitiesWithCodes[municipalityName]
 
 
     def getPredefinedAreaNames(self):
