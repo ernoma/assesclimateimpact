@@ -120,8 +120,8 @@ class YKRTool:
 
         self.calculateFuture = False
 
-        self.ykrUploadedPopTableName = None
-        self.ykrUploadedJobTableName = None
+        # self.ykrUploadedPopTableName = None
+        # self.ykrUploadedJobTableName = None
 
         self.layers = []
 
@@ -310,23 +310,23 @@ class YKRTool:
         # names = self.ykrToolDictionaries.getPredefinedUrbanCenterLayersUserFriendlyNames()
         # md.comboBoxPredefinedFutureNetwork.addItems(names)
 
-        names = self.ykrToolDictionaries.getYkrPopUserFriendlyNames()
-        md.comboBoxYkrPop.addItems(names)
-        names = self.ykrToolDictionaries.getYkrJobUserFriendlyNames()
-        md.comboBoxYkrJob.addItems(names)
+        # names = self.ykrToolDictionaries.getYkrPopUserFriendlyNames()
+        # md.comboBoxYkrPop.addItems(names)
+        # names = self.ykrToolDictionaries.getYkrJobUserFriendlyNames()
+        # md.comboBoxYkrJob.addItems(names)
 
         md.settingsButton.clicked.connect(self.displaySettingsDialog)
         md.infoButton.clicked.connect(lambda: self.infoDialog.show())
 
-        md.mapLayerComboBoxYkrPop.hide()
-        md.mapLayerComboBoxYkrJob.hide()
+        # md.mapLayerComboBoxYkrPop.hide()
+        # md.mapLayerComboBoxYkrJob.hide()
         # md.ykrBuildingsLayerList.hide()
         md.futureAreasLayerList.hide()
         md.futureNetworkLayerList.hide()
         md.futureStopsLayerList.hide()
 
-        md.checkBoxLoadYkrPopFromMapLayer.clicked.connect(self.handlePopLayerToggle)
-        md.checkBoxLoadYkrJobFromMapLayer.clicked.connect(self.handleJobLayerToggle)
+        # md.checkBoxLoadYkrPopFromMapLayer.clicked.connect(self.handlePopLayerToggle)
+        # md.checkBoxLoadYkrJobFromMapLayer.clicked.connect(self.handleJobLayerToggle)
         # md.ykrBuildingsLoadLayer.clicked.connect(self.handleLayerToggle)
         md.futureAreasLoadLayer.clicked.connect(self.handleLayerToggle)
         md.futureNetworkLoadLayer.clicked.connect(self.handleLayerToggle)
@@ -520,32 +520,32 @@ class YKRTool:
         return params
 
 
-    def handlePopLayerToggle(self):
-        '''Toggle UI components visibility based on selection'''
-        if self.mainDialog.checkBoxLoadYkrPopFromMapLayer.isChecked():
-            self.mainDialog.comboBoxYkrPop.hide()
-            self.mainDialog.mapLayerComboBoxYkrPop.setEnabled(True)
-            self.mainDialog.checkBoxAllowOtherUsersToUseUploadedYKRPopLayer.setEnabled(True)
-            self.mainDialog.mapLayerComboBoxYkrPop.show()
-        else:
-            self.mainDialog.comboBoxYkrPop.show()
-            self.mainDialog.mapLayerComboBoxYkrPop.setEnabled(False)
-            self.mainDialog.checkBoxAllowOtherUsersToUseUploadedYKRJobLayer.setEnabled(False)
-            self.mainDialog.mapLayerComboBoxYkrPop.hide()
+    # def handlePopLayerToggle(self):
+    #     '''Toggle UI components visibility based on selection'''
+    #     if self.mainDialog.checkBoxLoadYkrPopFromMapLayer.isChecked():
+    #         self.mainDialog.comboBoxYkrPop.hide()
+    #         self.mainDialog.mapLayerComboBoxYkrPop.setEnabled(True)
+    #         self.mainDialog.checkBoxAllowOtherUsersToUseUploadedYKRPopLayer.setEnabled(True)
+    #         self.mainDialog.mapLayerComboBoxYkrPop.show()
+    #     else:
+    #         self.mainDialog.comboBoxYkrPop.show()
+    #         self.mainDialog.mapLayerComboBoxYkrPop.setEnabled(False)
+    #         self.mainDialog.checkBoxAllowOtherUsersToUseUploadedYKRJobLayer.setEnabled(False)
+    #         self.mainDialog.mapLayerComboBoxYkrPop.hide()
 
 
-    def handleJobLayerToggle(self):
-        '''Toggle UI components visibility based on selection'''
-        if self.mainDialog.checkBoxLoadYkrJobFromMapLayer.isChecked():
-            self.mainDialog.comboBoxYkrJob.hide()
-            self.mainDialog.mapLayerComboBoxYkrJob.setEnabled(True)
-            self.mainDialog.checkBoxAllowOtherUsersToUseUploadedYKRJobLayer.setEnabled(True)
-            self.mainDialog.mapLayerComboBoxYkrJob.show()
-        else:
-            self.mainDialog.comboBoxYkrJob.show()
-            self.mainDialog.mapLayerComboBoxYkrJob.setEnabled(False)
-            self.mainDialog.checkBoxAllowOtherUsersToUseUploadedYKRJobLayer.setEnabled(False)
-            self.mainDialog.mapLayerComboBoxYkrJob.hide()
+    # def handleJobLayerToggle(self):
+    #     '''Toggle UI components visibility based on selection'''
+    #     if self.mainDialog.checkBoxLoadYkrJobFromMapLayer.isChecked():
+    #         self.mainDialog.comboBoxYkrJob.hide()
+    #         self.mainDialog.mapLayerComboBoxYkrJob.setEnabled(True)
+    #         self.mainDialog.checkBoxAllowOtherUsersToUseUploadedYKRJobLayer.setEnabled(True)
+    #         self.mainDialog.mapLayerComboBoxYkrJob.show()
+    #     else:
+    #         self.mainDialog.comboBoxYkrJob.show()
+    #         self.mainDialog.mapLayerComboBoxYkrJob.setEnabled(False)
+    #         self.mainDialog.checkBoxAllowOtherUsersToUseUploadedYKRJobLayer.setEnabled(False)
+    #         self.mainDialog.mapLayerComboBoxYkrJob.hide()
 
 
     def handleLayerToggle(self):
@@ -617,51 +617,51 @@ class YKRTool:
         '''Read user input from main dialog'''
         md = self.mainDialog
         self.inputLayers = []
-        if md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-            QgsMessageLog.logMessage("md.checkBoxLoadYkrPopFromMapLayer.isChecked(): {}".format(md.checkBoxLoadYkrPopFromMapLayer.isChecked()) , 'YKRTool', Qgis.Info)
-            self.ykrPopLayer = md.mapLayerComboBoxYkrPop.currentLayer()
-            if self.ykrPopLayer == None:
-                raise Exception(self.tr("YKR population layer has not been selected"))
-            elif not self.ykrPopLayer.isValid():
-                raise Exception(self.tr("YKR population layer is not valid"))
-            dataProvider = self.ykrPopLayer.dataProvider()
-            dataSourceUri = dataProvider.dataSourceUri()
-            uri = dataProvider.uri()
-            # if mapLayerComboBoxYkrPop layer is in Ubigu database then just use the schema.table name
-            # else in the readProcessingInput() load it there and use the loaded table
-            if uri.host() == "" or uri.host() != self.connParams['host'] or uri.database() == "" or uri.database() != self.connParams['database']:
-                self.ykrUploadedPopTableName = 'user_input.' + '"' + self.ykrPopLayer.name()[:YKRTool.MAX_TABLE_NAME_LENGTH] + '"'
-                QgsMessageLog.logMessage("calling copySourceYKRPopLayerFeaturesToTargetTable", 'YKRTool', Qgis.Info)
-                self.ykrToolUploadLayer.copySourceYKRPopLayerFeaturesToTargetTable(self.connParams, self.ykrPopLayer, self.ykrUploadedPopTableName, md.checkBoxAllowOtherUsersToUseUploadedYKRPopLayer.isChecked())
-            else:
-                QgsMessageLog.logMessage("schema: {}".format(uri.schema()) , 'YKRTool', Qgis.Info)
-                QgsMessageLog.logMessage("quotedTablename: {}".format(uri.quotedTablename()) , 'YKRTool', Qgis.Info)
-                self.ykrUploadedPopTableName = uri.quotedTablename()
-        else:
-            self.ykrUploadedPopTableName = None
+        # if md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+        #     QgsMessageLog.logMessage("md.checkBoxLoadYkrPopFromMapLayer.isChecked(): {}".format(md.checkBoxLoadYkrPopFromMapLayer.isChecked()) , 'YKRTool', Qgis.Info)
+        #     self.ykrPopLayer = md.mapLayerComboBoxYkrPop.currentLayer()
+        #     if self.ykrPopLayer == None:
+        #         raise Exception(self.tr("YKR population layer has not been selected"))
+        #     elif not self.ykrPopLayer.isValid():
+        #         raise Exception(self.tr("YKR population layer is not valid"))
+        #     dataProvider = self.ykrPopLayer.dataProvider()
+        #     dataSourceUri = dataProvider.dataSourceUri()
+        #     uri = dataProvider.uri()
+        #     # if mapLayerComboBoxYkrPop layer is in Ubigu database then just use the schema.table name
+        #     # else in the readProcessingInput() load it there and use the loaded table
+        #     if uri.host() == "" or uri.host() != self.connParams['host'] or uri.database() == "" or uri.database() != self.connParams['database']:
+        #         self.ykrUploadedPopTableName = 'user_input.' + '"' + self.ykrPopLayer.name()[:YKRTool.MAX_TABLE_NAME_LENGTH] + '"'
+        #         QgsMessageLog.logMessage("calling copySourceYKRPopLayerFeaturesToTargetTable", 'YKRTool', Qgis.Info)
+        #         self.ykrToolUploadLayer.copySourceYKRPopLayerFeaturesToTargetTable(self.connParams, self.ykrPopLayer, self.ykrUploadedPopTableName, md.checkBoxAllowOtherUsersToUseUploadedYKRPopLayer.isChecked())
+        #     else:
+        #         QgsMessageLog.logMessage("schema: {}".format(uri.schema()) , 'YKRTool', Qgis.Info)
+        #         QgsMessageLog.logMessage("quotedTablename: {}".format(uri.quotedTablename()) , 'YKRTool', Qgis.Info)
+        #         self.ykrUploadedPopTableName = uri.quotedTablename()
+        # else:
+        # self.ykrUploadedPopTableName = None
 
-        if md.checkBoxLoadYkrJobFromMapLayer.isChecked():
-            QgsMessageLog.logMessage("md.checkBoxLoadYkrJobFromMapLayer.isChecked(): {}".format(md.checkBoxLoadYkrJobFromMapLayer.isChecked()) , 'YKRTool', Qgis.Info)
-            self.ykrJobLayer = md.mapLayerComboBoxYkrJob.currentLayer()
-            if self.ykrJobLayer == None:
-                raise Exception(self.tr("YKR Job layer has not been selected"))
-            elif not self.ykrJobLayer.isValid():
-                raise Exception(self.tr("YKR Job layer is not valid"))
-            dataProvider = self.ykrJobLayer.dataProvider()
-            dataSourceUri = dataProvider.dataSourceUri()
-            uri = dataProvider.uri()
-            # if mapLayerComboBoxYkrJob layer is in Ubigu database then just use the schema.table name
-            # else in the readProcessingInput() load it there and use the loaded table
-            if uri.host() == "" or uri.host() != self.connParams['host'] or uri.database() == "" or uri.database() != self.connParams['database']:
-                self.ykrUploadedJobTableName = 'user_input.' + '"' + self.ykrJobLayer.name()[:YKRTool.MAX_TABLE_NAME_LENGTH] + '"'
-                QgsMessageLog.logMessage("calling copySourceYKRJobLayerFeaturesToTargetTable", 'YKRTool', Qgis.Info)
-                self.ykrToolUploadLayer.copySourceYKRJobLayerFeaturesToTargetTable(self.connParams, self.ykrJobLayer, self.ykrUploadedJobTableName, md.checkBoxAllowOtherUsersToUseUploadedYKRJobLayer.isChecked())
-            else:
-                QgsMessageLog.logMessage("schema: {}".format(uri.schema()) , 'YKRTool', Qgis.Info)
-                QgsMessageLog.logMessage("quotedTablename: {}".format(uri.quotedTablename()) , 'YKRTool', Qgis.Info)
-                self.ykrUploadedJobTableName = uri.quotedTablename()
-        else:
-            self.ykrUploadedJobTableName = None
+        # if md.checkBoxLoadYkrJobFromMapLayer.isChecked():
+        #     QgsMessageLog.logMessage("md.checkBoxLoadYkrJobFromMapLayer.isChecked(): {}".format(md.checkBoxLoadYkrJobFromMapLayer.isChecked()) , 'YKRTool', Qgis.Info)
+        #     self.ykrJobLayer = md.mapLayerComboBoxYkrJob.currentLayer()
+        #     if self.ykrJobLayer == None:
+        #         raise Exception(self.tr("YKR Job layer has not been selected"))
+        #     elif not self.ykrJobLayer.isValid():
+        #         raise Exception(self.tr("YKR Job layer is not valid"))
+        #     dataProvider = self.ykrJobLayer.dataProvider()
+        #     dataSourceUri = dataProvider.dataSourceUri()
+        #     uri = dataProvider.uri()
+        #     # if mapLayerComboBoxYkrJob layer is in Ubigu database then just use the schema.table name
+        #     # else in the readProcessingInput() load it there and use the loaded table
+        #     if uri.host() == "" or uri.host() != self.connParams['host'] or uri.database() == "" or uri.database() != self.connParams['database']:
+        #         self.ykrUploadedJobTableName = 'user_input.' + '"' + self.ykrJobLayer.name()[:YKRTool.MAX_TABLE_NAME_LENGTH] + '"'
+        #         QgsMessageLog.logMessage("calling copySourceYKRJobLayerFeaturesToTargetTable", 'YKRTool', Qgis.Info)
+        #         self.ykrToolUploadLayer.copySourceYKRJobLayerFeaturesToTargetTable(self.connParams, self.ykrJobLayer, self.ykrUploadedJobTableName, md.checkBoxAllowOtherUsersToUseUploadedYKRJobLayer.isChecked())
+        #     else:
+        #         QgsMessageLog.logMessage("schema: {}".format(uri.schema()) , 'YKRTool', Qgis.Info)
+        #         QgsMessageLog.logMessage("quotedTablename: {}".format(uri.quotedTablename()) , 'YKRTool', Qgis.Info)
+        #         self.ykrUploadedJobTableName = uri.quotedTablename()
+        # else:
+        # self.ykrUploadedJobTableName = None
 
 
         # if md.checkBoxLoadYkrJobFromMapLayer.isChecked():
@@ -708,6 +708,13 @@ class YKRTool:
 
         # self.onlySelectedFeats = md.checkBoxUploadOnlySelectedFeatures.isChecked()
         self.pitkoScenario = self.ykrToolDictionaries.getPITKOScenarioShortName(md.pitkoScenario.currentText())
+
+        self.includeLongDistance = md.checkBoxIncludeLongDistance.isChecked()
+        self.includeBusinessTravel = md.checkBoxIncludeBusinessTravel.isChecked()
+
+        # 'includeLongDistance': 'true' if self.includeLongDistance else 'false',
+        # 'includeBusinessTravel': 'true' if self.includeBusinessTravel else 'false',
+
         self.emissionsAllocation = self.ykrToolDictionaries.getEmissionAllocationMethodShortName(md.emissionsAllocation.currentText())
         self.elecEmissionType = self.ykrToolDictionaries.getElectricityTypeShortName(md.elecEmissionType.currentText())
 
@@ -950,11 +957,10 @@ class YKRTool:
         '''Generate queries to call processing functions in database'''
         vals = {
             'uuid': self.sessionParams['uuid'],
-            'municipalities': [837],
+            'municipalities': 'array[837]',
             'aoi': self.predefinedAreaDBTableName,
-            'includeLongDistance': False,
-            'includeBusinessTravel': True,
-            'calculationYears': [2023, 2023, 2023],
+            'includeLongDistance': 'true' if self.includeLongDistance else 'false',
+            'includeBusinessTravel': 'true' if self.includeBusinessTravel else 'false',
             # 'geomArea': self.geomArea,
             # 'popTable': (self.tableNames[self.ykrPopLayer]).lower(),
             # 'jobTable': (self.tableNames[self.ykrJobsLayer]).lower(),
@@ -963,12 +969,20 @@ class YKRTool:
             'pitkoScenario': self.pitkoScenario,
             'emissionsAllocation': self.emissionsAllocation,
             'elecEmissionType': self.elecEmissionType,
-            'baseYear': 2023, #self.sessionParams['baseYear'],
-            'targetYear': 2023, #self.sessionParams['baseYear'],
+            'baseYear': self.sessionParams['baseYear'],
+            # 'targetYear': 2023, #self.sessionParams['baseYear'],
         }
         queries = []
         if not self.calculateFuture:
-            query = '''CREATE TABLE user_output."output_{0}" AS SELECT * FROM CO2_CalculateEmissions(array{1}, '{2}', {3}, {4}, array{5}, '{6}', '{7}', '{8}', {9}, {10});'''.format(self.sessionParams['uuid'], [837], self.predefinedAreaDBTableName, 'false' ,'true', [2023, 2023, 2023], self.pitkoScenario, self.emissionsAllocation, self.elecEmissionType, 2023, 2023)
+            # presentYearVals = {
+            #     'calculationYears': 'array[{0}, {0}, {0}]'.format(self.sessionParams["baseYear"]),
+            # }
+            # vals.update(presentYearVals)
+            
+            query = '''CREATE TABLE user_output."output_dev_{uuid}" AS SELECT * FROM CO2_CalculateEmissionsLoop({municipalities}, '{aoi}', {includeLongDistance}, {includeBusinessTravel}, '{pitkoScenario}', '{emissionsAllocation}', '{elecEmissionType}', '{baseYear}', '{baseYear}');'''.format(**vals)
+
+            # query = '''CREATE TABLE user_output."output_{0}" AS SELECT * FROM CO2_CalculateEmissions(array{1}, '{2}', {3}, {4}, array{5}, '{6}', '{7}', '{8}', {9}, {10});'''.format(self.sessionParams['uuid'], [837], self.predefinedAreaDBTableName, 'false' ,'true', [2023, 2023, 2023], self.pitkoScenario, self.emissionsAllocation, self.elecEmissionType, 2023, 2023)
+
             # query = '''CREATE TABLE user_output."output_{uuid}" AS
             #     SELECT * FROM CO2_CalculateEmissions('{municipalities}', '{aoi}', '{includeLongDistance}', '{includeBusinessTravel}', '{calculationYears}', '{pitkoScenario}',
             #     '{emissionsAllocation}', '{elecEmissionType}', '{baseYear}', '{targetYear}')'''.format(**vals)
@@ -994,12 +1008,15 @@ class YKRTool:
         futureZoningAreasTableName = self.ykrToolDictionaries.getPredefinedFutureZoningAreasDatabaseTableName(self.mainDialog.comboBoxPredefinedFutureAreas.currentText())
         futureVals = {
             #'fAreas': (self.tableNames[self.futureAreasLayer]).lower(),
+            'calculationYears': 'array[{0}, {0}, {1}]'.format(self.sessionParams["baseYear"], self.targetYear),
             'fAreas': futureZoningAreasTableName,
             'targetYear': self.targetYear
         }
         vals.update(futureVals)
-        query = """CREATE TABLE user_output."output_{uuid}" AS
-        SELECT * FROM CO2_CalculateEmissions('{aoi}', '{calcYear}', '{pitkoScenario}', '{emissionsAllocation}', '{elecEmissionType}', '{baseYear}', '{targetYear}', '{fAreas}'""".format(**vals)
+        query = """CREATE TABLE user_output."output_dev_{uuid}" AS
+        SELECT * FROM CO2_CalculateEmissionsLoop({municipalities}, '{aoi}', {includeLongDistance}, {includeBusinessTravel}, '{pitkoScenario}', '{emissionsAllocation}', '{elecEmissionType}', '{baseYear}', '{targetYear}', '{fAreas}'""".format(**vals)
+        # query = """CREATE TABLE user_output."output_dev_{uuid}" AS
+        # SELECT * FROM CO2_CalculateEmissions({municipalities}, '{aoi}', {includeLongDistance}, {includeBusinessTravel}, {calculationYears}, '{pitkoScenario}', '{emissionsAllocation}', '{elecEmissionType}', '{baseYear}', '{targetYear}', '{fAreas}'""".format(**vals)
 
         # futureNetworkTableName = (self.tableNames[self.futureNetworkLayer]).lower()
         if self.futureNetworkLayerDBTableName:
@@ -1011,6 +1028,7 @@ class YKRTool:
             query += ", '{}'".format(self.futureStopsLayerDBTableName)
         query += ')'
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        QgsMessageLog.logMessage(query, 'YKRTool', Qgis.Info)
         return query
 
 
@@ -1055,17 +1073,17 @@ class YKRTool:
 
     def addResultAsLayers(self):
         outputSchemaName = 'user_output'
-        outputTableName = 'output_' + self.sessionParams['uuid']
+        outputTableName = 'output_dev_' + self.sessionParams['uuid']
         uid = self.sessionParams['uuid']
 
         if self.mainDialog.checkBoxNokianMyllyCO2Zeroed.isChecked():
             self.zeroCO2inNokianMyllySquare(outputSchemaName, outputTableName)
 
-        if self.calculateFuture:
-            self.updateYearToResultTable(outputSchemaName, outputTableName)
+        # if self.calculateFuture:
+        #     self.updateYearToResultTable(outputSchemaName, outputTableName)
 
-        self.addPopulationToResultsTableIfNeeded(outputSchemaName, outputTableName)
-        self.addJobsToResultsTable(uid, outputSchemaName, outputTableName)
+        # self.addPopulationToResultsTableIfNeeded(outputSchemaName, outputTableName)
+        # self.addJobsToResultsTable(uid, outputSchemaName, outputTableName)
 
 
         #QgsProject.instance().layerTreeRegistryBridge().setLayerInsertionPoint( QgsProject.instance().layerTreeRoot(), 0 )
@@ -1110,7 +1128,7 @@ class YKRTool:
             layer = QgsVectorLayer(uri.uri(False), name[0], 'postgres')
             layer.loadNamedStyle(name[1])
             renderer = layer.renderer()
-            if renderer.type() == 'graduatedSymbol':
+            if renderer != None and renderer.type() == 'graduatedSymbol':
                 renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
             self.layers.append(layer)
             QgsProject.instance().addMapLayer(layer, False)
@@ -2311,106 +2329,106 @@ class YKRTool:
         return queries
 
 
-    def addPopulationToResultsTableIfNeeded(self, outputSchemaName, outputTableName, retriesLeft=3):
-        md = self.mainDialog
-        if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-            ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
-        else:
-            ykrPopTableName = self.ykrUploadedPopTableName
+    # def addPopulationToResultsTableIfNeeded(self, outputSchemaName, outputTableName, retriesLeft=3):
+    #     md = self.mainDialog
+    #     if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
+    #         ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
+    #     else:
+    #         ykrPopTableName = self.ykrUploadedPopTableName
 
-        queries = []
+    #     queries = []
 
-        if ykrPopTableName != None and ykrPopTableName != '-':
-            ykrPopTableNameParts = ykrPopTableName.replace('"', '').split('.')
+    #     if ykrPopTableName != None and ykrPopTableName != '-':
+    #         ykrPopTableNameParts = ykrPopTableName.replace('"', '').split('.')
 
-            query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN v_yht integer DEFAULT 0"
-            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
+    #         query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN v_yht integer DEFAULT 0"
+    #         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+    #         queries.append(query)
 
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET v_yht = (SELECT v_yht FROM \"" + ykrPopTableNameParts[0] + "\".\"" + ykrPopTableNameParts[1] + "\" AS ykr WHERE ykr.xyind = out_grid.xyind AND out_grid.mun = ykr.kunta::int)"
-            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
+    #         query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET v_yht = (SELECT v_yht FROM \"" + ykrPopTableNameParts[0] + "\".\"" + ykrPopTableNameParts[1] + "\" AS ykr WHERE ykr.xyind = out_grid.xyind AND out_grid.mun = ykr.kunta::int)"
+    #         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+    #         queries.append(query)
 
-        conn = None
+    #     conn = None
 
-        try:
-            conn = createDbConnection(self.connParams)
-        except Exception as e:
-            if retriesLeft > 0:
-                return self.addPopulationToResultsTableIfNeeded(outputSchemaName, outputTableName, retriesLeft - 1)
-            else:
-                self.iface.messageBar().pushMessage(
-                    self.tr('Error in connecting to the database'),
-                    str(e), Qgis.Warning, duration=0)
-                return False
+    #     try:
+    #         conn = createDbConnection(self.connParams)
+    #     except Exception as e:
+    #         if retriesLeft > 0:
+    #             return self.addPopulationToResultsTableIfNeeded(outputSchemaName, outputTableName, retriesLeft - 1)
+    #         else:
+    #             self.iface.messageBar().pushMessage(
+    #                 self.tr('Error in connecting to the database'),
+    #                 str(e), Qgis.Warning, duration=0)
+    #             return False
 
-        try:
-            cur = conn.cursor()
-            for query in queries:
-                cur.execute(query)
-                conn.commit()
-        except Exception as e:
-            self.iface.messageBar().pushMessage(
-                self.tr('Error in modifying the results table ') + "{}".format(query),
-                str(e), Qgis.Warning, duration=0)
-            conn.rollback()
-            conn.close()
+    #     try:
+    #         cur = conn.cursor()
+    #         for query in queries:
+    #             cur.execute(query)
+    #             conn.commit()
+    #     except Exception as e:
+    #         self.iface.messageBar().pushMessage(
+    #             self.tr('Error in modifying the results table ') + "{}".format(query),
+    #             str(e), Qgis.Warning, duration=0)
+    #         conn.rollback()
+    #         conn.close()
 
-            return False
+    #         return False
 
-        return True
+    #     return True
 
 
-    def addJobsToResultsTable(self, uid, outputSchemaName, outputTableName, retriesLeft=3):
-        md = self.mainDialog
-        if not md.checkBoxLoadYkrJobFromMapLayer.isChecked():
-            ykrJobTableName = self.ykrToolDictionaries.getYkrJobTableDatabaseTableName(md.comboBoxYkrJob.currentText())
-        else:
-            ykrJobTableName = self.ykrUploadedPopTableName
-        ykrJobTableNameParts = ykrJobTableName.replace('"', '').split('.')
+    # def addJobsToResultsTable(self, uid, outputSchemaName, outputTableName, retriesLeft=3):
+    #     md = self.mainDialog
+    #     if not md.checkBoxLoadYkrJobFromMapLayer.isChecked():
+    #         ykrJobTableName = self.ykrToolDictionaries.getYkrJobTableDatabaseTableName(md.comboBoxYkrJob.currentText())
+    #     else:
+    #         ykrJobTableName = self.ykrUploadedJobTableName
+    #     ykrJobTableNameParts = ykrJobTableName.replace('"', '').split('.')
 
-        queries = []
-        query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN tp_yht integer DEFAULT 0"
-        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-        queries.append(query)
-        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET tp_yht = (SELECT tp_yht FROM \"" + ykrJobTableNameParts[0] + "\".\"" + ykrJobTableNameParts[1] + "\" AS ykr WHERE ykr.xyind = out_grid.xyind AND out_grid.mun = ykr.kunta::int)"
-        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-        queries.append(query)
+    #     queries = []
+    #     query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN tp_yht integer DEFAULT 0"
+    #     # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+    #     queries.append(query)
+    #     query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET tp_yht = (SELECT tp_yht FROM \"" + ykrJobTableNameParts[0] + "\".\"" + ykrJobTableNameParts[1] + "\" AS ykr WHERE ykr.xyind = out_grid.xyind AND out_grid.mun = ykr.kunta::int)"
+    #     # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+    #     queries.append(query)
 
-        if self.calculateFuture:
-            # calculate change in workplaces for each square and update tp_yht accordingly
-            queries.extend(self.createCalculateFutureJobsQueries(uid, outputSchemaName, outputTableName))
+    #     if self.calculateFuture:
+    #         # calculate change in workplaces for each square and update tp_yht accordingly
+    #         queries.extend(self.createCalculateFutureJobsQueries(uid, outputSchemaName, outputTableName))
         
-        conn = None
+    #     conn = None
 
-        try:
-            conn = createDbConnection(self.connParams)
-        except Exception as e:
-            if retriesLeft > 0:
-                return self.addJobsToResultsTable(outputSchemaName, outputTableName, retriesLeft - 1)
-            else:
-                self.iface.messageBar().pushMessage(
-                    self.tr('Error in connecting to the database'),
-                    str(e), Qgis.Warning, duration=0)
-                return False
+    #     try:
+    #         conn = createDbConnection(self.connParams)
+    #     except Exception as e:
+    #         if retriesLeft > 0:
+    #             return self.addJobsToResultsTable(outputSchemaName, outputTableName, retriesLeft - 1)
+    #         else:
+    #             self.iface.messageBar().pushMessage(
+    #                 self.tr('Error in connecting to the database'),
+    #                 str(e), Qgis.Warning, duration=0)
+    #             return False
 
-        try:
-            cur = conn.cursor()
-            for query in queries:
-                cur.execute(query)
-                conn.commit()
-        except Exception as e:
-            self.iface.messageBar().pushMessage(
-                self.tr('Error in modifying the results table ') + "{}".format(query),
-                str(e), Qgis.Warning, duration=0)
-            conn.rollback()
-            conn.close()
+    #     try:
+    #         cur = conn.cursor()
+    #         for query in queries:
+    #             cur.execute(query)
+    #             conn.commit()
+    #     except Exception as e:
+    #         self.iface.messageBar().pushMessage(
+    #             self.tr('Error in modifying the results table ') + "{}".format(query),
+    #             str(e), Qgis.Warning, duration=0)
+    #         conn.rollback()
+    #         conn.close()
 
-            return False
+    #         return False
 
-        conn.commit()
+    #     conn.commit()
 
-        return True
+    #     return True
 
 
     def createUrbanDevelopmentVisualizations(self, rootGroup, uid, outputSchemaName, outputTableName):
@@ -3000,17 +3018,12 @@ class YKRTool:
 
     def calculateRelativeGeneralEmissions(self, uid, outputSchemaName, outputTableName):
         layerNames = []
-        if not self.mainDialog.checkBoxLoadYkrPopFromMapLayer.isChecked():
-            ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(self.mainDialog.comboBoxYkrPop.currentText())
-        else:
-            ykrPopTableName = self.ykrUploadedPopTableName
+
         if self.mainDialog.checkBoxCalculateEmissionsPerPerson.isChecked():
             success = self.calculateEmissionsPerPerson(outputSchemaName, outputTableName)
             if success:
-                if ykrPopTableName == '-':
-                    layerNames.append((self.tr('CO2 / pop grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_grid.qml')))
-                else:
-                    layerNames.append((self.tr('CO2 / v_yht grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_grid.qml')))
+                layerNames.append((self.tr('CO2 / pop grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_grid.qml')))
+    
 
         if self.mainDialog.checkBoxCalculateEmissionsPerJob.isChecked():
             success = self.calculateEmissionsPerJob(uid, outputSchemaName, outputTableName)
@@ -3020,10 +3033,7 @@ class YKRTool:
         if self.mainDialog.checkBoxCalculateEmissionsPerPerson.isChecked() and self.mainDialog.checkBoxCalculateEmissionsPerJob.isChecked():
             success = self.calculateEmissionsPerPersonJob(outputSchemaName, outputTableName)
             if success:
-                if ykrPopTableName == '-':
-                    layerNames.append((self.tr('CO2 / (pop + job) grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_grid.qml')))
-                else:
-                    layerNames.append((self.tr('CO2 / (v_yht + job) grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_grid.qml')))
+                layerNames.append((self.tr('CO2 / (pop + employ) grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_pop_job_grid.qml')))
 
         if self.mainDialog.checkBoxCalculateEmissionsPerFloorSpaceSquares.isChecked():
             success = self.calculateEmissionsPerFloorSpaceSquares(outputSchemaName, outputTableName)
@@ -3404,23 +3414,14 @@ class YKRTool:
     def calculateEmissionsPerPerson(self, outputSchemaName, outputTableName, retriesLeft=3):
         md = self.mainDialog
         queries = []
-        if not md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-            ykrPopTableName = self.ykrToolDictionaries.getYkrPopTableDatabaseTableName(md.comboBoxYkrPop.currentText())
-        else:
-            ykrPopTableName = self.ykrUploadedPopTableName
 
         query = "ALTER TABLE " + outputSchemaName + ".\"" + outputTableName + "\" ADD COLUMN sum_yhteensa_tco2_per_asukas real"
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
-        if ykrPopTableName == '-':
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_asukas = (sum_yhteensa_tco2 / NULLIF(pop, 0))"
-            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
-        elif ykrPopTableName != None:
-            query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_asukas = (sum_yhteensa_tco2 /  NULLIF(v_yht, 0))"
-            # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
-            queries.append(query)
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_asukas = (sum_yhteensa_tco2 / NULLIF(pop, 0))"
+        # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
+        queries.append(query)
 
         conn = None
 
@@ -3460,7 +3461,7 @@ class YKRTool:
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
         
-        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_tp = (sum_yhteensa_tco2 / NULLIF(tp_yht, 0))"
+        query = "UPDATE " + outputSchemaName + ".\"" + outputTableName + "\" AS out_grid SET sum_yhteensa_tco2_per_tp = (sum_yhteensa_tco2 / NULLIF(employ, 0))"
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 

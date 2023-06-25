@@ -9,6 +9,7 @@ class YKRToolDictionaries:
 
         self.PredefinedAreas = {
             "fi": {
+                'Tre ksoyk (yk048)': 'user_input.tre_ksoyk',
                 'Tampereen kaupunkiseutu': 'user_input.tre_seutu_kunnat',
                 'Tampereen kaupunkiseudun rakennesuunnitelma 2040': 'user_input.seutu_rasu_2040_alue',
                 'Kangasala (2.4.2021)': 'user_input.tre_seutu_kunta_kangasala',
@@ -21,6 +22,7 @@ class YKRToolDictionaries:
                 'Ylöjärvi (2.4.2021)': 'user_input.tre_seutu_kunta_ylojarvi'
             },
             "en": {
+                'Tre ksoyk (yk048)': 'user_input.tre_ksoyk',
                 'Tampere City Region': 'user_input.tre_seutu_kunnat',
                 'Tampere City Region Structural Plan 2040': 'user_input.seutu_rasu_2040_alue',
                 'Kangasala (2.4.2021)': 'user_input.tre_seutu_kunta_kangasala',
@@ -68,22 +70,22 @@ class YKRToolDictionaries:
 
         self.PITKOScenarios = {
             "fi": {
+                "static": "static",
                 "kasvu": "kasvu",
                 "wem": "wem",
                 "eu80": "eu80",
                 "muutos": "muutos",
                 "saasto": "saasto",
-                "pysahdys": "pysahdys",
-                "static": "static"
+                "pysahdys": "pysahdys"
             },
             "en": {
+                "static": "static",
                 "growth": "kasvu",
                 "wem": "wem", 
                 "eu80": "eu80", 
                 "change": "muutos", 
                 "saving": "saasto", 
-                "stagnation": "pysahdys", 
-                "static": "static"
+                "stagnation": "pysahdys"
             }
         }
 
