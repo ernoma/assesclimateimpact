@@ -146,12 +146,12 @@ class YKRToolDictionaries:
 
         self.PredefinedFuturePublicTransportStopsLayers = {
             "fi": {
-                'Juna-asema- ja raitiotiepysäkkiverkko - Tre asemakaavoitusohjelma 2023-2027': 'user_input.joli_lahijuna_ja_raitiotie_ak_23_27_v2',
-                'Juna-asema- ja raitiotiepysäkkiverkko kaupunkiseutu ja kantakaupunki - yk049, valtuustokausi 2017-2021 - kaavaehdotus': 'user_input.joli_lahijuna_ja_raitiotie_tre_seutu_ve_yk049_vaihekaava_ehdotu'
+                'Juna-asema- ja raitiotiepysäkkiverkko kaupunkiseutu ja kantakaupunki - yk049, valtuustokausi 2017-2021 - kaavaehdotus': 'user_input.joli_lahijuna_ja_raitiotie_tre_seutu_ve_yk049_vaihekaava_ehdotu',
+                'Juna-asema- ja raitiotiepysäkkiverkko - Tre asemakaavoitusohjelma 2023-2027': 'user_input.joli_lahijuna_ja_raitiotie_ak_23_27_v2'
             },
             "en": {
-                'Railway and tram station transport stops - Tre detailed land use planning program 2023-2027': 'user_input.joli_lahijuna_ja_raitiotie_ak_23_27_v2',
-                'Railway and tram station transport stops of Tampere city region and downtown - Local master plan, City Council’s term 2017-2021 - plan proposal': 'user_input.joli_lahijuna_ja_raitiotie_tre_seutu_ve_yk049_vaihekaava_ehdotu'
+                'Railway and tram station transport stops of Tampere city region and downtown - Local master plan, City Council’s term 2017-2021 - plan proposal': 'user_input.joli_lahijuna_ja_raitiotie_tre_seutu_ve_yk049_vaihekaava_ehdotu',
+                'Railway and tram station transport stops - Tre detailed land use planning program 2023-2027': 'user_input.joli_lahijuna_ja_raitiotie_ak_23_27_v2'
             }
         }
 
