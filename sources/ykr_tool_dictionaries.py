@@ -9,9 +9,8 @@ class YKRToolDictionaries:
 
         self.PredefinedAreas = {
             "fi": {
-                'Tre ksoyk (yk048)': 'user_input.tre_ksoyk',
-                'Tampereen kaupunkiseutu': 'user_input.tre_seutu_kunnat',
-                'Tampereen kaupunkiseudun rakennesuunnitelma 2040': 'user_input.seutu_rasu_2040_alue',
+                'Tampereen kaupunkiseutu (2021)': 'user_input.tre_seutu_kunnat',
+                'Tampereen kaupunkiseudun rasu 2040 (2021)': 'user_input.seutu_rasu_2040_alue',
                 'Kangasala (2.4.2021)': 'user_input.tre_seutu_kunta_kangasala',
                 'Lempäälä (2.4.2021)': 'user_input.tre_seutu_kunta_lempaala',
                 'Nokia (2.4.2021)': 'user_input.tre_seutu_kunta_nokia',
@@ -19,12 +18,12 @@ class YKRToolDictionaries:
                 'Pirkkala (2.4.2021)': 'user_input.tre_seutu_kunta_pirkkala',
                 'Tampere (2.4.2021)': 'user_input.tre_seutu_kunta_tampere',
                 'Vesilahti (2.4.2021)': 'user_input.tre_seutu_kunta_vesilahti',
-                'Ylöjärvi (2.4.2021)': 'user_input.tre_seutu_kunta_ylojarvi'
+                'Ylöjärvi (2.4.2021)': 'user_input.tre_seutu_kunta_ylojarvi',
+                'Tre ksoyk (yk048)': 'user_input.tre_ksoyk'
             },
             "en": {
-                'Tre ksoyk (yk048)': 'user_input.tre_ksoyk',
-                'Tampere City Region': 'user_input.tre_seutu_kunnat',
-                'Tampere City Region Structural Plan 2040': 'user_input.seutu_rasu_2040_alue',
+                'Tampere City Region (2021)': 'user_input.tre_seutu_kunnat',
+                'Tampere City Region Structural Plan 2040 (2021)': 'user_input.seutu_rasu_2040_alue',
                 'Kangasala (2.4.2021)': 'user_input.tre_seutu_kunta_kangasala',
                 'Lempäälä (2.4.2021)': 'user_input.tre_seutu_kunta_lempaala',
                 'Nokia (2.4.2021)': 'user_input.tre_seutu_kunta_nokia',
@@ -32,7 +31,8 @@ class YKRToolDictionaries:
                 'Pirkkala (2.4.2021)': 'user_input.tre_seutu_kunta_pirkkala',
                 'Tampere (2.4.2021)': 'user_input.tre_seutu_kunta_tampere',
                 'Vesilahti (2.4.2021)': 'user_input.tre_seutu_kunta_vesilahti',
-                'Ylöjärvi (2.4.2021)': 'user_input.tre_seutu_kunta_ylojarvi'
+                'Ylöjärvi (2.4.2021)': 'user_input.tre_seutu_kunta_ylojarvi',
+                'Tre ksoyk (yk048)': 'user_input.tre_ksoyk'
             }
         }
 
