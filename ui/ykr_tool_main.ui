@@ -20,6 +20,27 @@
    <item>
     <layout class="QVBoxLayout" name="mainLayout">
      <item>
+      <layout class="QVBoxLayout" name="verticalLayout_9">
+       <item>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
+           <property name="toolTip">
+            <string>Will be stored to the user_output.sessions_v2 table if provided</string>
+           </property>
+           <property name="text">
+            <string>Optional name for the estimation run:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="lineEditNameOfTheCO2EstimationRun"/>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
       <widget class="QgsCollapsibleGroupBox" name="areaBox">
        <property name="minimumSize">
         <size>
@@ -46,6 +67,9 @@
               <property name="enabled">
                <bool>true</bool>
               </property>
+              <property name="toolTip">
+               <string>If the map layer is not in the azure ilmakalu database then try to upload the map layer to database</string>
+              </property>
               <property name="text">
                <string>Use a Map Layer (already in the ilmakaludb user_input schema)</string>
               </property>
@@ -59,8 +83,11 @@
               <property name="enabled">
                <bool>false</bool>
               </property>
+              <property name="toolTip">
+               <string>AOI</string>
+              </property>
               <property name="text">
-               <string>Map Layer:</string>
+               <string>Map Layer (AOI):</string>
               </property>
              </widget>
             </item>
@@ -77,6 +104,9 @@
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
+                <property name="toolTip">
+                 <string>If the map layer is not in the azure ilmakalu database then try to upload the map layer to database</string>
+                </property>
                </widget>
               </item>
              </layout>
@@ -85,6 +115,9 @@
              <widget class="QCheckBox" name="checkBoxAllowOtherUsersToUseUploadedMapLayer">
               <property name="enabled">
                <bool>false</bool>
+              </property>
+              <property name="toolTip">
+               <string>The users of the climate tool database will be given read access to the map layer</string>
               </property>
               <property name="text">
                <string>Allow other users access (if not already)</string>
@@ -99,6 +132,9 @@
               <property name="enabled">
                <bool>false</bool>
               </property>
+              <property name="toolTip">
+               <string>Not currently implemented</string>
+              </property>
               <property name="text">
                <string>Use Only Selected Features</string>
               </property>
@@ -109,6 +145,9 @@
             </item>
             <item row="4" column="0">
              <widget class="QRadioButton" name="radioButtonUsePredefinedAreaForInvestigatedArea">
+              <property name="toolTip">
+               <string>Thsese layers already exist in the user_input schema.</string>
+              </property>
               <property name="text">
                <string>Use Predefined Area</string>
               </property>
@@ -122,8 +161,11 @@
             </item>
             <item row="5" column="0">
              <widget class="QLabel" name="predefinedAreaLabel">
+              <property name="toolTip">
+               <string>AOI</string>
+              </property>
               <property name="text">
-               <string>Predefined Area:</string>
+               <string>Predefined Area (AOI):</string>
               </property>
              </widget>
             </item>
@@ -142,7 +184,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>Choose the predefined area. Default: Tampere City Region</string>
+               <string>Thsese layers already exist in the user_input schema.</string>
               </property>
              </widget>
             </item>
@@ -150,6 +192,9 @@
           </item>
           <item>
            <widget class="QGroupBox" name="groupBox">
+            <property name="toolTip">
+             <string>The chosen municipalities will be intersected with the AOI. If none selected then all are used.</string>
+            </property>
             <property name="title">
              <string>Choose municipalities:</string>
             </property>
@@ -158,6 +203,9 @@
               <layout class="QVBoxLayout" name="verticalLayout">
                <item>
                 <widget class="QCheckBox" name="checkBoxMunicipalitiesKangasala">
+                 <property name="toolTip">
+                  <string>The chosen municipalities will be intersected with the AOI.</string>
+                 </property>
                  <property name="text">
                   <string>Kangasala</string>
                  </property>
@@ -168,6 +216,9 @@
                </item>
                <item>
                 <widget class="QCheckBox" name="checkBoxMunicipalitiesLempaala">
+                 <property name="toolTip">
+                  <string>The chosen municipalities will be intersected with the AOI.</string>
+                 </property>
                  <property name="text">
                   <string>Lempäälä</string>
                  </property>
@@ -178,6 +229,9 @@
                </item>
                <item>
                 <widget class="QCheckBox" name="checkBoxMunicipalitiesNokia">
+                 <property name="toolTip">
+                  <string>The chosen municipalities will be intersected with the AOI.</string>
+                 </property>
                  <property name="text">
                   <string>Nokia</string>
                  </property>
@@ -188,6 +242,9 @@
                </item>
                <item>
                 <widget class="QCheckBox" name="checkBoxMunicipalitiesOrivesi">
+                 <property name="toolTip">
+                  <string>The chosen municipalities will be intersected with the AOI.</string>
+                 </property>
                  <property name="text">
                   <string>Orivesi</string>
                  </property>
@@ -198,6 +255,9 @@
                </item>
                <item>
                 <widget class="QCheckBox" name="checkBoxMunicipalitiesPirkkala">
+                 <property name="toolTip">
+                  <string>The chosen municipalities will be intersected with the AOI.</string>
+                 </property>
                  <property name="text">
                   <string>Pirkkala</string>
                  </property>
@@ -208,6 +268,9 @@
                </item>
                <item>
                 <widget class="QCheckBox" name="checkBoxMunicipalitiesTampere">
+                 <property name="toolTip">
+                  <string>The chosen municipalities will be intersected with the AOI.</string>
+                 </property>
                  <property name="text">
                   <string>Tampere</string>
                  </property>
@@ -218,6 +281,9 @@
                </item>
                <item>
                 <widget class="QCheckBox" name="checkBoxMunicipalitiesVesilahti">
+                 <property name="toolTip">
+                  <string>The chosen municipalities will be intersected with the AOI.</string>
+                 </property>
                  <property name="text">
                   <string>Vesilahti</string>
                  </property>
@@ -228,6 +294,9 @@
                </item>
                <item>
                 <widget class="QCheckBox" name="checkBoxMunicipalitiesYlojarvi">
+                 <property name="toolTip">
+                  <string>The chosen municipalities will be intersected with the AOI.</string>
+                 </property>
                  <property name="text">
                   <string>Ylöjärvi</string>
                  </property>
@@ -252,7 +321,7 @@
         <bool>true</bool>
        </property>
        <property name="toolTip">
-        <string>Laske tulevaisuusskenaario</string>
+        <string>Calculate future emissions estimation to the chose target year</string>
        </property>
        <property name="locale">
         <locale language="English" country="UnitedStates"/>
@@ -272,6 +341,9 @@
       <widget class="QgsCollapsibleGroupBox" name="futureBox">
        <property name="enabled">
         <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>The format of the future zoning data, urban center data and public transit stop data as defined in the technical report</string>
        </property>
        <property name="title">
         <string>User Input Data for the Future Estimation</string>
@@ -297,6 +369,9 @@
              </item>
              <item row="1" column="0">
               <widget class="QLabel" name="targetYearLabel">
+               <property name="toolTip">
+                <string>The emissions will be calculated from the current year to the target year (each year gets own results)</string>
+               </property>
                <property name="text">
                 <string>Target year:</string>
                </property>
@@ -304,8 +379,11 @@
              </item>
              <item row="1" column="1">
               <widget class="QgsSpinBox" name="targetYear">
+               <property name="toolTip">
+                <string>The emissions will be calculated from the current year to the target year (each year gets own results)</string>
+               </property>
                <property name="minimum">
-                <number>2020</number>
+                <number>2017</number>
                </property>
                <property name="maximum">
                 <number>2050</number>
@@ -324,7 +402,11 @@
              <item row="0" column="1">
               <layout class="QHBoxLayout" name="futureAreasLayout">
                <item>
-                <widget class="QComboBox" name="comboBoxPredefinedFutureAreas"/>
+                <widget class="QComboBox" name="comboBoxPredefinedFutureAreas">
+                 <property name="toolTip">
+                  <string>The format of the future zoning data is defined in the technical report</string>
+                 </property>
+                </widget>
                </item>
                <item>
                 <widget class="QgsMapLayerComboBox" name="futureAreasLayerList">
@@ -336,6 +418,9 @@
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
+                 </property>
+                 <property name="toolTip">
+                  <string>The format of the future zoning data is defined in the technical report</string>
                  </property>
                 </widget>
                </item>
@@ -385,6 +470,9 @@
                  <property name="enabled">
                   <bool>false</bool>
                  </property>
+                 <property name="toolTip">
+                  <string>The format of the urban center data is defined in the technical report</string>
+                 </property>
                 </widget>
                </item>
                <item>
@@ -397,6 +485,9 @@
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
+                 </property>
+                 <property name="toolTip">
+                  <string>The format of the urban center data is defined in the technical report</string>
                  </property>
                 </widget>
                </item>
@@ -412,7 +503,11 @@
              <item row="1" column="1">
               <layout class="QHBoxLayout" name="futureStopsLayout">
                <item>
-                <widget class="QComboBox" name="comboBoxPredefinedFutureStops"/>
+                <widget class="QComboBox" name="comboBoxPredefinedFutureStops">
+                 <property name="toolTip">
+                  <string>The format of the public transport stops data is defined in the technical report</string>
+                 </property>
+                </widget>
                </item>
                <item>
                 <widget class="QgsMapLayerComboBox" name="futureStopsLayerList">
@@ -424,6 +519,9 @@
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
+                 </property>
+                 <property name="toolTip">
+                  <string>The format of the public transport stops data is defined in the technical report</string>
                  </property>
                 </widget>
                </item>
@@ -446,6 +544,9 @@
      </item>
      <item>
       <widget class="QgsCollapsibleGroupBox" name="advancedBox">
+       <property name="toolTip">
+        <string>All the advanced settings affect both the present day and future emissions calculation. None of the available options slows the calculation significantly.</string>
+       </property>
        <property name="title">
         <string>Advanced Settings (optional)</string>
        </property>
@@ -477,7 +578,7 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>Choose PITKO scenario. Default: growth</string>
+             <string>Affects CO2 emissions. Static scenario fixes some calculation parameters to the base year. See method reports for more details.</string>
             </property>
             <property name="editable">
              <bool>false</bool>
@@ -486,6 +587,9 @@
           </item>
           <item row="1" column="0">
            <widget class="QCheckBox" name="checkBoxIncludeLongDistance">
+            <property name="toolTip">
+             <string>Affects CO2 emissions</string>
+            </property>
             <property name="text">
              <string>include over 100 km domestic trips to traffic calculation</string>
             </property>
@@ -496,6 +600,9 @@
           </item>
           <item row="2" column="0">
            <widget class="QCheckBox" name="checkBoxIncludeBusinessTravel">
+            <property name="toolTip">
+             <string>Affects CO2 emissions</string>
+            </property>
             <property name="text">
              <string>Allocate business errand trips (commuting trips included in any case)</string>
             </property>
@@ -520,7 +627,7 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>Choose emissions allocation method. Default: Benefits division method</string>
+             <string>Default: Energy method that divides produced CO2 emissions between produced heating and electricity</string>
             </property>
            </widget>
           </item>
@@ -540,12 +647,15 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>Choose electricity emission class. Default: purchase</string>
+             <string>Production: use domestic electrcity. Purchase: includes imported electricity in addition to lost electricity and domestically procuduced electricity</string>
             </property>
            </widget>
           </item>
           <item row="5" column="0">
            <widget class="QCheckBox" name="checkBoxNokianMyllyCO2Zeroed">
+            <property name="toolTip">
+             <string>The source data is inaccurate causing incorrect CO2 peak</string>
+            </property>
             <property name="text">
              <string>Allocate Zero Emissions for Nokian Mylly Square</string>
             </property>
@@ -565,6 +675,9 @@
           </item>
           <item row="8" column="0">
            <widget class="QCheckBox" name="checkBoxCalculateEmissionsPerPerson">
+            <property name="toolTip">
+             <string>QGIS layer will be created where CO2 emissions have been divided with population count</string>
+            </property>
             <property name="text">
              <string>Visualize Emissions Per Capita</string>
             </property>
@@ -575,6 +688,9 @@
           </item>
           <item row="9" column="0">
            <widget class="QCheckBox" name="checkBoxCalculateEmissionsPerJob">
+            <property name="toolTip">
+             <string>QGIS layer will be created where CO2 emissions have been divided with worker count</string>
+            </property>
             <property name="text">
              <string>Visualize Emissions Per Worker</string>
             </property>
@@ -585,6 +701,9 @@
           </item>
           <item row="10" column="0">
            <widget class="QCheckBox" name="checkBoxCalculateEmissionsPerFloorSpaceSquares">
+            <property name="toolTip">
+             <string>QGIS layer will be created where CO2 emissions have been divided with floor square meters</string>
+            </property>
             <property name="text">
              <string>Visualize Emissions Per Floor Squares (m2)</string>
             </property>
@@ -595,6 +714,9 @@
           </item>
           <item row="11" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeTrafficEmissions">
+            <property name="toolTip">
+             <string>QGIS layers will be created where total traffic CO2 emissions as well as more detailed traffic CO2 emissions are shown</string>
+            </property>
             <property name="text">
              <string>Visualize Traffic Emissions</string>
             </property>
@@ -605,6 +727,9 @@
           </item>
           <item row="12" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeThermoEmissions">
+            <property name="toolTip">
+             <string>QGIS layers will be created where total heating CO2 emissions as well as more detailed heating CO2 emissions are shown</string>
+            </property>
             <property name="text">
              <string>Visualize Buildings Thermo Emissions</string>
             </property>
@@ -615,6 +740,9 @@
           </item>
           <item row="13" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeElectricityConsumptionEmissions">
+            <property name="toolTip">
+             <string>QGIS layers will be created where total electricity CO2 emissions as well as more detailed electricity CO2 emissions are shown</string>
+            </property>
             <property name="text">
              <string>Visualize Electricity Consumption Emissions</string>
             </property>
@@ -625,6 +753,9 @@
           </item>
           <item row="14" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizePopJobMix">
+            <property name="toolTip">
+             <string>QGIS layer will be created where division between population and work place count is shown</string>
+            </property>
             <property name="text">
              <string>Visualize Mix of Population and Jobs</string>
             </property>
@@ -635,8 +766,11 @@
           </item>
           <item row="15" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeGoodZonesForPopJobDensityAndSustainableTransport">
+            <property name="toolTip">
+             <string>QGIS layer will be created where the most CO2 sustainable urban development zones are shown</string>
+            </property>
             <property name="text">
-             <string>Visualize Good Zones for Population+Job Density and for Sustainable Transport</string>
+             <string>Visualize Best Zones for New Population and Jobs</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -645,6 +779,9 @@
           </item>
           <item row="17" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeFloorSpaceRatio">
+            <property name="toolTip">
+             <string>QGIS layer will be created where the UZ squares with building floor space ratio with at least 0,2 are included in same class</string>
+            </property>
             <property name="text">
              <string>Visualize Floor Space Ratio</string>
             </property>
@@ -657,6 +794,9 @@
            <widget class="QCheckBox" name="checkBoxVisualizeSustainableUrbanStructure">
             <property name="enabled">
              <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>Not currently implemented</string>
             </property>
             <property name="text">
              <string>Visualize Sustainable Urban Structure Using YRK Car Ownership Data:</string>
@@ -671,12 +811,18 @@
             <property name="enabled">
              <bool>false</bool>
             </property>
+            <property name="toolTip">
+             <string>Not currently implemented</string>
+            </property>
            </widget>
           </item>
           <item row="19" column="0">
            <widget class="QCheckBox" name="checkBoxAllowOtherUsersToUseSustainableUrbanStructureTable">
             <property name="enabled">
              <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>Not currently implemented</string>
             </property>
             <property name="text">
              <string>Allow other users access to the urban structure data table in the database</string>
@@ -688,6 +834,9 @@
           </item>
           <item row="20" column="0">
            <widget class="QCheckBox" name="checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone">
+            <property name="toolTip">
+             <string>Static bar graph will be created (URL)</string>
+            </property>
             <property name="text">
              <string>Add Quickchart.io Links of Relative Emissions By Zone to the Results Table</string>
             </property>
@@ -698,6 +847,9 @@
           </item>
           <item row="21" column="0">
            <widget class="QCheckBox" name="checkBoxAddQuickchartIoLinksOfZoneSquaresAndPopJobPercentagesOfTotalByZone">
+            <property name="toolTip">
+             <string>Static bar graph will be created (URL)</string>
+            </property>
             <property name="text">
              <string>Add Quickchart.io Links of Zone Squares and Pop + Job as Percentages of Total By Zone</string>
             </property>

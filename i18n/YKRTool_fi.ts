@@ -9,92 +9,52 @@
         <translation>Tampereen kaupunkiseudun yhdyskuntarakenteen ilmastovaikutusten seurantatyökalu</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="37"/>
+        <location filename="../ui/ykr_tool_main.ui" line="58"/>
         <source>Investigated Area</source>
         <translation>Tutkimusalue</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="63"/>
-        <source>Map Layer:</source>
-        <translation>Karttataso  (aoi):</translation>
-    </message>
-    <message>
-        <location filename="../ui/ykr_tool_main.ui" line="113"/>
+        <location filename="../ui/ykr_tool_main.ui" line="152"/>
         <source>Use Predefined Area</source>
         <translation>Käytä esimääriteltyä aluetta</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="126"/>
-        <source>Predefined Area:</source>
-        <translation>Esimääritelty alue  (aoi):</translation>
-    </message>
-    <message>
-        <location filename="../ui/ykr_tool_main.ui" line="145"/>
-        <source>Choose the predefined area. Default: Tampere City Region</source>
-        <translation>Valitse esimääritelty alue. Oletus: Tampereen kaupunkiseutu</translation>
-    </message>
-    <message>
-        <location filename="../ui/ykr_tool_main.ui" line="103"/>
+        <location filename="../ui/ykr_tool_main.ui" line="139"/>
         <source>Use Only Selected Features</source>
         <translation>Lataa ainoastaan valitut kohteet</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="255"/>
-        <source>Laske tulevaisuusskenaario</source>
-        <translation>Laske tulevaisuuspäästöjen arvio</translation>
-    </message>
-    <message>
-        <location filename="../ui/ykr_tool_main.ui" line="450"/>
+        <location filename="../ui/ykr_tool_main.ui" line="551"/>
         <source>Advanced Settings (optional)</source>
         <translation>Lisäasetukset (valinnaisia)</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="464"/>
+        <location filename="../ui/ykr_tool_main.ui" line="565"/>
         <source>PITKO Scenario:</source>
         <translation>PITKO-skenaario:</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="480"/>
-        <source>Choose PITKO scenario. Default: growth</source>
-        <translation>Valitse PITKO-skenaario. Oletus: kasvu</translation>
-    </message>
-    <message>
-        <location filename="../ui/ykr_tool_main.ui" line="510"/>
+        <location filename="../ui/ykr_tool_main.ui" line="617"/>
         <source>Allocation Method for Emissions:</source>
         <translation>Päästöjen allokointimenetelmä:</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="523"/>
-        <source>Choose emissions allocation method. Default: Benefits division method</source>
-        <translation>Valitse päästöjen allokointimenetelmä. Oletus: Hyödynjakomenetelmä</translation>
-    </message>
-    <message>
-        <location filename="../ui/ykr_tool_main.ui" line="530"/>
+        <location filename="../ui/ykr_tool_main.ui" line="637"/>
         <source>Electricity Emission Class:</source>
         <translation>Sähköpäästölaji:</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="543"/>
-        <source>Choose electricity emission class. Default: purchase</source>
-        <translation>Valitse sähköpäästölaji, Oletus: hankinta</translation>
-    </message>
-    <message>
-        <location filename="../ui/ykr_tool_main.ui" line="550"/>
+        <location filename="../ui/ykr_tool_main.ui" line="660"/>
         <source>Allocate Zero Emissions for Nokian Mylly Square</source>
-        <translation>Nokian myllyn ruutu hiilineutraaliksi</translation>
+        <translation>Aseta Nokian myllyn tehtaan ruudun CO2-päästöt 0-arvoiksi</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="639"/>
-        <source>Visualize Good Zones for Population+Job Density and for Sustainable Transport</source>
-        <translation>Visualisoi &apos;edulliset&apos; vyöhykkeet</translation>
-    </message>
-    <message>
-        <location filename="../ui/ykr_tool_main.ui" line="732"/>
+        <location filename="../ui/ykr_tool_main.ui" line="884"/>
         <source>Database connection settings...</source>
         <translation>Tietokanta-asetukset...</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="739"/>
+        <location filename="../ui/ykr_tool_main.ui" line="891"/>
         <source>Info...</source>
         <translation></translation>
     </message>
@@ -174,169 +134,339 @@
         <translation>Lataa</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="90"/>
+        <location filename="../ui/ykr_tool_main.ui" line="123"/>
         <source>Allow other users access (if not already)</source>
         <translation>Salli käyttö kaikille tietokannan käyttäjille (jos ei jo ole)</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="261"/>
+        <location filename="../ui/ykr_tool_main.ui" line="330"/>
         <source>Estimate Future Emissions</source>
         <translation>Arvioi tulevaisuuden päästöt</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="277"/>
+        <location filename="../ui/ykr_tool_main.ui" line="349"/>
         <source>User Input Data for the Future Estimation</source>
         <translation>Käyttäjän syötelähtöaineistot tulevaisuuden päästöjen arviointiin</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="286"/>
+        <location filename="../ui/ykr_tool_main.ui" line="358"/>
         <source>Required</source>
         <translation>Pakolliset</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="294"/>
+        <location filename="../ui/ykr_tool_main.ui" line="366"/>
         <source>Future Zoning data:</source>
         <translation>Tulevaisuuden käyttötarkoitusalueet:</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="362"/>
+        <location filename="../ui/ykr_tool_main.ui" line="447"/>
         <source>Optional</source>
         <translation>Valinnaiset</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="370"/>
+        <location filename="../ui/ykr_tool_main.ui" line="455"/>
         <source>Urban centre data:</source>
         <translation>Keskusverkko:</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="377"/>
+        <location filename="../ui/ykr_tool_main.ui" line="462"/>
         <source>Public transit stops data:</source>
         <translation>Joukkoliikennepysäkit:</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="301"/>
+        <location filename="../ui/ykr_tool_main.ui" line="376"/>
         <source>Target year:</source>
         <translation>Kohdevuosi:</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="589"/>
+        <location filename="../ui/ykr_tool_main.ui" line="708"/>
         <source>Visualize Emissions Per Floor Squares (m2)</source>
         <translation>Visualisoi päästöt / kerrosneliöt</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="629"/>
+        <location filename="../ui/ykr_tool_main.ui" line="760"/>
         <source>Visualize Mix of Population and Jobs</source>
         <translation>Visualisoi asukkaiden ja työpaikkojen sekoittuneisuus</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="599"/>
+        <location filename="../ui/ykr_tool_main.ui" line="721"/>
         <source>Visualize Traffic Emissions</source>
         <translation>Visualisoi liikenteen päästöt</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="609"/>
+        <location filename="../ui/ykr_tool_main.ui" line="734"/>
         <source>Visualize Buildings Thermo Emissions</source>
         <translation>Visualisoi rakennusten lämmönsäädön päästöt</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="569"/>
+        <location filename="../ui/ykr_tool_main.ui" line="682"/>
         <source>Visualize Emissions Per Capita</source>
         <translation>Visualisoi päästöt per asukas</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="579"/>
+        <location filename="../ui/ykr_tool_main.ui" line="695"/>
         <source>Visualize Emissions Per Worker</source>
         <translation>Visualisoi päästöt per työpaikka</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="619"/>
+        <location filename="../ui/ykr_tool_main.ui" line="747"/>
         <source>Visualize Electricity Consumption Emissions</source>
         <translation>Visualisoi sähkönkäytön päästöt</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="649"/>
+        <location filename="../ui/ykr_tool_main.ui" line="786"/>
         <source>Visualize Floor Space Ratio</source>
         <translation>Visualisoi rakennustehokkuus</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="662"/>
+        <location filename="../ui/ykr_tool_main.ui" line="802"/>
         <source>Visualize Sustainable Urban Structure Using YRK Car Ownership Data:</source>
         <translation>Vísualisoi kestävän kaupunkirakenteen luvut SYKE:n Asuntokunnat ja autonomistus aineistolla:</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="692"/>
+        <location filename="../ui/ykr_tool_main.ui" line="841"/>
         <source>Add Quickchart.io Links of Relative Emissions By Zone to the Results Table</source>
         <translation>Lisää Quickchart.io-linkit suhteellisista päästöistä YKR-vyöhykkeittäin tulostauluun</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="702"/>
+        <location filename="../ui/ykr_tool_main.ui" line="854"/>
         <source>Add Quickchart.io Links of Zone Squares and Pop + Job as Percentages of Total By Zone</source>
         <translation>Lisää Quickchart.io-linkit vyöhykkeiden osuuksista ja as+tp summista YKR-vyöhykkeittäin suhteessa kokonaismäärään</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="682"/>
+        <location filename="../ui/ykr_tool_main.ui" line="828"/>
         <source>Allow other users access to the urban structure data table in the database</source>
         <translation>Salli kestävän kaupunkirakenteen taulun käyttö kaikille tietokannan käyttäjille</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="433"/>
+        <location filename="../ui/ykr_tool_main.ui" line="531"/>
         <source>Use a Map Layer (already in the ilmakaludb user_input schema)</source>
         <translation>Käytä karttatasoa (joka on jo ilmakaludb:n user_input-skeemassa)</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="154"/>
+        <location filename="../ui/ykr_tool_main.ui" line="199"/>
         <source>Choose municipalities:</source>
         <translation>Valitse kunnat (intersect aoi):</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="162"/>
+        <location filename="../ui/ykr_tool_main.ui" line="210"/>
         <source>Kangasala</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="172"/>
-        <source>Lempäälä</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../ui/ykr_tool_main.ui" line="182"/>
+        <location filename="../ui/ykr_tool_main.ui" line="236"/>
         <source>Nokia</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="192"/>
+        <location filename="../ui/ykr_tool_main.ui" line="249"/>
         <source>Orivesi</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="202"/>
+        <location filename="../ui/ykr_tool_main.ui" line="262"/>
         <source>Pirkkala</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="212"/>
+        <location filename="../ui/ykr_tool_main.ui" line="275"/>
         <source>Tampere</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="222"/>
+        <location filename="../ui/ykr_tool_main.ui" line="288"/>
         <source>Vesilahti</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="232"/>
-        <source>Ylöjärvi</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../ui/ykr_tool_main.ui" line="490"/>
+        <location filename="../ui/ykr_tool_main.ui" line="594"/>
         <source>include over 100 km domestic trips to traffic calculation</source>
         <translation>Sisällytä liikenteen laskentaan yli 100 km kotimaan matkat</translation>
     </message>
     <message>
-        <location filename="../ui/ykr_tool_main.ui" line="500"/>
+        <location filename="../ui/ykr_tool_main.ui" line="607"/>
         <source>Allocate business errand trips (commuting trips included in any case)</source>
         <translation>Allokoi työpaikkaruuduille myös työasiamatkat (työmatkojen lisäksi)</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="29"/>
+        <source>Will be stored to the user_output.sessions_v2 table if provided</source>
+        <translation>Tallennetaan user_output.sessions_v2-tauiluun, jos käyttäjä antaa nimen</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="32"/>
+        <source>Optional name for the estimation run:</source>
+        <translation>Vapaaehtoinen nimi arviolaskennalle:</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="108"/>
+        <source>If the map layer is not in the azure ilmakalu database then try to upload the map layer to database</source>
+        <translation>Jos karttataso  ei ole työkalun azure-tietokannassa, niin yritä ladata karttataso tietokantaan</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="165"/>
+        <source>AOI</source>
+        <translation>AOI</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="90"/>
+        <source>Map Layer (AOI):</source>
+        <translation>Karttataso  (aoi):</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="120"/>
+        <source>The users of the climate tool database will be given read access to the map layer</source>
+        <translation>Ilmastotyökalun tietokannan kaikille käyttäjille annetaan käyttöoikeus tietokantaan</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="825"/>
+        <source>Not currently implemented</source>
+        <translation>Ei tällä hetkelllä toteutettu</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="187"/>
+        <source>Thsese layers already exist in the user_input schema.</source>
+        <translation>Nämä tasot ovat jo user_input-skeeman alla.</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="168"/>
+        <source>Predefined Area (AOI):</source>
+        <translation>Esimääritelty alue  (aoi):</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="196"/>
+        <source>The chosen municipalities will be intersected with the AOI. If none selected then all are used.</source>
+        <translation>Valittujen kuntien rajausten leikkauspisteet haetaan AOI-alueen kanssa ja yhteinen alue (intersection) otetaan tuloksiin mukaan</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="324"/>
+        <source>Calculate future emissions estimation to the chose target year</source>
+        <translation>Laske valitun alueen tulevaisuuden päästöarvio</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="346"/>
+        <source>The format of the future zoning data, urban center data and public transit stop data as defined in the technical report</source>
+        <translation>Tulevaisuuslaskentalähtöineiston tulee olla teknisessä raportissa kuvatun muotoista</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="383"/>
+        <source>The emissions will be calculated from the current year to the target year (each year gets own results)</source>
+        <translation>Päästöt laskentaan nykyisestä vuodesta kohde vuoteen (kaikille vuosille tulee omat laskentatulokset)</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="423"/>
+        <source>The format of the future zoning data is defined in the technical report</source>
+        <translation>Käyttötarkoitusalueiden vaadittu muoto on kuvattu teknisessä raportissa.</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="490"/>
+        <source>The format of the urban center data is defined in the technical report</source>
+        <translation>Keskuverskoston vaadittu muoto on kuvattu teknisessä raportissa.</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="524"/>
+        <source>The format of the public transport stops data is defined in the technical report</source>
+        <translation>Jokkoliikenteen pysäkkien vaadittu muoto on kuvattu teknisessä raportissa.</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="548"/>
+        <source>All the advanced settings affect both the present day and future emissions calculation. None of the available options slows the calculation significantly.</source>
+        <translation>Kaikki lisäasetukset vaikuttavat sekä nykytilanteen että tulevaisuuden päästölaskentaan. Mikään tarjolla olevista lisäasetuksista ei hidasta laskentaa merkittävästi.</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="581"/>
+        <source>Affects CO2 emissions. Static scenario fixes some calculation parameters to the base year. See method reports for more details.</source>
+        <translation>Vaikuttaa CO2-päästöihin. Staattinen skenaario käyttää tiettyjä skenaarion  laskennan aloitusvuoden  arvoja kaikille laskentavuosille.</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="604"/>
+        <source>Affects CO2 emissions</source>
+        <translation>Vaikuttaa CO2-päästöihin</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="630"/>
+        <source>Default: Energy method that divides produced CO2 emissions between produced heating and electricity</source>
+        <translation>Oletus: Energiametodi, joka jakaa tuotetut CO2-päästöt lämmityksen tuotannon ja sähköntuotannon kesken</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="650"/>
+        <source>Production: use domestic electrcity. Purchase: includes imported electricity in addition to lost electricity and domestically procuduced electricity</source>
+        <translation>Tuotanto: käytä kotimaista sähköä. Hankinta: sisältää hankitun sähkön tuotetun lisäksi ja huomio myös sähkösiirtohävikit</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="657"/>
+        <source>The source data is inaccurate causing incorrect CO2 peak</source>
+        <translation>Lähtöaineisto on epätarkkaa ja aiheuttaa virheellisen CO2-päästöpiikin</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="679"/>
+        <source>QGIS layer will be created where CO2 emissions have been divided with population count</source>
+        <translation>QGIS:iin lisätään karttataso, jossa CO2-päästöt on jaettu väestön lukumäärällä</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="692"/>
+        <source>QGIS layer will be created where CO2 emissions have been divided with worker count</source>
+        <translation>QGIS:iin lisätään karttataso, jossa CO2-päästöt on jaettu työpaikkojen  lukumäärällä</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="705"/>
+        <source>QGIS layer will be created where CO2 emissions have been divided with floor square meters</source>
+        <translation>QGIS:iin lisätään karttataso, jossa CO2-päästöt on jaettu kerrosneliömetreilllä</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="718"/>
+        <source>QGIS layers will be created where total traffic CO2 emissions as well as more detailed traffic CO2 emissions are shown</source>
+        <translation>QGIS:iin lisätään karttatasoja, joilla esitetään liikenteen kokonais-CO2-päästöt ja tarkemmat luokittaiset liikenteen-CO2-päästöt</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="731"/>
+        <source>QGIS layers will be created where total heating CO2 emissions as well as more detailed heating CO2 emissions are shown</source>
+        <translation>QGIS:iin lisätään karttatasoja, joilla esitetään lämmönsäädön kokonais-CO2-päästöt ja tarkemmat luokittaiset lämmönsäädön-CO2-päästöt</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="744"/>
+        <source>QGIS layers will be created where total electricity CO2 emissions as well as more detailed electricity CO2 emissions are shown</source>
+        <translation>QGIS:iin lisätään karttatasoja, joilla esitetään sähkön kokonais-CO2-päästöt ja tarkemmat luokittaiset sähkön-CO2-päästöt</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="757"/>
+        <source>QGIS layer will be created where division between population and work place count is shown</source>
+        <translation>QGIS:iin lisätään karttataso, jossa esitetään väestön ja työpaikkojen suhde kussakin ruudussa</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="770"/>
+        <source>QGIS layer will be created where the most CO2 sustainable urban development zones are shown</source>
+        <translation>QGIS:iin lisätään karttataso, jossa esitetään CO2-päästönäkökulmasta kaikkein edullisimmat YKR-vyöhykkeet</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="773"/>
+        <source>Visualize Best Zones for New Population and Jobs</source>
+        <translation>Näytä uusille asukkaille ja työpaikoille parhaiten soveltuvat vyöhykkeet</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="783"/>
+        <source>QGIS layer will be created where the UZ squares with building floor space ratio with at least 0,2 are included in same class</source>
+        <translation>QGIS:iin lisätään karttataso, jossa esitetään omassa luokassaan ruudut, joissa rakennusten yhteenlaskettu kerrosala suhteessa ruudun pinta-alaan on vähintään 0,2 </translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="851"/>
+        <source>Static bar graph will be created (URL)</source>
+        <translation>Lisätään staattinen pylväsgraafi (URL)</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="298"/>
+        <source>The chosen municipalities will be intersected with the AOI.</source>
+        <translation>Laskentamoottori suodattaa laskentaruuduista edelleen käsittelyyn vain sen AOI-osa-alueen, joka leikkaa (intersect) valittujen kuntien alueita</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="223"/>
+        <source>Lempäälä</source>
+        <translation>Lempäälä</translation>
+    </message>
+    <message>
+        <location filename="../ui/ykr_tool_main.ui" line="301"/>
+        <source>Ylöjärvi</source>
+        <translation>Ylöjärvi</translation>
     </message>
 </context>
 <context>

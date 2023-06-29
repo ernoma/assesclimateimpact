@@ -101,6 +101,8 @@ class YKRTool:
         self.settingsDialog = uic.loadUi(os.path.join(self.plugin_dir, 'ui', 'ykr_tool_db_settings.ui'))
         self.infoDialog = uic.loadUi(os.path.join(self.plugin_dir, 'ui', 'ykr_tool_info.ui'))
 
+        self.NameOfTheCO2EstimationRun = None
+
         self.targetYear = None
         self.ykrPopLayer = None
         self.ykrBuildingsLayer = None
@@ -622,6 +624,9 @@ class YKRTool:
     def readProcessingInput(self):
         '''Read user input from main dialog'''
         md = self.mainDialog
+
+        self.NameOfTheCO2EstimationRun = md.lineEditNameOfTheCO2EstimationRun.text()
+
         self.inputLayers = []
         # if md.checkBoxLoadYkrPopFromMapLayer.isChecked():
         #     QgsMessageLog.logMessage("md.checkBoxLoadYkrPopFromMapLayer.isChecked(): {}".format(md.checkBoxLoadYkrPopFromMapLayer.isChecked()) , 'YKRTool', Qgis.Info)
@@ -1103,6 +1108,7 @@ class YKRTool:
 
     def writeSessionInfo(self):
         '''Writes session info to user_output.sessions_v2 table'''
+        nameOfTheCO2EstimationRun = self.NameOfTheCO2EstimationRun if self.NameOfTheCO2EstimationRun != None else ''
         predefinedAreaName = self.ykrToolDictionaries.getPredefinedAreaNameFromDatabaseTableName(self.predefinedAreaDBTableName)
         municipalitiesArrayString = self.municipalitiesArrayString
         futureZoningAreasTableName = self.futureZoningAreasTableName
@@ -1117,8 +1123,8 @@ class YKRTool:
         emissionsAllocation = self.emissionsAllocation
         elecEmissionType = self.elecEmissionType
 
-        self.cur.execute('''INSERT INTO user_output.sessions_v2(aoi, municipalities, kt_table_name, kv_table_name, joli_table_name, sid, usr, starttime, baseyear, targetyear, calculationScenario, metodi, paastolaji) VALUES (%s, %s, %s, %s, %s,
-        %s, %s, %s, %s, %s, %s, %s, %s)''', (predefinedAreaName, municipalitiesArrayString, futureZoningAreasTableName, futureNetworkLayerDBTableName, futureStopsLayerDBTableName, uuid, user, startTime, baseYear, targetYear,\
+        self.cur.execute('''INSERT INTO user_output.sessions_v2(session_name, aoi, municipalities, kt_table_name, kv_table_name, joli_table_name, sid, usr, starttime, baseyear, targetyear, calculationScenario, metodi, paastolaji) VALUES (%s, %s, %s, %s, %s, %s,
+        %s, %s, %s, %s, %s, %s, %s, %s)''', (nameOfTheCO2EstimationRun, predefinedAreaName, municipalitiesArrayString, futureZoningAreasTableName, futureNetworkLayerDBTableName, futureStopsLayerDBTableName, uuid, user, startTime, baseYear, targetYear,\
             pitkoScenario, emissionsAllocation, elecEmissionType, ))
         self.conn.commit()
 
