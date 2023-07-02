@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1112</width>
-    <height>1092</height>
+    <height>1104</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -790,7 +790,7 @@
              <string>Visualize Floor Space Ratio</string>
             </property>
             <property name="checked">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
            </widget>
           </item>

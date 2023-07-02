@@ -291,7 +291,7 @@
     <message>
         <location filename="../ui/ykr_tool_main.ui" line="39"/>
         <source>Will be stored to the user_output.sessions_v2 table if provided</source>
-        <translation>Tallennetaan user_output.sessions_v2-tauiluun, jos käyttäjä antaa nimen</translation>
+        <translation>Tallennetaan user_output.sessions_v2-tauluun, jos käyttäjä antaa nimen</translation>
     </message>
     <message>
         <location filename="../ui/ykr_tool_main.ui" line="32"/>
