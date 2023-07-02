@@ -134,10 +134,12 @@ class YKRToolDictionaries:
         
         self.PredefinedUrbanCenterLayers = {
             "fi": {
+                'Keskusverkko kaupunkiseutu, myös suunniteltu, 2023/07 tilanne': 'user_input.keskusverkko_tre_seutu_2023_07',
                 'Keskusverkko kaupunkiseutu ja kantakaupunki - yk049, valtuustokausi 2017-2021 - kaavaehdotus': 'user_input.keskusverkko_tre_seutu_ve_yk049_vaihekaava_ehdotus',
                 'Tre keskusverkko - yk049, valtuustokausi 2017-2021 - kaavaehdotus': 'user_input.kv_ehdotus_ve3'
             },
             "en": {
+                'Urban centers of Tampere city region, also planned, 2023/07 situation': 'user_input.keskusverkko_tre_seutu_2023_07',
                 'Urban centers of Tampere city region and downtown - Local master plan, City Council’s term 2017-2021 - plan proposal': 'user_input.keskusverkko_tre_seutu_ve_yk049_vaihekaava_ehdotus',
                 'Tre centers - Local master plan, City Council’s term 2017-2021 - plan proposal': 'user_input.kv_ehdotus_ve3'
             }
