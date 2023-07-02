@@ -34,7 +34,11 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEditNameOfTheCO2EstimationRun"/>
+          <widget class="QLineEdit" name="lineEditNameOfTheCO2EstimationRun">
+           <property name="toolTip">
+            <string>Will be stored to the user_output.sessions_v2 table if provided</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
