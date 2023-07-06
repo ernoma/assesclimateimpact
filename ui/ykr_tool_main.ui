@@ -883,9 +883,22 @@
      <item>
       <layout class="QHBoxLayout" name="menuLayout">
        <item>
-        <widget class="QPushButton" name="settingsButton">
+        <widget class="QPushButton" name="buttonDatabaseSettings">
+         <property name="toolTip">
+          <string>The main part of the calculation is done in the database and the results table is saved in the database.</string>
+         </property>
          <property name="text">
           <string>Database connection settings...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="buttonUserSettings">
+         <property name="toolTip">
+          <string>Settings aimed to improve usage of the plugin.</string>
+         </property>
+         <property name="text">
+          <string>User settings...</string>
          </property>
         </widget>
        </item>

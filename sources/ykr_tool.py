@@ -87,9 +87,11 @@ class YKRTool:
         self.conn = None
         self.connParams = None
 
-        configFilePath = QSettings().value("/YKRTool/configFilePath", "", type=str)
-        if configFilePath != "":
-            self.connParams = self.parseConfigFile(configFilePath)
+        self.loadDatabaseConnectionSettingsAutomatically = True if QSettings().value("/YKRTool/loadDatabaseConnectionSettingsAutomatically", "True", type=str).lower() == 'true' else False
+        if self.loadDatabaseConnectionSettingsAutomatically:
+            configFilePath = QSettings().value("/YKRTool/configFilePath", "", type=str)
+            if configFilePath != "":
+                self.connParams = self.parseConfigFile(configFilePath)
 
         self.tableNames = {}
 
@@ -98,7 +100,8 @@ class YKRTool:
         self.first_start = None
 
         self.mainDialog = uic.loadUi(os.path.join(self.plugin_dir, 'ui', 'ykr_tool_main.ui'))
-        self.settingsDialog = uic.loadUi(os.path.join(self.plugin_dir, 'ui', 'ykr_tool_db_settings.ui'))
+        self.userSettingsDialog = uic.loadUi(os.path.join(self.plugin_dir, 'ui', 'ykr_tool_user_settings.ui'))
+        self.databaseSettingsDialog = uic.loadUi(os.path.join(self.plugin_dir, 'ui', 'ykr_tool_db_settings.ui'))
         self.infoDialog = uic.loadUi(os.path.join(self.plugin_dir, 'ui', 'ykr_tool_info.ui'))
 
         self.NameOfTheCO2EstimationRun = None
@@ -262,7 +265,9 @@ class YKRTool:
 
     def runProcess(self, retriesLeft=3):
         try:
-            self.preProcess()
+            shouldRun = self.preProcess()
+            if shouldRun == False:
+                return False
         except Exception as e:
             if retriesLeft > 0:
                 return self.runProcess(retriesLeft - 1)
@@ -279,13 +284,16 @@ class YKRTool:
         self.layers = []
         '''Starts calculation'''
         if not self.connParams:
-            configFilePath = QSettings().value("/YKRTool/configFilePath", "", type=str)
-            self.connParams = self.parseConfigFile(configFilePath)
+            self.iface.messageBar().pushMessage(self.tr('Database connection not setup'), Qgis.Critical, duration=0)
+            return False
+            # configFilePath = QSettings().value("/YKRTool/configFilePath", "", type=str)
+            # self.connParams = self.parseConfigFile(configFilePath)
         self.conn = createDbConnection(self.connParams)
         self.cur = self.conn.cursor()
         self.sessionParams = self.generateSessionParameters()
         self.readProcessingInput()
-
+        return True
+    
 
     def setupMainDialog(self):
         '''Sets up the main dialog'''
@@ -323,7 +331,8 @@ class YKRTool:
         # names = self.ykrToolDictionaries.getYkrJobUserFriendlyNames()
         # md.comboBoxYkrJob.addItems(names)
 
-        md.settingsButton.clicked.connect(self.displaySettingsDialog)
+        md.buttonUserSettings.clicked.connect(self.displayUserSettingsDialog)
+        md.buttonDatabaseSettings.clicked.connect(self.displayDatabaseSettingsDialog)
         md.infoButton.clicked.connect(lambda: self.infoDialog.show())
 
         # md.mapLayerComboBoxYkrPop.hide()
@@ -458,21 +467,41 @@ class YKRTool:
             md.predefinedAreaLabel.setEnabled(False)
 
 
-    def displaySettingsDialog(self):
-        '''Sets up and displays the settings dialog'''
-        self.settingsDialog.show()
-        self.settingsDialog.configFileInput.setStorageMode(QgsFileWidget.GetFile)
-        self.settingsDialog.configFileInput.setFilePath(QSettings().value\
-            ("/YKRTool/configFilePath", "", type=str))
-        self.settingsDialog.loadFileButton.clicked.connect(self.setConnectionParamsFromFile)
+    def displayUserSettingsDialog(self):
+        # todo
+        self.userSettingsDialog.show()
+        self.userSettingsDialog.checkBoxLoadDatabaseConnectionSettingsAutomatically.setChecked(True if QSettings().value("/YKRTool/loadDatabaseConnectionSettingsAutomatically", "True", type=str).lower() == 'true' else False)
+        result = self.userSettingsDialog.exec_()
+        if result:
+            self.handleUserSettingsDialogData()
 
-        result = self.settingsDialog.exec_()
+
+    def handleUserSettingsDialogData(self):
+        self.loadDatabaseConnectionSettingsAutomatically = True if self.userSettingsDialog.checkBoxLoadDatabaseConnectionSettingsAutomatically.isChecked() else False
+        QSettings().setValue("/YKRTool/loadDatabaseConnectionSettingsAutomatically", 'True' if self.loadDatabaseConnectionSettingsAutomatically else 'False')
+
+
+    def displayDatabaseSettingsDialog(self):
+        '''Sets up and displays the settings dialog'''
+        self.databaseSettingsDialog.show()
+        self.databaseSettingsDialog.configFileInput.setStorageMode(QgsFileWidget.GetFile)
+        configFilePath = QSettings().value("/YKRTool/configFilePath", "", type=str)
+        self.databaseSettingsDialog.configFileInput.setFilePath(configFilePath)
+        
+        if self.loadDatabaseConnectionSettingsAutomatically:
+            if configFilePath != "":
+                self.setConnectionParamsFromFile()
+
+        self.databaseSettingsDialog.loadFileButton.clicked.connect(self.setConnectionParamsFromFile)
+
+        result = self.databaseSettingsDialog.exec_()
         if result:
             self.connParams = self.readConnectionParamsFromInput()
 
+
     def setConnectionParamsFromFile(self):
         '''Reads connection parameters from file and sets them to the input fields'''
-        filePath = self.settingsDialog.configFileInput.filePath()
+        filePath = self.databaseSettingsDialog.configFileInput.filePath()
         QSettings().setValue("/YKRTool/configFilePath", filePath)
 
         try:
@@ -511,20 +540,20 @@ class YKRTool:
 
     def setConnectionParamsFromInput(self, params):
         '''Sets connection parameters to input fields'''
-        self.settingsDialog.dbHost.setValue(params['host'])
-        self.settingsDialog.dbPort.setValue(params['port'])
-        self.settingsDialog.dbName.setValue(params['database'])
-        self.settingsDialog.dbUser.setValue(params['user'])
-        self.settingsDialog.dbPass.setText(params['password'])
+        self.databaseSettingsDialog.dbHost.setValue(params['host'])
+        self.databaseSettingsDialog.dbPort.setValue(params['port'])
+        self.databaseSettingsDialog.dbName.setValue(params['database'])
+        self.databaseSettingsDialog.dbUser.setValue(params['user'])
+        self.databaseSettingsDialog.dbPass.setText(params['password'])
 
     def readConnectionParamsFromInput(self):
         '''Reads connection parameters from user input and returns a dictionary'''
         params = {}
-        params['host'] = self.settingsDialog.dbHost.value()
-        params['port'] = self.settingsDialog.dbPort.value()
-        params['database'] = self.settingsDialog.dbName.value()
-        params['user'] = self.settingsDialog.dbUser.value()
-        params['password'] = self.settingsDialog.dbPass.text()
+        params['host'] = self.databaseSettingsDialog.dbHost.value()
+        params['port'] = self.databaseSettingsDialog.dbPort.value()
+        params['database'] = self.databaseSettingsDialog.dbName.value()
+        params['user'] = self.databaseSettingsDialog.dbUser.value()
+        params['password'] = self.databaseSettingsDialog.dbPass.text()
         return params
 
 
