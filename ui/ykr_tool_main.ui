@@ -903,6 +903,16 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="pushButtonRestoreDefaultCalculationSettings">
+         <property name="toolTip">
+          <string>This will reset settings in this window but it will leave user settings and database connection settings intact.</string>
+         </property>
+         <property name="text">
+          <string>Restore default calculation settings</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="infoButton">
          <property name="text">
           <string>Info...</string>

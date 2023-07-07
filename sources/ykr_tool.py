@@ -93,6 +93,13 @@ class YKRTool:
             if configFilePath != "":
                 self.connParams = self.parseConfigFile(configFilePath)
 
+        self.rememberCalculationSettingsBetweenRuns = True if QSettings().value("/YKRTool/rememberCalculationSettingsBetweenRuns", "True", type=str).lower() == 'true' else False
+
+        self.rememberCalculationSettingsExitingQGIS = True if QSettings().value("/YKRTool/rememberCalculationSettingsExitingQGIS", "True", type=str).lower() == 'true' else False
+        #todo 
+        # * if true then store to QSettings and load from QSettings when exiting & starting
+        # * if false then do not load  from QSettings and store to QSettings when starting & exiting
+
         self.tableNames = {}
 
         # Check if plugin was started the first time in current QGIS session
@@ -130,7 +137,9 @@ class YKRTool:
         # self.ykrUploadedPopTableName = None
         # self.ykrUploadedJobTableName = None
 
-        self.layers = []
+        self.inputLayers = []
+
+        self.resultLayers = []
 
 
     # noinspection PyMethodMayBeStatic
@@ -281,7 +290,7 @@ class YKRTool:
 
 
     def preProcess(self):
-        self.layers = []
+        self.resultLayers = []
         '''Starts calculation'''
         if not self.connParams:
             self.iface.messageBar().pushMessage(self.tr('Database connection not setup'), Qgis.Critical, duration=0)
@@ -331,6 +340,7 @@ class YKRTool:
         # names = self.ykrToolDictionaries.getYkrJobUserFriendlyNames()
         # md.comboBoxYkrJob.addItems(names)
 
+        md.pushButtonRestoreDefaultCalculationSettings.clicked.connect(self.restoreDefaultCalculationSettings)
         md.buttonUserSettings.clicked.connect(self.displayUserSettingsDialog)
         md.buttonDatabaseSettings.clicked.connect(self.displayDatabaseSettingsDialog)
         md.infoButton.clicked.connect(lambda: self.infoDialog.show())
@@ -357,6 +367,79 @@ class YKRTool:
         md.checkBoxVisualizeTrafficEmissions.clicked.connect(self.handleVisualizeTrafficEmissionsToggle)
         md.checkBoxVisualizeSustainableUrbanStructure.clicked.connect(self.handleVisualizeSustainableUrbanStructureToggle)
         md.checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone.clicked.connect(self.handleAddQuickchartIoLinksOfRelativeEmissionsByZoneToggle)
+
+    def restoreDefaultCalculationSettings(self):
+        md = self.mainDialog
+        
+        #
+        # AOI
+        #
+        # self.handleRadioButtonUseMapLayerForInvestigatedAreaToggle(False)
+        md.radioButtonUsePredefinedAreaForInvestigatedArea.click()
+        md.radioButtonUsePredefinedAreaForInvestigatedArea.setChecked(True)
+        layers = list(QgsProject.instance().mapLayers().values())
+        if len(layers) > 0:
+            md.comboBoxMapLayer.setLayer(layers[0])
+        md.comboBoxPredefinedArea.clear()
+        names = self.ykrToolDictionaries.getPredefinedAreaNames()
+        md.comboBoxPredefinedArea.addItems(names)
+        md.checkBoxMunicipalitiesKangasala.setChecked(True)
+        md.checkBoxMunicipalitiesLempaala.setChecked(True)
+        md.checkBoxMunicipalitiesNokia.setChecked(True)
+        md.checkBoxMunicipalitiesOrivesi.setChecked(True)
+        md.checkBoxMunicipalitiesPirkkala.setChecked(True)
+        md.checkBoxMunicipalitiesTampere.setChecked(True)
+        md.checkBoxMunicipalitiesVesilahti.setChecked(True)
+        md.checkBoxMunicipalitiesYlojarvi.setChecked(True)
+
+        #
+        # Future emissions
+        #
+        md.futureBox.setEnabled(False)
+        md.checkBoxCalculateFuture.setChecked(False)
+        md.futureAreasLoadLayer.setChecked(False)
+        md.futureNetworkLoadLayer.setChecked(False)
+        md.futureStopsLoadLayer.setChecked(False)
+        md.comboBoxPredefinedFutureAreas.clear()
+        names = self.ykrToolDictionaries.getPredefinedFutureZoningAreasUserFriendlyNames()
+        md.comboBoxPredefinedFutureAreas.addItems(names)
+        md.comboBoxPredefinedFutureNetwork.clear()
+        urbanCenterNames = self.ykrToolDictionaries.getPredefinedUrbanCenterLayersUserFriendlyNames()
+        md.comboBoxPredefinedFutureNetwork.addItems(urbanCenterNames)
+        md.comboBoxPredefinedFutureStops.clear()
+        publicTransportStopsNames = self.ykrToolDictionaries.getPredefinedFuturePublicTransportStopsUserFriendlyNames()
+        md.comboBoxPredefinedFutureStops.addItems(publicTransportStopsNames)
+        if len(layers) > 0:
+            md.futureAreasLayerList.setLayer(layers[0])
+            md.futureNetworkLayerList.setLayer(layers[0])
+            md.futureStopsLayerList.setLayer(layers[0])
+        md.targetYear.setValue(2030)
+        self.targetYear = 2030
+        self.handleLayerToggle()
+
+        #
+        # Advanced settings
+        #
+        md.checkBoxIncludeLongDistance.setChecked(True)
+        md.checkBoxIncludeBusinessTravel.setChecked(False)
+        md.emissionsAllocation.clear()
+        names = self.ykrToolDictionaries.getEmissionAllocationMethodNames()
+        md.emissionsAllocation.addItems(names)
+        md.elecEmissionType.clear()
+        names = self.ykrToolDictionaries.getElectricityTypeNames()
+        md.elecEmissionType.addItems(names)
+        md.checkBoxNokianMyllyCO2Zeroed.setChecked(True)
+        md.checkBoxCalculateEmissionsPerPerson.setChecked(True)
+        md.checkBoxCalculateEmissionsPerJob.setChecked(True)
+        md.checkBoxCalculateEmissionsPerFloorSpaceSquares.setChecked(True)
+        md.checkBoxVisualizeTrafficEmissions.setChecked(True)
+        md.checkBoxVisualizeThermoEmissions.setChecked(False)
+        md.checkBoxVisualizeElectricityConsumptionEmissions.setChecked(False)
+        md.checkBoxVisualizePopJobMix.setChecked(True)
+        md.checkBoxVisualizeGoodZonesForPopJobDensityAndSustainableTransport.setChecked(True)
+        md.checkBoxVisualizeFloorSpaceRatio.setChecked(True)
+        md.checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone.setChecked(False)
+        md.checkBoxAddQuickchartIoLinksOfZoneSquaresAndPopJobPercentagesOfTotalByZone.setChecked(False)
 
 
     def handleAddQuickchartIoLinksOfRelativeEmissionsByZoneToggle(self, checked):
@@ -470,7 +553,11 @@ class YKRTool:
     def displayUserSettingsDialog(self):
         # todo
         self.userSettingsDialog.show()
+
         self.userSettingsDialog.checkBoxLoadDatabaseConnectionSettingsAutomatically.setChecked(True if QSettings().value("/YKRTool/loadDatabaseConnectionSettingsAutomatically", "True", type=str).lower() == 'true' else False)
+        self.userSettingsDialog.checkBoxRememberCalculationSettingsBetweenRuns.setChecked(True if QSettings().value("/YKRTool/rememberCalculationSettingsBetweenRuns", "True", type=str).lower() == 'true' else False)
+        self.userSettingsDialog.checkBoxRememberCalculationSettingsExitingQGIS.setChecked(True if QSettings().value("/YKRTool/rememberCalculationSettingsExitingQGIS", "True", type=str).lower() == 'true' else False)
+
         result = self.userSettingsDialog.exec_()
         if result:
             self.handleUserSettingsDialogData()
@@ -479,6 +566,12 @@ class YKRTool:
     def handleUserSettingsDialogData(self):
         self.loadDatabaseConnectionSettingsAutomatically = True if self.userSettingsDialog.checkBoxLoadDatabaseConnectionSettingsAutomatically.isChecked() else False
         QSettings().setValue("/YKRTool/loadDatabaseConnectionSettingsAutomatically", 'True' if self.loadDatabaseConnectionSettingsAutomatically else 'False')
+
+        self.rememberCalculationSettingsBetweenRuns = True if self.userSettingsDialog.checkBoxRememberCalculationSettingsBetweenRuns.isChecked() else False
+        QSettings().setValue("/YKRTool/rememberCalculationSettingsBetweenRuns", 'True' if self.rememberCalculationSettingsBetweenRuns else 'False')
+
+        self.rememberCalculationSettingsExitingQGIS = True if self.userSettingsDialog.checkBoxRememberCalculationSettingsExitingQGIS.isChecked() else False
+        QSettings().setValue("/YKRTool/rememberCalculationSettingsExitingQGIS", 'True' if self.rememberCalculationSettingsExitingQGIS else 'False')
 
 
     def displayDatabaseSettingsDialog(self):
@@ -657,58 +750,6 @@ class YKRTool:
         self.NameOfTheCO2EstimationRun = md.lineEditNameOfTheCO2EstimationRun.text()
 
         self.inputLayers = []
-        # if md.checkBoxLoadYkrPopFromMapLayer.isChecked():
-        #     QgsMessageLog.logMessage("md.checkBoxLoadYkrPopFromMapLayer.isChecked(): {}".format(md.checkBoxLoadYkrPopFromMapLayer.isChecked()) , 'YKRTool', Qgis.Info)
-        #     self.ykrPopLayer = md.mapLayerComboBoxYkrPop.currentLayer()
-        #     if self.ykrPopLayer == None:
-        #         raise Exception(self.tr("YKR population layer has not been selected"))
-        #     elif not self.ykrPopLayer.isValid():
-        #         raise Exception(self.tr("YKR population layer is not valid"))
-        #     dataProvider = self.ykrPopLayer.dataProvider()
-        #     dataSourceUri = dataProvider.dataSourceUri()
-        #     uri = dataProvider.uri()
-        #     # if mapLayerComboBoxYkrPop layer is in Ubigu database then just use the schema.table name
-        #     # else in the readProcessingInput() load it there and use the loaded table
-        #     if uri.host() == "" or uri.host() != self.connParams['host'] or uri.database() == "" or uri.database() != self.connParams['database']:
-        #         self.ykrUploadedPopTableName = 'user_input.' + '"' + self.ykrPopLayer.name()[:YKRTool.MAX_TABLE_NAME_LENGTH] + '"'
-        #         QgsMessageLog.logMessage("calling copySourceYKRPopLayerFeaturesToTargetTable", 'YKRTool', Qgis.Info)
-        #         self.ykrToolUploadLayer.copySourceYKRPopLayerFeaturesToTargetTable(self.connParams, self.ykrPopLayer, self.ykrUploadedPopTableName, md.checkBoxAllowOtherUsersToUseUploadedYKRPopLayer.isChecked())
-        #     else:
-        #         QgsMessageLog.logMessage("schema: {}".format(uri.schema()) , 'YKRTool', Qgis.Info)
-        #         QgsMessageLog.logMessage("quotedTablename: {}".format(uri.quotedTablename()) , 'YKRTool', Qgis.Info)
-        #         self.ykrUploadedPopTableName = uri.quotedTablename()
-        # else:
-        # self.ykrUploadedPopTableName = None
-
-        # if md.checkBoxLoadYkrJobFromMapLayer.isChecked():
-        #     QgsMessageLog.logMessage("md.checkBoxLoadYkrJobFromMapLayer.isChecked(): {}".format(md.checkBoxLoadYkrJobFromMapLayer.isChecked()) , 'YKRTool', Qgis.Info)
-        #     self.ykrJobLayer = md.mapLayerComboBoxYkrJob.currentLayer()
-        #     if self.ykrJobLayer == None:
-        #         raise Exception(self.tr("YKR Job layer has not been selected"))
-        #     elif not self.ykrJobLayer.isValid():
-        #         raise Exception(self.tr("YKR Job layer is not valid"))
-        #     dataProvider = self.ykrJobLayer.dataProvider()
-        #     dataSourceUri = dataProvider.dataSourceUri()
-        #     uri = dataProvider.uri()
-        #     # if mapLayerComboBoxYkrJob layer is in Ubigu database then just use the schema.table name
-        #     # else in the readProcessingInput() load it there and use the loaded table
-        #     if uri.host() == "" or uri.host() != self.connParams['host'] or uri.database() == "" or uri.database() != self.connParams['database']:
-        #         self.ykrUploadedJobTableName = 'user_input.' + '"' + self.ykrJobLayer.name()[:YKRTool.MAX_TABLE_NAME_LENGTH] + '"'
-        #         QgsMessageLog.logMessage("calling copySourceYKRJobLayerFeaturesToTargetTable", 'YKRTool', Qgis.Info)
-        #         self.ykrToolUploadLayer.copySourceYKRJobLayerFeaturesToTargetTable(self.connParams, self.ykrJobLayer, self.ykrUploadedJobTableName, md.checkBoxAllowOtherUsersToUseUploadedYKRJobLayer.isChecked())
-        #     else:
-        #         QgsMessageLog.logMessage("schema: {}".format(uri.schema()) , 'YKRTool', Qgis.Info)
-        #         QgsMessageLog.logMessage("quotedTablename: {}".format(uri.quotedTablename()) , 'YKRTool', Qgis.Info)
-        #         self.ykrUploadedJobTableName = uri.quotedTablename()
-        # else:
-        # self.ykrUploadedJobTableName = None
-
-
-        # if md.checkBoxLoadYkrJobFromMapLayer.isChecked():
-        #     self.ykrJobsLayer = md.mapLayerComboBoxYkrJob.currentLayer()
-
-        # self.inputLayers.extend([self.ykrPopLayer,
-        #     self.ykrJobsLayer, self.ykrBuildingsLayer])
 
         if md.radioButtonUseMapLayerForInvestigatedArea.isChecked():
             self.predefinedAreaDBTableName = None
@@ -740,11 +781,7 @@ class YKRTool:
             self.investigatedAreaMapLayer = None
             self.predefinedAreaDBTableName = self.ykrToolDictionaries.getPredefinedAreaDatabaseTableName(md.comboBoxPredefinedArea.currentText())
 
-        self.finishReadingProcessingInput()
-
-
-    def finishReadingProcessingInput(self):
-        md = self.mainDialog
+        self.municipalitiesArrayString = self.createMunicipalitiesArrayString()
 
         # self.onlySelectedFeats = md.checkBoxUploadOnlySelectedFeatures.isChecked()
         self.pitkoScenario = self.ykrToolDictionaries.getPITKOScenarioShortName(md.pitkoScenario.currentText())
@@ -769,6 +806,7 @@ class YKRTool:
         self.runCalculation()
 
 
+
     def readFutureProcessingInput(self):
         '''Reads user input for future processing from main dialog'''
         self.calculateFuture = True
@@ -782,7 +820,7 @@ class YKRTool:
             schemaName, tableName = self.futureZoningAreasTableName.split('.')
             uri = QgsDataSourceUri()
             uri.setConnection(self.connParams['host'], self.connParams['port'],\
-            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+                self.connParams['database'], self.connParams['user'], self.connParams['password'])
             uri.setDataSource(schemaName, tableName, 'geom')
             self.futureAreasLayer = QgsVectorLayer(uri.uri(False), "aluevaraus_tulevaisuus", 'postgres')
             # QgsMessageLog.logMessage("futureAreasLayer: " +  str(self.futureAreasLayer), 'YKRTool', Qgis.Info)
@@ -1007,8 +1045,6 @@ class YKRTool:
     def getCalculationQueries(self):
         '''Generate queries to call processing functions in database'''
 
-        self.municipalitiesArrayString = self.createMunicipalitiesArrayString()
-
         vals = {
             'uuid': self.sessionParams['uuid'],
             'municipalities': self.municipalitiesArrayString,
@@ -1217,11 +1253,11 @@ class YKRTool:
             renderer = layer.renderer()
             if renderer != None and renderer.type() == 'graduatedSymbol':
                 renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
-            self.layers.append(layer)
+            self.resultLayers.append(layer)
             QgsProject.instance().addMapLayer(layer, False)
             group.addLayer(layer)
 
-        for layer in self.layers: # To have all columns in all layers
+        for layer in self.resultLayers: # To have all columns in all layers
             layer.setDataSource( layer.source(), layer.name(), layer.providerType() )
             #layer.dataProvider().reloadData()
 
@@ -2425,7 +2461,7 @@ class YKRTool:
             renderer = layer.renderer()
             if renderer.type() == 'graduatedSymbol':
                 renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
-            self.layers.append(layer)
+            self.resultLayers.append(layer)
             QgsProject.instance().addMapLayer(layer, False)
             group.addLayer(layer)
 
@@ -2778,7 +2814,7 @@ class YKRTool:
             renderer = layer.renderer()
             if renderer.type() == 'graduatedSymbol':
                 renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
-            # self.layers.append(layer)
+            # self.resultLayers.append(layer)
             QgsProject.instance().addMapLayer(layer, False)
             group.addLayer(layer)
 
@@ -2841,7 +2877,7 @@ class YKRTool:
                 renderer = layer.renderer()
                 if renderer.type() == 'graduatedSymbol':
                     renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
-                self.layers.append(layer)
+                self.resultLayers.append(layer)
                 QgsProject.instance().addMapLayer(layer, False)
                 group.addLayer(layer)
 
@@ -2881,7 +2917,7 @@ class YKRTool:
                 renderer = layer.renderer()
                 if renderer.type() == 'graduatedSymbol':
                     renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
-                self.layers.append(layer)
+                self.resultLayers.append(layer)
                 QgsProject.instance().addMapLayer(layer, False)
                 group.addLayer(layer)
 
@@ -2925,7 +2961,7 @@ class YKRTool:
                     renderer = layer.renderer()
                     if renderer.type() == 'graduatedSymbol':
                         renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
-                    self.layers.append(layer)
+                    self.resultLayers.append(layer)
                     QgsProject.instance().addMapLayer(layer, False)
                     group.addLayer(layer)
 
@@ -3367,8 +3403,8 @@ class YKRTool:
 
     def createCalculateFutureJobsQueries(self, uid, outputSchemaName, outputTableName):
         '''calculate change in workplaces for each square and update tp_yht accordingly'''
-        # TODO should include municipality code in the future zoning areas and take into account in the future jobs calculation
-        # TODO take into note that there can be difference between the calculation year (now) and
+        # should include municipality code in the future zoning areas and take into account in the future jobs calculation
+        # take into note that there can be difference between the calculation year (now) and
         #  - the YKR workplace data (old) and
         #  - future zoning data (a zone starting earlier than the calculation year (now))
 
@@ -3594,17 +3630,24 @@ class YKRTool:
 
 
     def cleanUpSession(self):
+
+        if self.rememberCalculationSettingsBetweenRuns == False:
+            # * if true then nothing to do
+            # * if false then set the settings according to the QT Dialog (.ui) default settings at the end of the calculation run
+            #    (* also reset to default settings button sets the settings according to the QT Dialog (.ui) default settings)
+            self.restoreDefaultCalculationSettings()
+
         '''Delete temporary data and close db connection'''
-        for table in list(self.tableNames.values()):
-            if not table: continue
-            try:
-                self.cur.execute('DROP TABLE user_input."{}"'.format(table.lower()))
-                self.conn.commit()
-            except Exception as e:
-                self.iface.messageBar().pushMessage(
-                     self.tr('Error in removing temporary table ') + '{}'.format(table),
-                    str(e), Qgis.Warning, duration=0)
-                self.conn.rollback()
+        # for table in list(self.tableNames.values()):
+        #     if not table: continue
+        #     try:
+        #         self.cur.execute('DROP TABLE user_input."{}"'.format(table.lower()))
+        #         self.conn.commit()
+        #     except Exception as e:
+        #         self.iface.messageBar().pushMessage(
+        #              self.tr('Error in removing temporary table ') + '{}'.format(table),
+        #             str(e), Qgis.Warning, duration=0)
+        #         self.conn.rollback()
 
         if self.conn != None:
             self.conn.close()

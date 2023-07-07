@@ -9,7 +9,7 @@ class YKRToolDictionaries:
 
         self.PredefinedAreas = {
             "fi": {
-                'Tampereen kaupunkiseutu (2021)': 'user_input.tre_seutu_kunnat',
+                # 'Tampereen kaupunkiseutu (2021)': 'user_input.tre_seutu_kunnat',
                 'Tampereen kaupunkiseudun rasu 2040 (2021)': 'user_input.seutu_rasu_2040_alue',
                 'Kangasala (2.4.2021)': 'user_input.tre_seutu_kunta_kangasala',
                 'Lempäälä (2.4.2021)': 'user_input.tre_seutu_kunta_lempaala',
@@ -22,7 +22,7 @@ class YKRToolDictionaries:
                 'Tre ksoyk (yk048)': 'user_input.tre_ksoyk'
             },
             "en": {
-                'Tampere City Region (2021)': 'user_input.tre_seutu_kunnat',
+                # 'Tampere City Region (2021)': 'user_input.tre_seutu_kunnat',
                 'Tampere City Region Structural Plan 2040 (2021)': 'user_input.seutu_rasu_2040_alue',
                 'Kangasala (2.4.2021)': 'user_input.tre_seutu_kunta_kangasala',
                 'Lempäälä (2.4.2021)': 'user_input.tre_seutu_kunta_lempaala',
