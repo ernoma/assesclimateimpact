@@ -476,15 +476,16 @@ class YKRTool:
             md.radioButtonUsePredefinedAreaForInvestigatedArea.setChecked(True)
         mapLayerIdForInvestigatedArea = QSettings().value("/YKRTool/mapLayerIdForInvestigatedArea", "", type=str)
         mapLayerNameForInvestigatedArea = QSettings().value("/YKRTool/mapLayerNameForInvestigatedArea", "", type=str)
-        foundMapLayerIdForInvestigatedArea = False
-        if QgsProject.instance().mapLayers() != None:
-            for id, layer in QgsProject.instance().mapLayers().items():
-                if id == mapLayerIdForInvestigatedArea:
-                    md.comboBoxMapLayer.setLayer(layer)
-                    foundMapLayerIdForInvestigatedArea = True
-                    break
-            if foundMapLayerIdForInvestigatedArea == False:
-                self.iface.messageBar().pushMessage(self.tr('Could not find map layer for AOI that was specified in the saved settings'), self.tr('The map layer name was ') + mapLayerNameForInvestigatedArea, Qgis.Warning)
+        if useMapLayerForInvestigatedArea == True:
+            foundMapLayerIdForInvestigatedArea = False
+            if QgsProject.instance().mapLayers() != None:
+                for id, layer in QgsProject.instance().mapLayers().items():
+                    if id == mapLayerIdForInvestigatedArea:
+                        md.comboBoxMapLayer.setLayer(layer)
+                        foundMapLayerIdForInvestigatedArea = True
+                        break
+                if foundMapLayerIdForInvestigatedArea == False:
+                    self.iface.messageBar().pushMessage(self.tr('Could not find map layer for AOI that was specified in the saved settings'), self.tr('The map layer name was ') + mapLayerNameForInvestigatedArea, Qgis.Warning)
         self.predefinedAreaDBTableName = QSettings().value("/YKRTool/predefinedAreaDatabaseTableName", "", type=str)
         predefinedAreaName = self.ykrToolDictionaries.getPredefinedAreaNameFromDatabaseTableName(self.predefinedAreaDBTableName)
         md.comboBoxPredefinedArea.setCurrentText(predefinedAreaName)
@@ -527,7 +528,7 @@ class YKRTool:
         md.futureStopsLoadLayer.setChecked(futureStopsLoadLayer)
         mapLayerIdForfutureAreasLoadLayer = QSettings().value("/YKRTool/mapLayerIdForfutureAreasLoadLayer", "", type=str)
         mapLayerNameForfutureAreasLoadLayer = QSettings().value("/YKRTool/mapLayerNameForfutureAreasLoadLayer", "", type=str)
-        if mapLayerIdForfutureAreasLoadLayer != "":
+        if futureAreasLoadLayer:
             foundMapLayerIdForfutureAreasLoadLayer = False
             if QgsProject.instance().mapLayers() != None:
                 for id, layer in QgsProject.instance().mapLayers().items():
@@ -539,7 +540,7 @@ class YKRTool:
                     self.iface.messageBar().pushMessage(self.tr('Could not find map layer for Future zoning data that was specified in the saved settings'), self.tr('The map layer name was ') + mapLayerNameForfutureAreasLoadLayer, Qgis.Warning)
         mapLayerIdForfutureNetworkLoadLayer = QSettings().value("/YKRTool/mapLayerIdForfutureNetworkLoadLayer", "", type=str)
         mapLayerNameForfutureNetworkLoadLayer = QSettings().value("/YKRTool/mapLayerNameForfutureNetworkLoadLayer", "", type=str)
-        if mapLayerIdForfutureNetworkLoadLayer != "":
+        if futureNetworkLoadLayer:
             foundMapLayerIdForfutureNetworkLoadLayer = False
             if QgsProject.instance().mapLayers() != None:
                 for id, layer in QgsProject.instance().mapLayers().items():
@@ -548,10 +549,10 @@ class YKRTool:
                         foundMapLayerIdForfutureNetworkLoadLayer = True
                         break
                 if foundMapLayerIdForfutureNetworkLoadLayer == False:
-                    self.iface.messageBar().pushMessage(self.tr('Could not find map layer for Future zoning data that was specified in the saved settings'), self.tr('The map layer name was ') + mapLayerNameForfutureNetworkLoadLayer, Qgis.Warning)
+                    self.iface.messageBar().pushMessage(self.tr('Could not find map layer for future urban center data that was specified in the saved settings'), self.tr('The map layer name was ') + mapLayerNameForfutureNetworkLoadLayer, Qgis.Warning)
         mapLayerIdForfutureStopsLoadLayer = QSettings().value("/YKRTool/mapLayerIdForfutureStopsLoadLayer", "", type=str)
         mapLayerNameForfutureStopsLoadLayer = QSettings().value("/YKRTool/mapLayerNameForfutureStopsLoadLayer", "", type=str)
-        if mapLayerIdForfutureStopsLoadLayer != "":
+        if futureStopsLoadLayer:
             foundMapLayerIdForfutureStopsLoadLayer = False
             if QgsProject.instance().mapLayers() != None:
                 for id, layer in QgsProject.instance().mapLayers().items():
@@ -560,7 +561,7 @@ class YKRTool:
                         foundMapLayerIdForfutureStopsLoadLayer = True
                         break
                 if foundMapLayerIdForfutureStopsLoadLayer == False:
-                    self.iface.messageBar().pushMessage(self.tr('Could not find map layer for Future zoning data that was specified in the saved settings'), self.tr('The map layer name was ') + mapLayerNameForfutureStopsLoadLayer, Qgis.Warning)
+                    self.iface.messageBar().pushMessage(self.tr('Could not find map layer for (future) transit stops data that was specified in the saved settings'), self.tr('The map layer name was ') + mapLayerNameForfutureStopsLoadLayer, Qgis.Warning)
 
         targetYear = QSettings().value("/YKRTool/targetYear", "", type=str)
         if targetYear != "":  
