@@ -1476,7 +1476,7 @@ class YKRTool:
         layerNames.append((self.tr('CO2 total grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_t_grid.qml')))
         layerNames.append((self.tr('YKR Zones (UZ and urban-countryside)') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/zones.qml')))
         # todo Visualize population grid, employees grid and floor space grid
-        layerNames.append((self.tr('Population count') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/population.qml')))
+        layerNames.append((self.tr('Population count') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/Population.qml')))
         layerNames.append((self.tr('Employee count') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/employees.qml')))
         layerNames.append((self.tr('Floor space (m2)') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/floorspace.qml')))
 
