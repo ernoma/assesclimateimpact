@@ -17,6 +17,8 @@
   4.2. copy /y T:\kaavadat\Yleiskaava\_14_OMAT\Erno\ohjelmistokehitys\assesclimateimpact\ui\*.ui C:\Users\ernomaki\AppData\Roaming\QGIS\QGIS3\profiles\Erno\python\plugins\ykr_tool\ui
   4.3.
   copy /y T:\kaavadat\Yleiskaava\_14_OMAT\Erno\ohjelmistokehitys\assesclimateimpact\i18n\*.* C:\Users\ernomaki\AppData\Roaming\QGIS\QGIS3\profiles\Erno\python\plugins\ykr_tool\i18n
+  (4.4.
+  copy /y T:\kaavadat\Yleiskaava\_14_OMAT\Erno\ohjelmistokehitys\assesclimateimpact\docs\*.qml C:\Users\ernomaki\AppData\Roaming\QGIS\QGIS3\profiles\Erno\python\plugins\ykr_tool\docs)
 6. QGIS:ssä: Plugin reloader -> reload
 7. Kun muutos valmis, niin avaa komentoikkuna -> git
 
