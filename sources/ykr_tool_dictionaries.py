@@ -174,18 +174,6 @@ class YKRToolDictionaries:
             return self.PITKOScenarios[self.locale][userFriendlyName]
 
 
-    def getElectricityTypeNames(self):
-        if self.locale not in self.electricityEmissionClasses:
-            return self.electricityEmissionClasses["en"].keys()
-        else:
-            return self.electricityEmissionClasses[self.locale].keys()
-
-    def getElectricityTypeShortName(self, userFriendlyName):
-        if self.locale not in self.electricityEmissionClasses:
-            return self.electricityEmissionClasses["en"][userFriendlyName]
-        else:
-            return self.electricityEmissionClasses[self.locale][userFriendlyName]
-
 
     def getMunicipalityCode(self, municipalityName):
         return self.municipalitiesWithCodes[municipalityName]
@@ -264,8 +252,53 @@ class YKRToolDictionaries:
             return self.PredefinedFutureZoningAreas[self.locale][predefinedFutureZoningAreasUserFriendlyName]
 
 
-    # getPredefinedFuturePublicTransportStopsDatabaseTableName
-    # PredefinedFuturePublicTransportStopsLayers
+    def getPredefinedFutureZoningAreaNameFromDatabaseTableName(self, PredefinedFutureZoningAreaTableName):
+        if self.locale not in self.PredefinedFutureZoningAreas:
+            key_list = list(self.PredefinedFutureZoningAreas["en"].keys())
+            val_list = list(self.PredefinedFutureZoningAreas["en"].values())
+        else:
+            key_list = list(self.PredefinedFutureZoningAreas[self.locale].keys())
+            val_list = list(self.PredefinedFutureZoningAreas[self.locale].values())
+
+        try:
+            position = val_list.index(PredefinedFutureZoningAreaTableName)
+        except ValueError as e:
+            return PredefinedFutureZoningAreaTableName
+
+        return key_list[position]
+
+    ##
+
+    def getPredefinedUrbanCenterLayersUserFriendlyNames(self):
+        if self.locale not in self.PredefinedUrbanCenterLayers:
+            return self.PredefinedUrbanCenterLayers["en"].keys()
+        else:
+            return self.PredefinedUrbanCenterLayers[self.locale].keys()
+
+
+    def getPredefinedUrbanCenterLayersDatabaseTableName(self, predefinedUrbanCenterLayersUserFriendlyName):
+        if self.locale not in self.PredefinedUrbanCenterLayers:
+            return self.PredefinedUrbanCenterLayers["en"][predefinedUrbanCenterLayersUserFriendlyName]
+        else:
+            return self.PredefinedUrbanCenterLayers[self.locale][predefinedUrbanCenterLayersUserFriendlyName]
+
+
+    def getPredefinedFutureUrbanCenterNameFromDatabaseTableName(self, PredefinedFutureUrbanCenterTableName):
+        if self.locale not in self.PredefinedUrbanCenterLayers:
+            key_list = list(self.PredefinedUrbanCenterLayers["en"].keys())
+            val_list = list(self.PredefinedUrbanCenterLayers["en"].values())
+        else:
+            key_list = list(self.PredefinedUrbanCenterLayers[self.locale].keys())
+            val_list = list(self.PredefinedUrbanCenterLayers[self.locale].values())
+
+        try:
+            position = val_list.index(PredefinedFutureUrbanCenterTableName)
+        except ValueError as e:
+            return PredefinedFutureUrbanCenterTableName
+
+        return key_list[position]
+ 
+    ##
 
     def getPredefinedFuturePublicTransportStopsUserFriendlyNames(self):
         if self.locale not in self.PredefinedFuturePublicTransportStopsLayers:
@@ -281,6 +314,25 @@ class YKRToolDictionaries:
             return self.PredefinedFuturePublicTransportStopsLayers[self.locale][predefinedFuturePublicTransportStopsUserFriendlyName]
 
 
+    def getPredefinedFuturePublicTransportStopsNameFromDatabaseTableName(self, PredefinedFuturePublicTransportStopsTableName):
+        if self.locale not in self.PredefinedFuturePublicTransportStopsLayers:
+            key_list = list(self.PredefinedFuturePublicTransportStopsLayers["en"].keys())
+            val_list = list(self.PredefinedFuturePublicTransportStopsLayers["en"].values())
+        else:
+            key_list = list(self.PredefinedFuturePublicTransportStopsLayers[self.locale].keys())
+            val_list = list(self.PredefinedFuturePublicTransportStopsLayers[self.locale].values())
+
+        try:
+            position = val_list.index(PredefinedFuturePublicTransportStopsTableName)
+        except ValueError as e:
+            return PredefinedFuturePublicTransportStopsTableName
+
+        return key_list[position]
+
+    ##
+    ##
+    ##
+            
     def getEmissionAllocationMethodNames(self):
         if self.locale not in self.emissionAllocationMethod:
             return self.emissionAllocationMethod["en"].keys()
@@ -294,18 +346,45 @@ class YKRToolDictionaries:
         else:
             return self.emissionAllocationMethod[self.locale][emissionAllocationMethodUserFriendlyName]
 
-
-    def getPredefinedUrbanCenterLayersUserFriendlyNames(self):
-        if self.locale not in self.PredefinedUrbanCenterLayers:
-            return self.PredefinedUrbanCenterLayers["en"].keys()
+    def getPredefinedEmissionAllocationMethodName(self, EmissionAllocationMethodName):
+        if self.locale not in self.emissionAllocationMethod:
+            key_list = list(self.emissionAllocationMethod["en"].keys())
+            val_list = list(self.emissionAllocationMethod["en"].values())
         else:
-            return self.PredefinedUrbanCenterLayers[self.locale].keys()
+            key_list = list(self.emissionAllocationMethod[self.locale].keys())
+            val_list = list(self.emissionAllocationMethod[self.locale].values())
+
+        try:
+            position = val_list.index(EmissionAllocationMethodName)
+        except ValueError as e:
+            return EmissionAllocationMethodName
+
+        return key_list[position]
 
 
-    def getPredefinedUrbanCenterLayersDatabaseTableName(self, predefinedUrbanCenterLayersUserFriendlyName):
-        if self.locale not in self.PredefinedUrbanCenterLayers:
-            return self.PredefinedUrbanCenterLayers["en"][predefinedUrbanCenterLayersUserFriendlyName]
+    def getElectricityTypeNames(self):
+        if self.locale not in self.electricityEmissionClasses:
+            return self.electricityEmissionClasses["en"].keys()
         else:
-            return self.PredefinedUrbanCenterLayers[self.locale][predefinedUrbanCenterLayersUserFriendlyName]
+            return self.electricityEmissionClasses[self.locale].keys()
 
-            
+    def getElectricityTypeShortName(self, userFriendlyName):
+        if self.locale not in self.electricityEmissionClasses:
+            return self.electricityEmissionClasses["en"][userFriendlyName]
+        else:
+            return self.electricityEmissionClasses[self.locale][userFriendlyName]
+    
+    def getPredefinedElectricityTypeName(self, ElectricityTypeName):
+        if self.locale not in self.electricityEmissionClasses:
+            key_list = list(self.electricityEmissionClasses["en"].keys())
+            val_list = list(self.electricityEmissionClasses["en"].values())
+        else:
+            key_list = list(self.electricityEmissionClasses[self.locale].keys())
+            val_list = list(self.electricityEmissionClasses[self.locale].values())
+
+        try:
+            position = val_list.index(ElectricityTypeName)
+        except ValueError as e:
+            return ElectricityTypeName
+
+        return key_list[position]

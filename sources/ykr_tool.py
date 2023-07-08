@@ -96,7 +96,6 @@ class YKRTool:
         self.rememberCalculationSettingsBetweenRuns = True if QSettings().value("/YKRTool/rememberCalculationSettingsBetweenRuns", "True", type=str).lower() == 'true' else False
 
         self.rememberCalculationSettingsExitingQGIS = True if QSettings().value("/YKRTool/rememberCalculationSettingsExitingQGIS", "True", type=str).lower() == 'true' else False
-        #todo 
         # * if true then store to QSettings and load from QSettings when exiting & starting
         # * if false then do not load  from QSettings and store to QSettings when starting & exiting
 
@@ -113,7 +112,9 @@ class YKRTool:
 
         self.NameOfTheCO2EstimationRun = None
 
-        self.targetYear = None
+        self.DEFAULT_TARGET_YEAR = 2035
+
+        self.targetYear = self.DEFAULT_TARGET_YEAR
         self.ykrPopLayer = None
         self.ykrBuildingsLayer = None
         self.ykrJobsLayer = None
@@ -247,6 +248,7 @@ class YKRTool:
 
 
     def unload(self):
+
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
             self.iface.removePluginMenu(
@@ -263,6 +265,8 @@ class YKRTool:
         if self.first_start:
             self.first_start = False
             self.setupMainDialog()
+            if self.rememberCalculationSettingsExitingQGIS:
+                self.restoreSavedCalculationSettings()
 
         self.mainDialog.show()
 
@@ -308,6 +312,8 @@ class YKRTool:
         '''Sets up the main dialog'''
         md = self.mainDialog
 
+        md.finished.connect(self.calculationDialogFinished)
+
         md.radioButtonUseMapLayerForInvestigatedArea.clicked.connect(self.handleRadioButtonUseMapLayerForInvestigatedAreaToggle)
         md.radioButtonUsePredefinedAreaForInvestigatedArea.clicked.connect(self.handleRadioButtonUsePredefinedAreaForInvestigatedAreaToggle)
 
@@ -333,7 +339,6 @@ class YKRTool:
 
         publicTransportStopsNames = self.ykrToolDictionaries.getPredefinedFuturePublicTransportStopsUserFriendlyNames()
         md.comboBoxPredefinedFutureStops.addItems(publicTransportStopsNames)
-
 
         # names = self.ykrToolDictionaries.getYkrPopUserFriendlyNames()
         # md.comboBoxYkrPop.addItems(names)
@@ -368,9 +373,18 @@ class YKRTool:
         md.checkBoxVisualizeSustainableUrbanStructure.clicked.connect(self.handleVisualizeSustainableUrbanStructureToggle)
         md.checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone.clicked.connect(self.handleAddQuickchartIoLinksOfRelativeEmissionsByZoneToggle)
 
+
+    def calculationDialogFinished(self):
+        # tallenna aina, kun käyttäjä sulkee laskentaikkunan (finished-signaali)
+        if self.rememberCalculationSettingsExitingQGIS:
+            self.saveCalculationSettings()
+
+
     def restoreDefaultCalculationSettings(self):
         md = self.mainDialog
         
+        md.lineEditNameOfTheCO2EstimationRun.setText("")
+
         #
         # AOI
         #
@@ -413,8 +427,9 @@ class YKRTool:
             md.futureAreasLayerList.setLayer(layers[0])
             md.futureNetworkLayerList.setLayer(layers[0])
             md.futureStopsLayerList.setLayer(layers[0])
-        md.targetYear.setValue(2030)
-        self.targetYear = 2030
+        self.targetYear = self.DEFAULT_TARGET_YEAR
+        md.targetYear.setValue(self.targetYear)
+        
         self.handleLayerToggle()
 
         #
@@ -440,6 +455,228 @@ class YKRTool:
         md.checkBoxVisualizeFloorSpaceRatio.setChecked(True)
         md.checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone.setChecked(False)
         md.checkBoxAddQuickchartIoLinksOfZoneSquaresAndPopJobPercentagesOfTotalByZone.setChecked(False)
+    
+
+    def restoreSavedCalculationSettings(self):
+        # warn of the missing layers (or other options)
+        md = self.mainDialog
+
+        #
+        #
+        #
+
+        md.lineEditNameOfTheCO2EstimationRun.setText(QSettings().value("/YKRTool/nameOfTheCO2EstimationRun", "", type=str))
+
+        useMapLayerForInvestigatedArea = True if QSettings().value("/YKRTool/useMapLayerForInvestigatedArea", "True", type=str).lower() == 'true' else False
+        if useMapLayerForInvestigatedArea == True:
+            md.radioButtonUseMapLayerForInvestigatedArea.click()
+            md.radioButtonUseMapLayerForInvestigatedArea.setChecked(True)
+        else:
+            md.radioButtonUsePredefinedAreaForInvestigatedArea.click()
+            md.radioButtonUsePredefinedAreaForInvestigatedArea.setChecked(True)
+        mapLayerIdForInvestigatedArea = QSettings().value("/YKRTool/mapLayerIdForInvestigatedArea", "", type=str)
+        mapLayerNameForInvestigatedArea = QSettings().value("/YKRTool/mapLayerNameForInvestigatedArea", "", type=str)
+        foundMapLayerIdForInvestigatedArea = False
+        if QgsProject.instance().mapLayers() != None:
+            for id, layer in QgsProject.instance().mapLayers().items():
+                if id == mapLayerIdForInvestigatedArea:
+                    md.comboBoxMapLayer.setLayer(layer)
+                    foundMapLayerIdForInvestigatedArea = True
+                    break
+            if foundMapLayerIdForInvestigatedArea == False:
+                self.iface.messageBar().pushMessage(self.tr('Could not find map layer for AOI that was specified in the saved settings'), self.tr('The map layer name was ') + mapLayerNameForInvestigatedArea, Qgis.Warning)
+        self.predefinedAreaDBTableName = QSettings().value("/YKRTool/predefinedAreaDatabaseTableName", "", type=str)
+        predefinedAreaName = self.ykrToolDictionaries.getPredefinedAreaNameFromDatabaseTableName(self.predefinedAreaDBTableName)
+        md.comboBoxPredefinedArea.setCurrentText(predefinedAreaName)
+
+        md.checkBoxMunicipalitiesKangasala.setChecked(True if QSettings().value("/YKRTool/chosenMunicipalitiesKangasala", "True", type=str).lower() == 'true' else False)
+        md.checkBoxMunicipalitiesLempaala.setChecked(True if QSettings().value("/YKRTool/chosenMunicipalitiesLempaala", "True", type=str).lower() == 'true' else False)
+        md.checkBoxMunicipalitiesNokia.setChecked(True if QSettings().value("/YKRTool/chosenMunicipalitiesNokia", "True", type=str).lower() == 'true' else False)
+        md.checkBoxMunicipalitiesOrivesi.setChecked(True if QSettings().value("/YKRTool/chosenMunicipalitiesOrivesi", "True", type=str).lower() == 'true' else False)
+        md.checkBoxMunicipalitiesPirkkala.setChecked(True if QSettings().value("/YKRTool/chosenMunicipalitiesPirkkala", "True", type=str).lower() == 'true' else False)
+        md.checkBoxMunicipalitiesTampere.setChecked(True if QSettings().value("/YKRTool/chosenMunicipalitiesTampere", "True", type=str).lower() == 'true' else False)
+        md.checkBoxMunicipalitiesVesilahti.setChecked(True if QSettings().value("/YKRTool/chosenMunicipalitiesVesilahti", "True", type=str).lower() == 'true' else False)
+        md.checkBoxMunicipalitiesYlojarvi.setChecked(True if QSettings().value("/YKRTool/chosenMunicipalitiesYlojarvi", "True", type=str).lower() == 'true' else False)
+
+        #
+        # Future emissions
+        #
+
+        shouldCalculateFuture = True if QSettings().value("/YKRTool/shouldCalculateFuture", "False", type=str).lower() == 'true' else False
+        if shouldCalculateFuture:
+            md.futureBox.setEnabled(True)
+            md.checkBoxCalculateFuture.setChecked(True)
+
+        self.futureZoningAreasTableName = QSettings().value("/YKRTool/predefinedFutureAreaDBTableName", "", type=str)
+        predefinedFutureZoningAreasName = self.ykrToolDictionaries.getPredefinedFutureZoningAreaNameFromDatabaseTableName(self.futureZoningAreasTableName)
+        md.comboBoxPredefinedFutureAreas.setCurrentText(predefinedFutureZoningAreasName)
+
+        self.futureNetworkTableName = QSettings().value("/YKRTool/predefinedFutureNetworkDBTableName", "", type=str)
+        predefinedFutureNetworkName = self.ykrToolDictionaries.getPredefinedFutureUrbanCenterNameFromDatabaseTableName(self.futureNetworkTableName)
+        md.comboBoxPredefinedFutureNetwork.setCurrentText(predefinedFutureNetworkName)
+
+        self.futureStopsTableName = QSettings().value("/YKRTool/predefinedFutureStopsDBTableName", "", type=str)
+        predefinedFutureStopsName = self.ykrToolDictionaries.getPredefinedFuturePublicTransportStopsNameFromDatabaseTableName(self.futureStopsTableName)
+        md.comboBoxPredefinedFutureStops.setCurrentText(predefinedFutureStopsName)
+
+        futureAreasLoadLayer = True if QSettings().value("/YKRTool/futureAreasLoadLayer", "False", type=str).lower() == 'true' else False
+        futureNetworkLoadLayer = True if QSettings().value("/YKRTool/futureNetworkLoadLayer", "False", type=str).lower() == 'true' else False
+        futureStopsLoadLayer = True if QSettings().value("/YKRTool/futureStopsLoadLayer", "False", type=str).lower() == 'true' else False
+        md.futureAreasLoadLayer.setChecked(futureAreasLoadLayer)
+        md.futureNetworkLoadLayer.setChecked(futureNetworkLoadLayer)
+        md.futureStopsLoadLayer.setChecked(futureStopsLoadLayer)
+        mapLayerIdForfutureAreasLoadLayer = QSettings().value("/YKRTool/mapLayerIdForfutureAreasLoadLayer", "", type=str)
+        mapLayerNameForfutureAreasLoadLayer = QSettings().value("/YKRTool/mapLayerNameForfutureAreasLoadLayer", "", type=str)
+        if mapLayerIdForfutureAreasLoadLayer != "":
+            foundMapLayerIdForfutureAreasLoadLayer = False
+            if QgsProject.instance().mapLayers() != None:
+                for id, layer in QgsProject.instance().mapLayers().items():
+                    if id == mapLayerIdForfutureAreasLoadLayer:
+                        md.futureAreasLayerList.setLayer(layer)
+                        foundMapLayerIdForfutureAreasLoadLayer = True
+                        break
+                if foundMapLayerIdForfutureAreasLoadLayer == False:
+                    self.iface.messageBar().pushMessage(self.tr('Could not find map layer for Future zoning data that was specified in the saved settings'), self.tr('The map layer name was ') + mapLayerNameForfutureAreasLoadLayer, Qgis.Warning)
+        mapLayerIdForfutureNetworkLoadLayer = QSettings().value("/YKRTool/mapLayerIdForfutureNetworkLoadLayer", "", type=str)
+        mapLayerNameForfutureNetworkLoadLayer = QSettings().value("/YKRTool/mapLayerNameForfutureNetworkLoadLayer", "", type=str)
+        if mapLayerIdForfutureNetworkLoadLayer != "":
+            foundMapLayerIdForfutureNetworkLoadLayer = False
+            if QgsProject.instance().mapLayers() != None:
+                for id, layer in QgsProject.instance().mapLayers().items():
+                    if id == mapLayerIdForfutureNetworkLoadLayer:
+                        md.futureNetworkLayerList.setLayer(layer)
+                        foundMapLayerIdForfutureNetworkLoadLayer = True
+                        break
+                if foundMapLayerIdForfutureNetworkLoadLayer == False:
+                    self.iface.messageBar().pushMessage(self.tr('Could not find map layer for Future zoning data that was specified in the saved settings'), self.tr('The map layer name was ') + mapLayerNameForfutureNetworkLoadLayer, Qgis.Warning)
+        mapLayerIdForfutureStopsLoadLayer = QSettings().value("/YKRTool/mapLayerIdForfutureStopsLoadLayer", "", type=str)
+        mapLayerNameForfutureStopsLoadLayer = QSettings().value("/YKRTool/mapLayerNameForfutureStopsLoadLayer", "", type=str)
+        if mapLayerIdForfutureStopsLoadLayer != "":
+            foundMapLayerIdForfutureStopsLoadLayer = False
+            if QgsProject.instance().mapLayers() != None:
+                for id, layer in QgsProject.instance().mapLayers().items():
+                    if id == mapLayerIdForfutureStopsLoadLayer:
+                        md.futureStopsLayerList.setLayer(layer)
+                        foundMapLayerIdForfutureStopsLoadLayer = True
+                        break
+                if foundMapLayerIdForfutureStopsLoadLayer == False:
+                    self.iface.messageBar().pushMessage(self.tr('Could not find map layer for Future zoning data that was specified in the saved settings'), self.tr('The map layer name was ') + mapLayerNameForfutureStopsLoadLayer, Qgis.Warning)
+
+        targetYear = QSettings().value("/YKRTool/targetYear", "", type=str)
+        if targetYear != "":  
+            self.targetYear = int(targetYear)
+            md.targetYear.setValue(self.targetYear)
+        else:
+            self.targetYear = int(self.DEFAULT_TARGET_YEAR)
+            md.targetYear.setValue(self.targetYear)
+            
+        self.handleLayerToggle()
+
+        #
+        # Advanced settings
+        #
+
+        md.checkBoxIncludeLongDistance.setChecked(True if QSettings().value("/YKRTool/IncludeLongDistance", "True", type=str).lower() == 'true' else False)
+        md.checkBoxIncludeBusinessTravel.setChecked(True if QSettings().value("/YKRTool/IncludeBusinessTravel", "False", type=str).lower() == 'true' else False)
+
+        emissionsAllocationName = QSettings().value("/YKRTool/emissionsAllocationName", "", type=str)
+        emissionsAllocationPredefinedName = self.ykrToolDictionaries.getPredefinedEmissionAllocationMethodName(emissionsAllocationName)
+        md.emissionsAllocation.setCurrentText(emissionsAllocationPredefinedName)
+
+        ElectricityTypeName = QSettings().value("/YKRTool/ElectricityTypeName", "", type=str)
+        ElectricityTypePredefinedName = self.ykrToolDictionaries.getPredefinedElectricityTypeName(ElectricityTypeName)
+        md.elecEmissionType.setCurrentText(ElectricityTypePredefinedName)
+
+        md.checkBoxNokianMyllyCO2Zeroed.setChecked(True if QSettings().value("/YKRTool/NokianMyllyCO2Zeroed", "True", type=str).lower() == 'true' else False)
+        md.checkBoxCalculateEmissionsPerPerson.setChecked(True if QSettings().value("/YKRTool/CalculateEmissionsPerPerson", "True", type=str).lower() == 'true' else False)
+        md.checkBoxCalculateEmissionsPerJob.setChecked(True if QSettings().value("/YKRTool/CalculateEmissionsPerJob", "True", type=str).lower() == 'true' else False)
+        md.checkBoxCalculateEmissionsPerFloorSpaceSquares.setChecked(True if QSettings().value("/YKRTool/CalculateEmissionsPerFloorSpaceSquares", "True", type=str).lower() == 'true' else False)
+        md.checkBoxVisualizeTrafficEmissions.setChecked(True if QSettings().value("/YKRTool/VisualizeTrafficEmissions", "True", type=str).lower() == 'true' else False)
+        md.checkBoxVisualizeThermoEmissions.setChecked(True if QSettings().value("/YKRTool/VisualizeThermoEmissions", "False", type=str).lower() == 'true' else False)
+        md.checkBoxVisualizeElectricityConsumptionEmissions.setChecked(True if QSettings().value("/YKRTool/VisualizeElectricityConsumptionEmissions", "False", type=str).lower() == 'true' else False)
+        md.checkBoxVisualizePopJobMix.setChecked(True if QSettings().value("/YKRTool/VisualizePopJobMix", "True", type=str).lower() == 'true' else False)
+        md.checkBoxVisualizeGoodZonesForPopJobDensityAndSustainableTransport.setChecked(True if QSettings().value("/YKRTool/VisualizeGoodZonesForPopJobDensityAndSustainableTransport", "True", type=str).lower() == 'true' else False)
+        md.checkBoxVisualizeFloorSpaceRatio.setChecked(True if QSettings().value("/YKRTool/VisualizeFloorSpaceRatio", "True", type=str).lower() == 'true' else False)
+        md.checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone.setChecked(True if QSettings().value("/YKRTool/AddQuickchartIoLinksOfRelativeEmissionsByZone", "False", type=str).lower() == 'true' else False)
+        md.checkBoxAddQuickchartIoLinksOfZoneSquaresAndPopJobPercentagesOfTotalByZone.setChecked(True if QSettings().value("/YKRTool/AddQuickchartIoLinksOfZoneSquaresAndPopJobPercentagesOfTotalByZone", "False", type=str).lower() == 'true' else False)
+
+
+    def saveCalculationSettings(self):
+        md = self.mainDialog
+
+        #
+        #
+        #
+
+        QSettings().setValue("/YKRTool/nameOfTheCO2EstimationRun", md.lineEditNameOfTheCO2EstimationRun.text())
+
+        QSettings().setValue("/YKRTool/useMapLayerForInvestigatedArea", 'True' if md.radioButtonUseMapLayerForInvestigatedArea.isChecked() else 'False')
+        currentLayer = md.comboBoxMapLayer.currentLayer()
+        if currentLayer != None:
+            QSettings().setValue("/YKRTool/mapLayerIdForInvestigatedArea", md.comboBoxMapLayer.currentLayer().id())
+            QSettings().setValue("/YKRTool/mapLayerNameForInvestigatedArea", md.comboBoxMapLayer.currentLayer().name())
+        QSettings().setValue("/YKRTool/predefinedAreaDatabaseTableName", self.ykrToolDictionaries.getPredefinedAreaDatabaseTableName(md.comboBoxPredefinedArea.currentText()))
+
+        QSettings().setValue("/YKRTool/chosenMunicipalitiesKangasala", 'True' if md.checkBoxMunicipalitiesKangasala.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/chosenMunicipalitiesLempaala", 'True' if md.checkBoxMunicipalitiesLempaala.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/chosenMunicipalitiesNokia", 'True' if md.checkBoxMunicipalitiesNokia.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/chosenMunicipalitiesOrivesi", 'True' if md.checkBoxMunicipalitiesOrivesi.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/chosenMunicipalitiesPirkkala", 'True' if md.checkBoxMunicipalitiesPirkkala.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/chosenMunicipalitiesTampere", 'True' if md.checkBoxMunicipalitiesTampere.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/chosenMunicipalitiesVesilahti", 'True' if md.checkBoxMunicipalitiesVesilahti.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/chosenMunicipalitiesYlojarvi", 'True' if md.checkBoxMunicipalitiesYlojarvi.isChecked() else 'False')
+
+        #
+        # Future emissions
+        #
+
+        QSettings().setValue("/YKRTool/shouldCalculateFuture", 'True' if md.checkBoxCalculateFuture.isChecked() else 'False')
+
+        QSettings().setValue("/YKRTool/predefinedFutureAreaDBTableName", md.comboBoxPredefinedFutureAreas.currentText())
+        QSettings().setValue("/YKRTool/predefinedFutureNetworkDBTableName", md.comboBoxPredefinedFutureNetwork.currentText())
+        QSettings().setValue("/YKRTool/predefinedFutureStopsDBTableName", md.comboBoxPredefinedFutureStops.currentText())
+
+        QSettings().setValue("/YKRTool/futureAreasLoadLayer", 'True' if md.futureAreasLoadLayer.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/futureNetworkLoadLayer", 'True' if md.futureNetworkLoadLayer.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/futureStopsLoadLayer", 'True' if md.futureStopsLoadLayer.isChecked() else 'False')
+
+        futureAreasLayer = md.futureAreasLayerList.currentLayer()
+        if futureAreasLayer != None:
+            QSettings().setValue("/YKRTool/mapLayerIdForfutureAreasLoadLayer", futureAreasLayer.id())
+            QSettings().setValue("/YKRTool/mapLayerNameForfutureAreasLoadLayer", futureAreasLayer.name())
+        futureNetworkLayer = md.futureNetworkLayerList.currentLayer()
+        if futureNetworkLayer != None:
+            QSettings().setValue("/YKRTool/mapLayerIdForfutureNetworkLoadLayer", futureNetworkLayer.id())
+            QSettings().setValue("/YKRTool/mapLayerNameForfutureNetworkLoadLayer", futureNetworkLayer.name())
+        futureStopsLayer = md.futureStopsLayerList.currentLayer()
+        if futureStopsLayer != None:
+            QSettings().setValue("/YKRTool/mapLayerIdForfutureStopsLoadLayer", futureStopsLayer.id())
+            QSettings().setValue("/YKRTool/mapLayerNameForfutureStopsLoadLayer", futureStopsLayer.name())
+
+        QSettings().setValue("/YKRTool/targetYear",  md.targetYear.value())
+
+        #
+        # Advanced settings
+        #
+
+        QSettings().setValue("/YKRTool/IncludeLongDistance", 'True' if md.checkBoxIncludeLongDistance.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/IncludeBusinessTravel", 'True' if md.checkBoxIncludeBusinessTravel.isChecked() else 'False')
+
+        QSettings().setValue("/YKRTool/emissionsAllocationName", self.ykrToolDictionaries.getEmissionAllocationMethodShortName(md.emissionsAllocation.currentText()))
+        QSettings().setValue("/YKRTool/ElectricityTypeName", self.ykrToolDictionaries.getElectricityTypeShortName(md.elecEmissionType.currentText()))
+
+        QSettings().setValue("/YKRTool/NokianMyllyCO2Zeroed", 'True' if md.checkBoxNokianMyllyCO2Zeroed.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/CalculateEmissionsPerPerson", 'True' if md.checkBoxCalculateEmissionsPerPerson.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/CalculateEmissionsPerJob", 'True' if md.checkBoxCalculateEmissionsPerJob.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/CalculateEmissionsPerFloorSpaceSquares", 'True' if md.checkBoxCalculateEmissionsPerFloorSpaceSquares.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/VisualizeTrafficEmissions", 'True' if md.checkBoxVisualizeTrafficEmissions.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/VisualizeThermoEmissions", 'True' if md.checkBoxVisualizeThermoEmissions.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/VisualizeElectricityConsumptionEmissions", 'True' if md.checkBoxVisualizeElectricityConsumptionEmissions.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/VisualizePopJobMix", 'True' if md.checkBoxVisualizePopJobMix.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/VisualizeGoodZonesForPopJobDensityAndSustainableTransport", 'True' if md.checkBoxVisualizeGoodZonesForPopJobDensityAndSustainableTransport.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/VisualizeFloorSpaceRatio", 'True' if md.checkBoxVisualizeFloorSpaceRatio.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/AddQuickchartIoLinksOfRelativeEmissionsByZone", 'True' if md.checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/AddQuickchartIoLinksOfZoneSquaresAndPopJobPercentagesOfTotalByZone", 'True' if md.checkBoxAddQuickchartIoLinksOfZoneSquaresAndPopJobPercentagesOfTotalByZone.isChecked() else 'False')
 
 
     def handleAddQuickchartIoLinksOfRelativeEmissionsByZoneToggle(self, checked):
@@ -551,7 +788,6 @@ class YKRTool:
 
 
     def displayUserSettingsDialog(self):
-        # todo
         self.userSettingsDialog.show()
 
         self.userSettingsDialog.checkBoxLoadDatabaseConnectionSettingsAutomatically.setChecked(True if QSettings().value("/YKRTool/loadDatabaseConnectionSettingsAutomatically", "True", type=str).lower() == 'true' else False)
@@ -572,6 +808,9 @@ class YKRTool:
 
         self.rememberCalculationSettingsExitingQGIS = True if self.userSettingsDialog.checkBoxRememberCalculationSettingsExitingQGIS.isChecked() else False
         QSettings().setValue("/YKRTool/rememberCalculationSettingsExitingQGIS", 'True' if self.rememberCalculationSettingsExitingQGIS else 'False')
+        
+        if self.rememberCalculationSettingsExitingQGIS:
+            self.saveCalculationSettings()
 
 
     def displayDatabaseSettingsDialog(self):
