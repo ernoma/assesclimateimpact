@@ -52,7 +52,7 @@
              <string>This settings affects the runs in the separate QGIS sessions</string>
             </property>
             <property name="text">
-             <string>even when exiting QGIS</string>
+             <string>when exiting QGIS</string>
             </property>
             <property name="checked">
              <bool>false</bool>

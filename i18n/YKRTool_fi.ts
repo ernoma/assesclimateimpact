@@ -510,8 +510,8 @@
     </message>
     <message>
         <location filename="../ui/ykr_tool_user_settings.ui" line="55"/>
-        <source>even when exiting QGIS</source>
-        <translation>myös QGIS: sulkemisen jälkeen</translation>
+        <source>when exiting QGIS</source>
+        <translation>QGIS:n sulkemisen jälkeen</translation>
     </message>
     <message>
         <location filename="../ui/ykr_tool_user_settings.ui" line="68"/>
