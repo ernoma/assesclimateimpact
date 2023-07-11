@@ -47,6 +47,7 @@ from configparser import ConfigParser
 from .ykr_tool_dictionaries import YKRToolDictionaries
 from .ykr_tool_tasks import QueryTask
 from .createdbconnection import createDbConnection
+from .ykr_zones_stats import YKRZonesStats
 from .ykr_tool_upload_layer import YKRToolUploadLayer
 
 class YKRTool:
@@ -120,6 +121,7 @@ class YKRTool:
         self.ykrJobsLayer = None
 
         self.ykrToolDictionaries = YKRToolDictionaries(self.iface, locale)
+        self.ykrZonesStats = YKRZonesStats(self.ykrToolDictionaries, self.connParams, self.iface)
         self.ykrToolUploadLayer = YKRToolUploadLayer(self.iface)
 
         self.investigatedAreaMapLayer = None
@@ -241,6 +243,12 @@ class YKRTool:
             icon_path,
             text=self.tr(u'CO2 Emissions Tool'),
             callback=self.run,
+            parent=self.iface.mainWindow())
+        
+        self.add_action(
+            icon_path,
+            text=self.tr(u'Create YKR summary statistics'),
+            callback=self.runYkrSummaryStatistics,
             parent=self.iface.mainWindow())
 
         # will be set False in run()
@@ -824,12 +832,14 @@ class YKRTool:
         if self.loadDatabaseConnectionSettingsAutomatically:
             if configFilePath != "":
                 self.setConnectionParamsFromFile()
+                self.ykrZonesStats.setConnectionParams(self.connParams)
 
         self.databaseSettingsDialog.loadFileButton.clicked.connect(self.setConnectionParamsFromFile)
 
         result = self.databaseSettingsDialog.exec_()
         if result:
             self.connParams = self.readConnectionParamsFromInput()
+            self.ykrZonesStats.setConnectionParams(self.connParams)
 
 
     def setConnectionParamsFromFile(self):
@@ -844,6 +854,7 @@ class YKRTool:
                 str(e), Qgis.Warning, duration=10)
 
         self.setConnectionParamsFromInput(dbParams)
+
 
     def parseConfigFile(self, filePath):
         '''Reads configuration file and returns parameters as a dict'''
@@ -1475,7 +1486,7 @@ class YKRTool:
         layerNames.extend(self.calculateRelativeGeneralEmissions(uid, outputSchemaName, outputTableName))
         layerNames.append((self.tr('CO2 total grid') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/CO2_t_grid.qml')))
         layerNames.append((self.tr('YKR Zones (UZ and urban-countryside)') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/zones.qml')))
-        # todo Visualize population grid, employees grid and floor space grid
+        # Visualize population grid, employees grid and floor space grid
         layerNames.append((self.tr('Population count') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/Population.qml')))
         layerNames.append((self.tr('Employee count') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/employees.qml')))
         layerNames.append((self.tr('Floor space (m2)') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/floorspace.qml')))
@@ -3902,3 +3913,10 @@ class YKRTool:
         self.cleanUpSession()
         self.iface.messageBar().pushMessage(self.tr('Error in performing calculation'),\
             self.tr('See further info in the error log'), Qgis.Critical, duration=0)
+
+    def runYkrSummaryStatistics(self):
+        '''Run summary statistics for YKR grid'''
+        self.iface.messageBar().pushMessage(self.tr('Creating summary statistics'),\
+            self.tr('This may take a while'), Qgis.Info, duration=0)
+        self.ykrZonesStats.calculateYKRZoneEmissions('3c250050-0a4d-4726-b3f5-26e8456e2992', 'user_output', 'output_dev_3c250050-0a4d-4726-b3f5-26e8456e2992')
+        self.iface.messageBar().pushMessage(self.tr('Summary statistics ready'), Qgis.Info, duration=0)

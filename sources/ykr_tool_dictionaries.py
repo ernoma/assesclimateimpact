@@ -159,6 +159,42 @@ class YKRToolDictionaries:
             }
         }
 
+        # the list of YKR zones
+        self.PredefinedUrbanRuralZoningAreas = {
+            "fi": {
+                'Keskustan jalankulkuvyöhyke': '1',
+                'Keskustan reunavyöhyke': '2',
+                'Intensiivinen joukkoliikennevyöhyke': '3',
+                'Joukkoliikennevyöhyke': '4',
+                'Autovyöhyke': '5',
+                'Alakeskuksen jalankulkuvyöhyke': '10',
+                'Sisempi kaupunkialue': '81',
+                'Ulompi kaupunkialue': '82',
+                'Kaupungin kehysalue': '83',
+                'Maaseudun paikalliskeskus': '84',
+                'Kaupungin läheinen maaseutu': '85',
+                'Ydinmaaseutu': '86',
+                'Harvaan asuttu maaseutu': '87',
+                'Hervanta (alakeskus, HLT:ssä eroja)': '837101'
+            },
+            "en": {
+                'Pedestrian zone': '1',
+                'Fringe of pedestrian zone': '2',
+                'Intensive transit zone': '3',
+                'Transit zone': '4',
+                'Car-oriented zone': '5',
+                'Pedestrian zone of a subcentre': '10',
+                'Inner urban area': '81',
+                'Outer urban area': '82',
+                'Peri-urban area': '83',
+                'Local centres in rural areas': '84',
+                'Rural areas close to urban areas': '85',
+                'Rural heartland areas': '86',
+                'Sparsely populated rural areas': '87',
+                'Hervanta (subcentre, HLT differs)': '837101'
+            }
+        }
+
 
     def getPITKOScenarioNames(self):
         if self.locale not in self.PITKOScenarios:
@@ -245,14 +281,14 @@ class YKRToolDictionaries:
             return self.PredefinedFutureZoningAreas[self.locale].keys()
 
 
-    def getPredefinedFutureZoningAreasDatabaseTableName(self, predefinedFutureZoningAreasUserFriendlyName):
+    def getPredefinedFutureZoningAreaNumber(self, predefinedFutureZoningAreasUserFriendlyName):
         if self.locale not in self.PredefinedFutureZoningAreas:
             return self.PredefinedFutureZoningAreas["en"][predefinedFutureZoningAreasUserFriendlyName]
         else:
             return self.PredefinedFutureZoningAreas[self.locale][predefinedFutureZoningAreasUserFriendlyName]
 
 
-    def getPredefinedFutureZoningAreaNameFromDatabaseTableName(self, PredefinedFutureZoningAreaTableName):
+    def getPredefinedFutureZoningAreaUserFriendlyName(self, PredefinedFutureZoningAreaNumber):
         if self.locale not in self.PredefinedFutureZoningAreas:
             key_list = list(self.PredefinedFutureZoningAreas["en"].keys())
             val_list = list(self.PredefinedFutureZoningAreas["en"].values())
@@ -261,9 +297,9 @@ class YKRToolDictionaries:
             val_list = list(self.PredefinedFutureZoningAreas[self.locale].values())
 
         try:
-            position = val_list.index(PredefinedFutureZoningAreaTableName)
+            position = val_list.index(PredefinedFutureZoningAreaNumber)
         except ValueError as e:
-            return PredefinedFutureZoningAreaTableName
+            return PredefinedFutureZoningAreaNumber
 
         return key_list[position]
 
@@ -388,3 +424,32 @@ class YKRToolDictionaries:
             return ElectricityTypeName
 
         return key_list[position]
+
+    
+    def getPredefinedUrbanRuralZoningAreaKeys(self):
+        if self.locale not in self.PredefinedUrbanRuralZoningAreas:
+            return self.PredefinedUrbanRuralZoningAreas["en"].keys()
+        else:
+            return self.PredefinedUrbanRuralZoningAreas[self.locale].keys()
+        
+    def getPredefinedUrbanRuralZoningAreaValue(self, userFriendlyName):
+        if self.locale not in self.PredefinedUrbanRuralZoningAreas:
+            return self.PredefinedUrbanRuralZoningAreas["en"][userFriendlyName]
+        else:
+            return self.PredefinedUrbanRuralZoningAreas[self.locale][userFriendlyName]
+        
+    def getPredefinedUrbanRuralZoningAreaName(self, predefinedUrbanRuralZoningAreaValue):
+        if self.locale not in self.PredefinedUrbanRuralZoningAreas:
+            key_list = list(self.PredefinedUrbanRuralZoningAreas["en"].keys())
+            val_list = list(self.PredefinedUrbanRuralZoningAreas["en"].values())
+        else:
+            key_list = list(self.PredefinedUrbanRuralZoningAreas[self.locale].keys())
+            val_list = list(self.PredefinedUrbanRuralZoningAreas[self.locale].values())
+
+        try:
+            position = val_list.index(predefinedUrbanRuralZoningAreaValue)
+        except ValueError as e:
+            return predefinedUrbanRuralZoningAreaValue
+
+        return key_list[position]
+    

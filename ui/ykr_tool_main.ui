@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1112</width>
-    <height>1104</height>
+    <width>1104</width>
+    <height>1078</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -353,6 +353,13 @@
         <string>User Input Data for the Future Estimation</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QCheckBox" name="checkBoxCreateTimeSeriesVisualization">
+          <property name="text">
+           <string>Create time series visualization</string>
+          </property>
+         </widget>
+        </item>
         <item>
          <widget class="QgsCollapsibleGroupBox" name="futureRequired">
           <property name="enabled">
