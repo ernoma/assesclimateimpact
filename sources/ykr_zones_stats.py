@@ -85,7 +85,7 @@ class YKRZonesStats:
                         emissionCalculationResultTypes.append(field.name())
 
 
-        outputTableName = 'stats_' + outputBaseTableName
+        outputTableName = 's' + outputBaseTableName
         # Create table for storing YKR zone emission calculation results
         sql = 'CREATE TABLE IF NOT EXISTS ' + outputSchemaName + '."' + outputTableName + '" (id serial primary key, sid varchar, geom geometry(MultiPolygon, 3067), zone_name varchar, year integer, '
         for emissionCalculationResultType in emissionCalculationResultTypes:
@@ -133,13 +133,13 @@ class YKRZonesStats:
                 queries.append(sql)
 
         # 4. Create new table for storing quickchart.io charts for each emission calculation result type year by year, if it does not exist
-        sql = 'CREATE TABLE IF NOT EXISTS ' + outputSchemaName + '."stats_charts_' + outputBaseTableName + '" (id serial primary key, sid varchar, geom geometry(MultiPolygon, 3067), year integer, emission_calculation_result_type varchar, chart_url varchar);'
+        sql = 'CREATE TABLE IF NOT EXISTS ' + outputSchemaName + '."sc' + outputBaseTableName + '" (id serial primary key, sid varchar, geom geometry(MultiPolygon, 3067), year integer, emission_calculation_result_type varchar, chart_url varchar);'
         queries.append(sql)
         
         # 5. Create SQL query that creates database table entry separately for each emission calculation result type
         for year in range(baseYear, targetYear + 1):
             for emissionCalculationResultType in emissionCalculationResultTypes:
-                sql = 'INSERT INTO ' + outputSchemaName + '."stats_charts_' + outputBaseTableName + '" (sid, year, emission_calculation_result_type, chart_url) VALUES (\'' + uuid + "\', " + str(year) + ", '" + emissionCalculationResultType + "', "
+                sql = 'INSERT INTO ' + outputSchemaName + '."sc' + outputBaseTableName + '" (sid, year, emission_calculation_result_type, chart_url) VALUES (\'' + uuid + "\', " + str(year) + ", '" + emissionCalculationResultType + "', "
                 sql += "'https://quickchart.io/chart?w=600&h=300&c={type:''bar'',data:{labels:["
                 for ykrZoneName in ykrEmissions:
                     sql += "''" + ykrZoneName + "'', "
@@ -164,7 +164,7 @@ class YKRZonesStats:
         self.addQueriesToDatabase(queries)
 
         # 8. Return table names list
-        return [outputSchemaName + '.' + outputTableName, outputSchemaName + '.stats_charts_' + outputBaseTableName]
+        return [outputSchemaName + '.' + outputTableName, outputSchemaName + '.sc' + outputBaseTableName]
         
 
 

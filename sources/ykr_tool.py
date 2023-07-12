@@ -42,6 +42,7 @@ import uuid
 import os.path
 import psycopg2
 import datetime, getpass
+import re
 import traceback
 from configparser import ConfigParser
 from .ykr_tool_dictionaries import YKRToolDictionaries
@@ -1298,11 +1299,59 @@ class YKRTool:
             self.cleanUpSession()
             return False
 
+
+    def getOutputTableName(self):
+        '''Returns the name of the output table'''
+        outputTableName = 'o_'
+
+        if self.connParams != None and self.connParams['user'] != None and self.connParams['user'] != '':
+            outputTableName += self.connParams['user'][:13] + '_'
+        else:
+            usr_getpass = getpass.getuser()
+            if usr_getpass != None and usr_getpass != '':
+                usr_getpass = re.sub(r'\W+', '', usr_getpass)
+    
+                # Convert to lowercase
+                usr_getpass = usr_getpass.lower()
+                
+                # Replace scandinavian characters
+                usr_getpass = usr_getpass.replace('ä', 'a')
+                usr_getpass = usr_getpass.replace('ö', 'o')
+                usr_getpass = usr_getpass.replace('å', 'a')
+
+                outputTableName += usr_getpass[:13] + '_'
+            else:
+                outputTableName += 'unknown_'
+
+        #
+
+        if self.NameOfTheCO2EstimationRun != None and self.NameOfTheCO2EstimationRun != '':
+            table_name = re.sub(r'\W+', '', self.NameOfTheCO2EstimationRun)
+
+            # Replace spaces with underscores
+            table_name = table_name.replace(' ', '_')
+        
+            # Convert to lowercase
+            table_name = table_name.lower()
+            
+            # Replace scandinavian characters
+            table_name = table_name.replace('ä', 'a')
+            table_name = table_name.replace('ö', 'o')
+            table_name = table_name.replace('å', 'a')
+
+            outputTableName += table_name[:11] + '_'
+
+        outputTableName += self.sessionParams['uuid'].replace('-', '')
+        
+        return outputTableName
+
+
     def getCalculationQueries(self):
         '''Generate queries to call processing functions in database'''
 
+        outputTableName = self.getOutputTableName()
+
         vals = {
-            'uuid': self.sessionParams['uuid'],
             'municipalities': self.municipalitiesArrayString,
             'aoi': self.predefinedAreaDBTableName,
             'includeLongDistance': 'true' if self.includeLongDistance else 'false',
@@ -1317,6 +1366,7 @@ class YKRTool:
             'elecEmissionType': self.elecEmissionType,
             'baseYear': self.sessionParams['baseYear'],
             # 'targetYear': 2023, #self.sessionParams['baseYear'],
+            'outputTableName': outputTableName
         }
         queries = []
         if not self.calculateFuture:
@@ -1325,7 +1375,7 @@ class YKRTool:
             # }
             # vals.update(presentYearVals)
             
-            query = '''CREATE TABLE user_output."output_dev_{uuid}" AS SELECT * FROM CO2_CalculateEmissionsLoop({municipalities}, '{aoi}', {includeLongDistance}, {includeBusinessTravel}, '{pitkoScenario}', '{emissionsAllocation}', '{elecEmissionType}', '{baseYear}', '{baseYear}');'''.format(**vals)
+            query = '''CREATE TABLE user_output."{outputTableName}" AS SELECT * FROM CO2_CalculateEmissionsLoop({municipalities}, '{aoi}', {includeLongDistance}, {includeBusinessTravel}, '{pitkoScenario}', '{emissionsAllocation}', '{elecEmissionType}', '{baseYear}', '{baseYear}');'''.format(**vals)
 
             # query = '''CREATE TABLE user_output."output_{0}" AS SELECT * FROM CO2_CalculateEmissions(array{1}, '{2}', {3}, {4}, array{5}, '{6}', '{7}', '{8}', {9}, {10});'''.format(self.sessionParams['uuid'], [837], self.predefinedAreaDBTableName, 'false' ,'true', [2023, 2023, 2023], self.pitkoScenario, self.emissionsAllocation, self.elecEmissionType, 2023, 2023)
 
@@ -1359,7 +1409,8 @@ class YKRTool:
             'targetYear': self.targetYear
         }
         vals.update(futureVals)
-        query = """CREATE TABLE user_output."output_dev_{uuid}" AS
+        
+        query = """CREATE TABLE user_output."{outputTableName}" AS
         SELECT * FROM CO2_CalculateEmissionsLoop({municipalities}, '{aoi}', {includeLongDistance}, {includeBusinessTravel}, '{pitkoScenario}', '{emissionsAllocation}', '{elecEmissionType}', '{baseYear}', '{targetYear}', '{fAreas}'""".format(**vals)
         # query = """CREATE TABLE user_output."output_dev_{uuid}" AS
         # SELECT * FROM CO2_CalculateEmissions({municipalities}, '{aoi}', {includeLongDistance}, {includeBusinessTravel}, {calculationYears}, '{pitkoScenario}', '{emissionsAllocation}', '{elecEmissionType}', '{baseYear}', '{targetYear}', '{fAreas}'""".format(**vals)
@@ -1411,7 +1462,7 @@ class YKRTool:
         try:
             self.writeSessionInfo()
             self.iface.messageBar().pushMessage(self.tr('Ready'), self.tr('Emission calculation ') +\
-                str(self.sessionParams['uuid']) + self.tr(' is ready'), Qgis.Success, duration=0)
+                str(self.getOutputTableName()) + self.tr(' is ready'), Qgis.Success, duration=0)
         except Exception as e:
             self.iface.messageBar().pushMessage(self.tr('Error in storing session data: '),\
                 str(e), Qgis.Warning, duration=0)
@@ -1430,7 +1481,8 @@ class YKRTool:
     def writeSessionInfo(self):
         '''Writes session info to user_output.sessions_v2 table'''
         nameOfTheCO2EstimationRun = self.NameOfTheCO2EstimationRun if self.NameOfTheCO2EstimationRun != None else ''
-        resultsTableName = 'output_dev_' + self.sessionParams['uuid']
+        outputTableName = self.getOutputTableName()
+        resultsTableName = outputTableName
         predefinedAreaName = self.ykrToolDictionaries.getPredefinedAreaNameFromDatabaseTableName(self.predefinedAreaDBTableName)
         municipalitiesArrayString = self.municipalitiesArrayString
         futureZoningAreasTableName = self.futureZoningAreasTableName
@@ -1453,7 +1505,7 @@ class YKRTool:
 
     def addResultAsLayers(self):
         outputSchemaName = 'user_output'
-        outputTableName = 'output_dev_' + self.sessionParams['uuid']
+        outputTableName = self.getOutputTableName()
         uid = self.sessionParams['uuid']
 
         if self.mainDialog.checkBoxNokianMyllyCO2Zeroed.isChecked():
@@ -1467,7 +1519,7 @@ class YKRTool:
 
 
         #QgsProject.instance().layerTreeRegistryBridge().setLayerInsertionPoint( QgsProject.instance().layerTreeRoot(), 0 )
-        groupName = self.tr("emissions calculation results") + " {}".format(uid)
+        groupName = self.tr("emissions calculation results") + " {}".format(outputTableName)
         #root = QgsProject.instance().layerTreeRoot()
         #rootGroup = root.insertGroup(0, groupName)
 
