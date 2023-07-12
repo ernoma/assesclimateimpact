@@ -245,11 +245,11 @@ class YKRTool:
             callback=self.run,
             parent=self.iface.mainWindow())
         
-        self.add_action(
-            icon_path,
-            text=self.tr(u'Create YKR summary statistics'),
-            callback=self.runYkrSummaryStatistics,
-            parent=self.iface.mainWindow())
+        # self.add_action(
+        #     icon_path,
+        #     text=self.tr(u'Create YKR summary statistics'),
+        #     callback=self.runYkrSummaryStatistics,
+        #     parent=self.iface.mainWindow())
 
         # will be set False in run()
         self.first_start = True
@@ -461,6 +461,7 @@ class YKRTool:
         md.checkBoxVisualizePopJobMix.setChecked(True)
         md.checkBoxVisualizeGoodZonesForPopJobDensityAndSustainableTransport.setChecked(True)
         md.checkBoxVisualizeFloorSpaceRatio.setChecked(True)
+        md.checkBoxCreateYKRZoneSummaryStats.setChecked(True)
         md.checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone.setChecked(False)
         md.checkBoxAddQuickchartIoLinksOfZoneSquaresAndPopJobPercentagesOfTotalByZone.setChecked(False)
     
@@ -606,6 +607,9 @@ class YKRTool:
         md.checkBoxVisualizePopJobMix.setChecked(True if QSettings().value("/YKRTool/VisualizePopJobMix", "True", type=str).lower() == 'true' else False)
         md.checkBoxVisualizeGoodZonesForPopJobDensityAndSustainableTransport.setChecked(True if QSettings().value("/YKRTool/VisualizeGoodZonesForPopJobDensityAndSustainableTransport", "True", type=str).lower() == 'true' else False)
         md.checkBoxVisualizeFloorSpaceRatio.setChecked(True if QSettings().value("/YKRTool/VisualizeFloorSpaceRatio", "True", type=str).lower() == 'true' else False)
+
+        md.checkBoxCreateYKRZoneSummaryStats.setChecked(True if QSettings().value("/YKRTool/CreateYKRZoneSummaryStats", "True", type=str).lower() == 'true' else False)
+
         md.checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone.setChecked(True if QSettings().value("/YKRTool/AddQuickchartIoLinksOfRelativeEmissionsByZone", "False", type=str).lower() == 'true' else False)
         md.checkBoxAddQuickchartIoLinksOfZoneSquaresAndPopJobPercentagesOfTotalByZone.setChecked(True if QSettings().value("/YKRTool/AddQuickchartIoLinksOfZoneSquaresAndPopJobPercentagesOfTotalByZone", "False", type=str).lower() == 'true' else False)
 
@@ -684,6 +688,7 @@ class YKRTool:
         QSettings().setValue("/YKRTool/VisualizePopJobMix", 'True' if md.checkBoxVisualizePopJobMix.isChecked() else 'False')
         QSettings().setValue("/YKRTool/VisualizeGoodZonesForPopJobDensityAndSustainableTransport", 'True' if md.checkBoxVisualizeGoodZonesForPopJobDensityAndSustainableTransport.isChecked() else 'False')
         QSettings().setValue("/YKRTool/VisualizeFloorSpaceRatio", 'True' if md.checkBoxVisualizeFloorSpaceRatio.isChecked() else 'False')
+        QSettings().setValue("/YKRTool/CreateYKRZoneSummaryStats", 'True' if md.checkBoxCreateYKRZoneSummaryStats.isChecked() else 'False')
         QSettings().setValue("/YKRTool/AddQuickchartIoLinksOfRelativeEmissionsByZone", 'True' if md.checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone.isChecked() else 'False')
         QSettings().setValue("/YKRTool/AddQuickchartIoLinksOfZoneSquaresAndPopJobPercentagesOfTotalByZone", 'True' if md.checkBoxAddQuickchartIoLinksOfZoneSquaresAndPopJobPercentagesOfTotalByZone.isChecked() else 'False')
 
@@ -1425,6 +1430,7 @@ class YKRTool:
     def writeSessionInfo(self):
         '''Writes session info to user_output.sessions_v2 table'''
         nameOfTheCO2EstimationRun = self.NameOfTheCO2EstimationRun if self.NameOfTheCO2EstimationRun != None else ''
+        resultsTableName = 'output_dev_' + self.sessionParams['uuid']
         predefinedAreaName = self.ykrToolDictionaries.getPredefinedAreaNameFromDatabaseTableName(self.predefinedAreaDBTableName)
         municipalitiesArrayString = self.municipalitiesArrayString
         futureZoningAreasTableName = self.futureZoningAreasTableName
@@ -1434,13 +1440,13 @@ class YKRTool:
         user = self.sessionParams['user']
         startTime = self.sessionParams['startTime']
         baseYear = self.sessionParams['baseYear']
-        targetYear = self.targetYear
+        targetYear = self.targetYear if self.calculateFuture else None
         pitkoScenario = self.pitkoScenario[:6]
         emissionsAllocation = self.emissionsAllocation
         elecEmissionType = self.elecEmissionType
 
-        self.cur.execute('''INSERT INTO user_output.sessions_v2(session_name, aoi, municipalities, kt_table_name, kv_table_name, joli_table_name, sid, usr, starttime, baseyear, targetyear, calculationScenario, metodi, paastolaji) VALUES (%s, %s, %s, %s, %s, %s,
-        %s, %s, %s, %s, %s, %s, %s, %s)''', (nameOfTheCO2EstimationRun, predefinedAreaName, municipalitiesArrayString, futureZoningAreasTableName, futureNetworkLayerDBTableName, futureStopsLayerDBTableName, uuid, user, startTime, baseYear, targetYear,\
+        self.cur.execute('''INSERT INTO user_output.sessions_v2(session_name, results_table_name, aoi, municipalities, kt_table_name, kv_table_name, joli_table_name, sid, usr, starttime, baseyear, targetyear, calculationScenario, metodi, paastolaji) VALUES (%s, %s, %s, %s, %s, %s, %s,
+        %s, %s, %s, %s, %s, %s, %s, %s)''', (nameOfTheCO2EstimationRun, resultsTableName, predefinedAreaName, municipalitiesArrayString, futureZoningAreasTableName, futureNetworkLayerDBTableName, futureStopsLayerDBTableName, uuid, user, startTime, baseYear, targetYear,\
             pitkoScenario, emissionsAllocation, elecEmissionType, ))
         self.conn.commit()
 
@@ -1490,6 +1496,9 @@ class YKRTool:
         layerNames.append((self.tr('Population count') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/Population.qml')))
         layerNames.append((self.tr('Employee count') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/employees.qml')))
         layerNames.append((self.tr('Floor space (m2)') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/floorspace.qml')))
+
+        if self.mainDialog.checkBoxCreateYKRZoneSummaryStats.isChecked():
+            self.ykrZonesStats.calculateYKRZoneEmissions(uid, outputSchemaName, outputTableName)
 
         self.createQuickchartIoLinks(uid, outputSchemaName, outputTableName)
 
@@ -3914,9 +3923,9 @@ class YKRTool:
         self.iface.messageBar().pushMessage(self.tr('Error in performing calculation'),\
             self.tr('See further info in the error log'), Qgis.Critical, duration=0)
 
-    def runYkrSummaryStatistics(self):
-        '''Run summary statistics for YKR grid'''
-        self.iface.messageBar().pushMessage(self.tr('Creating summary statistics'),\
-            self.tr('This may take a while'), Qgis.Info, duration=0)
-        self.ykrZonesStats.calculateYKRZoneEmissions('3c250050-0a4d-4726-b3f5-26e8456e2992', 'user_output', 'output_dev_3c250050-0a4d-4726-b3f5-26e8456e2992')
-        self.iface.messageBar().pushMessage(self.tr('Summary statistics ready'), Qgis.Info, duration=0)
+    # def runYkrSummaryStatistics(self):
+    #     '''Run summary statistics for YKR grid'''
+    #     self.iface.messageBar().pushMessage(self.tr('Creating summary statistics'),\
+    #         self.tr('This may take a while'), Qgis.Info, duration=0)
+    #     self.ykrZonesStats.calculateYKRZoneEmissions('3c250050-0a4d-4726-b3f5-26e8456e2992', 'user_output', 'output_dev_3c250050-0a4d-4726-b3f5-26e8456e2992')
+    #     self.iface.messageBar().pushMessage(self.tr('Summary statistics ready'), Qgis.Info, duration=0)

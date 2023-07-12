@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1104</width>
-    <height>1078</height>
+    <height>1128</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -353,13 +353,6 @@
         <string>User Input Data for the Future Estimation</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
-        <item>
-         <widget class="QCheckBox" name="checkBoxCreateTimeSeriesVisualization">
-          <property name="text">
-           <string>Create time series visualization</string>
-          </property>
-         </widget>
-        </item>
         <item>
          <widget class="QgsCollapsibleGroupBox" name="futureRequired">
           <property name="enabled">
@@ -843,7 +836,7 @@
             </property>
            </widget>
           </item>
-          <item row="20" column="0">
+          <item row="21" column="0">
            <widget class="QCheckBox" name="checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone">
             <property name="toolTip">
              <string>Static bar graph will be created (URL)</string>
@@ -856,7 +849,7 @@
             </property>
            </widget>
           </item>
-          <item row="21" column="0">
+          <item row="22" column="0">
            <widget class="QCheckBox" name="checkBoxAddQuickchartIoLinksOfZoneSquaresAndPopJobPercentagesOfTotalByZone">
             <property name="toolTip">
              <string>Static bar graph will be created (URL)</string>
@@ -866,6 +859,19 @@
             </property>
             <property name="checked">
              <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="20" column="0">
+           <widget class="QCheckBox" name="checkBoxCreateYKRZoneSummaryStats">
+            <property name="toolTip">
+             <string>If checked a few yearly summary statistics will be calculated for YKR zones and summary table names stored to sessions_v2 table</string>
+            </property>
+            <property name="text">
+             <string>Create YKR Zone Summary statistics</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>

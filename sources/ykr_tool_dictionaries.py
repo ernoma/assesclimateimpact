@@ -281,7 +281,7 @@ class YKRToolDictionaries:
             return self.PredefinedFutureZoningAreas[self.locale].keys()
 
 
-    def getPredefinedFutureZoningAreaNumber(self, predefinedFutureZoningAreasUserFriendlyName):
+    def getPredefinedFutureZoningAreasDatabaseTableName(self, predefinedFutureZoningAreasUserFriendlyName):
         if self.locale not in self.PredefinedFutureZoningAreas:
             return self.PredefinedFutureZoningAreas["en"][predefinedFutureZoningAreasUserFriendlyName]
         else:
