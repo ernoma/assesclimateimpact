@@ -97,7 +97,7 @@ class YKRTool:
 
         self.rememberCalculationSettingsBetweenRuns = True if QSettings().value("/YKRTool/rememberCalculationSettingsBetweenRuns", "True", type=str).lower() == 'true' else False
 
-        self.rememberCalculationSettingsExitingQGIS = True if QSettings().value("/YKRTool/rememberCalculationSettingsExitingQGIS", "True", type=str).lower() == 'true' else False
+        self.rememberCalculationSettingsExitingQGIS = True if QSettings().value("/YKRTool/rememberCalculationSettingsExitingQGIS", "False", type=str).lower() == 'true' else False
         # * if true then store to QSettings and load from QSettings when exiting & starting
         # * if false then do not load  from QSettings and store to QSettings when starting & exiting
 
@@ -499,8 +499,9 @@ class YKRTool:
                 if foundMapLayerIdForInvestigatedArea == False:
                     self.iface.messageBar().pushMessage(self.tr('Could not find map layer for AOI that was specified in the saved settings'), self.tr('The map layer name was ') + mapLayerNameForInvestigatedArea, Qgis.Warning)
         self.predefinedAreaDBTableName = QSettings().value("/YKRTool/predefinedAreaDatabaseTableName", "", type=str)
-        predefinedAreaName = self.ykrToolDictionaries.getPredefinedAreaNameFromDatabaseTableName(self.predefinedAreaDBTableName)
-        md.comboBoxPredefinedArea.setCurrentText(predefinedAreaName)
+        if self.predefinedAreaDBTableName != "":
+            predefinedAreaName = self.ykrToolDictionaries.getPredefinedAreaNameFromDatabaseTableName(self.predefinedAreaDBTableName)
+            md.comboBoxPredefinedArea.setCurrentText(predefinedAreaName)
 
         md.checkBoxMunicipalitiesKangasala.setChecked(True if QSettings().value("/YKRTool/chosenMunicipalitiesKangasala", "True", type=str).lower() == 'true' else False)
         md.checkBoxMunicipalitiesLempaala.setChecked(True if QSettings().value("/YKRTool/chosenMunicipalitiesLempaala", "True", type=str).lower() == 'true' else False)
@@ -520,17 +521,20 @@ class YKRTool:
             md.futureBox.setEnabled(True)
             md.checkBoxCalculateFuture.setChecked(True)
 
-        self.futureZoningAreasTableName = QSettings().value("/YKRTool/predefinedFutureAreaDBTableName", "", type=str)
-        predefinedFutureZoningAreasName = self.ykrToolDictionaries.getPredefinedFutureZoningAreaNameFromDatabaseTableName(self.futureZoningAreasTableName)
-        md.comboBoxPredefinedFutureAreas.setCurrentText(predefinedFutureZoningAreasName)
+        predefinedFutureZoningAreasName = QSettings().value("/YKRTool/predefinedFutureAreaDBTableName", "", type=str)
+        if predefinedFutureZoningAreasName != "":
+            self.futureZoningAreasTableName = self.ykrToolDictionaries.getPredefinedFutureZoningAreasDatabaseTableName(predefinedFutureZoningAreasName)
+            md.comboBoxPredefinedFutureAreas.setCurrentText(predefinedFutureZoningAreasName)
 
-        self.futureNetworkTableName = QSettings().value("/YKRTool/predefinedFutureNetworkDBTableName", "", type=str)
-        predefinedFutureNetworkName = self.ykrToolDictionaries.getPredefinedFutureUrbanCenterNameFromDatabaseTableName(self.futureNetworkTableName)
-        md.comboBoxPredefinedFutureNetwork.setCurrentText(predefinedFutureNetworkName)
+        predefinedFutureNetworkName = QSettings().value("/YKRTool/predefinedFutureNetworkDBTableName", "", type=str)
+        if predefinedFutureNetworkName != "":
+            self.futureNetworkLayerDBTableName = self.ykrToolDictionaries.getPredefinedUrbanCenterLayersDatabaseTableName(predefinedFutureNetworkName)
+            md.comboBoxPredefinedFutureNetwork.setCurrentText(predefinedFutureNetworkName)
 
-        self.futureStopsTableName = QSettings().value("/YKRTool/predefinedFutureStopsDBTableName", "", type=str)
-        predefinedFutureStopsName = self.ykrToolDictionaries.getPredefinedFuturePublicTransportStopsNameFromDatabaseTableName(self.futureStopsTableName)
-        md.comboBoxPredefinedFutureStops.setCurrentText(predefinedFutureStopsName)
+        predefinedFutureStopsName = QSettings().value("/YKRTool/predefinedFutureStopsDBTableName", "", type=str)
+        if predefinedFutureStopsName != "":
+            self.futureStopsLayerDBTableName = self.ykrToolDictionaries.getPredefinedFuturePublicTransportStopsDatabaseTableName(predefinedFutureStopsName)
+            md.comboBoxPredefinedFutureStops.setCurrentText(predefinedFutureStopsName)
 
         futureAreasLoadLayer = True if QSettings().value("/YKRTool/futureAreasLoadLayer", "False", type=str).lower() == 'true' else False
         futureNetworkLoadLayer = True if QSettings().value("/YKRTool/futureNetworkLoadLayer", "False", type=str).lower() == 'true' else False
@@ -593,12 +597,14 @@ class YKRTool:
         md.checkBoxIncludeBusinessTravel.setChecked(True if QSettings().value("/YKRTool/IncludeBusinessTravel", "False", type=str).lower() == 'true' else False)
 
         emissionsAllocationName = QSettings().value("/YKRTool/emissionsAllocationName", "", type=str)
-        emissionsAllocationPredefinedName = self.ykrToolDictionaries.getPredefinedEmissionAllocationMethodName(emissionsAllocationName)
-        md.emissionsAllocation.setCurrentText(emissionsAllocationPredefinedName)
+        if emissionsAllocationName != "":
+            emissionsAllocationPredefinedName = self.ykrToolDictionaries.getPredefinedEmissionAllocationMethodName(emissionsAllocationName)
+            md.emissionsAllocation.setCurrentText(emissionsAllocationPredefinedName)
 
         ElectricityTypeName = QSettings().value("/YKRTool/ElectricityTypeName", "", type=str)
-        ElectricityTypePredefinedName = self.ykrToolDictionaries.getPredefinedElectricityTypeName(ElectricityTypeName)
-        md.elecEmissionType.setCurrentText(ElectricityTypePredefinedName)
+        if ElectricityTypeName != "":
+            ElectricityTypePredefinedName = self.ykrToolDictionaries.getPredefinedElectricityTypeName(ElectricityTypeName)
+            md.elecEmissionType.setCurrentText(ElectricityTypePredefinedName)
 
         md.checkBoxNokianMyllyCO2Zeroed.setChecked(True if QSettings().value("/YKRTool/NokianMyllyCO2Zeroed", "True", type=str).lower() == 'true' else False)
         md.checkBoxCalculateEmissionsPerPerson.setChecked(True if QSettings().value("/YKRTool/CalculateEmissionsPerPerson", "True", type=str).lower() == 'true' else False)
@@ -809,7 +815,7 @@ class YKRTool:
 
         self.userSettingsDialog.checkBoxLoadDatabaseConnectionSettingsAutomatically.setChecked(True if QSettings().value("/YKRTool/loadDatabaseConnectionSettingsAutomatically", "True", type=str).lower() == 'true' else False)
         self.userSettingsDialog.checkBoxRememberCalculationSettingsBetweenRuns.setChecked(True if QSettings().value("/YKRTool/rememberCalculationSettingsBetweenRuns", "True", type=str).lower() == 'true' else False)
-        self.userSettingsDialog.checkBoxRememberCalculationSettingsExitingQGIS.setChecked(True if QSettings().value("/YKRTool/rememberCalculationSettingsExitingQGIS", "True", type=str).lower() == 'true' else False)
+        self.userSettingsDialog.checkBoxRememberCalculationSettingsExitingQGIS.setChecked(True if QSettings().value("/YKRTool/rememberCalculationSettingsExitingQGIS", "False", type=str).lower() == 'true' else False)
 
         result = self.userSettingsDialog.exec_()
         if result:
