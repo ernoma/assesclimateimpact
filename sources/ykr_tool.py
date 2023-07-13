@@ -143,6 +143,8 @@ class YKRTool:
 
         self.inputLayers = []
 
+        self.latestSessionInfo = None
+
         self.resultLayers = []
 
 
@@ -1286,6 +1288,16 @@ class YKRTool:
 
     def runCalculation(self):
         '''Runs the main calculation'''
+        
+        try:
+            self.writeSessionInfoToDatabase()
+            # self.iface.messageBar().pushMessage(self.tr('Ready'), self.tr('Emission calculation ') +\
+            #     str(self.getOutputTableName()) + self.tr(' is ready'), Qgis.Success, duration=0)
+        except Exception as e:
+            self.iface.messageBar().pushMessage(self.tr('Error in storing session data to the database: '),\
+                str(e), Qgis.Warning, duration=0)
+            self.conn.rollback()
+
         try:
             queries = self.getCalculationQueries()
             queryTask = QueryTask(self.connParams, queries)
@@ -1458,15 +1470,22 @@ class YKRTool:
 
 
     def postCalculation(self):
-        '''Called after QueryTask finishes. Writes session info to sessions_v2 table and closes session'''
+        '''Called after QueryTask finishes. Updates session info in sessions_v2 table and closes session'''
+
         try:
-            self.writeSessionInfo()
-            self.iface.messageBar().pushMessage(self.tr('Ready'), self.tr('Emission calculation ') +\
-                str(self.getOutputTableName()) + self.tr(' is ready'), Qgis.Success, duration=0)
+            now = datetime.datetime.now()
+            endtime = now.strftime("%Y%m%d_%H%M%S")
+            self.cur.execute('UPDATE user_output.sessions_v2 SET endtime = %s WHERE sid = %s', (endtime, self.sessionParams['uuid'],))
+            self.conn.commit()
         except Exception as e:
-            self.iface.messageBar().pushMessage(self.tr('Error in storing session data: '),\
+            self.iface.messageBar().pushMessage(
+                self.tr('Error in adding endtime to sessions_v2 table ') + '{}'.format(self.sessionParams['uuid']),
                 str(e), Qgis.Warning, duration=0)
             self.conn.rollback()
+
+        self.iface.messageBar().pushMessage(self.tr('Ready'), self.tr('Emission calculation ') +\
+                str(self.getOutputTableName()) + self.tr(' is ready'), Qgis.Success, duration=0)
+
         try:
             self.addResultAsLayers()
         except Exception as e:
@@ -1478,28 +1497,35 @@ class YKRTool:
             self.iface.messageBar().pushMessage(self.tr('Error in cleaning up: '), str(e), Qgis.Warning, duration=0)
 
 
-    def writeSessionInfo(self):
+    def writeSessionInfoToDatabase(self):
         '''Writes session info to user_output.sessions_v2 table'''
-        nameOfTheCO2EstimationRun = self.NameOfTheCO2EstimationRun if self.NameOfTheCO2EstimationRun != None else ''
-        outputTableName = self.getOutputTableName()
-        resultsTableName = outputTableName
-        predefinedAreaName = self.ykrToolDictionaries.getPredefinedAreaNameFromDatabaseTableName(self.predefinedAreaDBTableName)
-        municipalitiesArrayString = self.municipalitiesArrayString
-        futureZoningAreasTableName = self.futureZoningAreasTableName
-        futureNetworkLayerDBTableName = self.futureNetworkLayerDBTableName
-        futureStopsLayerDBTableName = self.futureStopsLayerDBTableName
-        uuid = self.sessionParams['uuid']
-        user = self.sessionParams['user']
-        startTime = self.sessionParams['startTime']
-        baseYear = self.sessionParams['baseYear']
-        targetYear = self.targetYear if self.calculateFuture else None
-        pitkoScenario = self.pitkoScenario[:6]
-        emissionsAllocation = self.emissionsAllocation
-        elecEmissionType = self.elecEmissionType
+
+        aoi = self.predefinedAreaDBTableName
+        aoiDatabaseTableName = self.ykrToolDictionaries.getPredefinedAreaNameFromDatabaseTableName(self.predefinedAreaDBTableName)
+        if aoiDatabaseTableName != None and aoiDatabaseTableName != '' and aoiDatabaseTableName != aoi:
+            aoi = aoiDatabaseTableName + ' (' + aoi + ')'
+
+        self.latestSessionInfo = {
+            'session_name': self.NameOfTheCO2EstimationRun if self.NameOfTheCO2EstimationRun != None else '',
+            'results_table_name': self.getOutputTableName(),
+            'aoi': aoi,
+            'municipalities': self.municipalitiesArrayString,
+            'kt_table_name': self.futureZoningAreasTableName,
+            'kv_table_name': self.futureNetworkLayerDBTableName,
+            'joli_table_name': self.futureStopsLayerDBTableName,
+            'sid': self.sessionParams['uuid'],
+            'usr': self.sessionParams['user'],
+            'starttime': self.sessionParams['startTime'],
+            'baseyear': self.sessionParams['baseYear'],
+            'targetyear': self.targetYear if self.calculateFuture else None,
+            'calculationScenario': self.pitkoScenario,
+            'metodi': self.emissionsAllocation,
+            'paastolaji': self.elecEmissionType
+        }
 
         self.cur.execute('''INSERT INTO user_output.sessions_v2(session_name, results_table_name, aoi, municipalities, kt_table_name, kv_table_name, joli_table_name, sid, usr, starttime, baseyear, targetyear, calculationScenario, metodi, paastolaji) VALUES (%s, %s, %s, %s, %s, %s, %s,
-        %s, %s, %s, %s, %s, %s, %s, %s)''', (nameOfTheCO2EstimationRun, resultsTableName, predefinedAreaName, municipalitiesArrayString, futureZoningAreasTableName, futureNetworkLayerDBTableName, futureStopsLayerDBTableName, uuid, user, startTime, baseYear, targetYear,\
-            pitkoScenario, emissionsAllocation, elecEmissionType, ))
+        %s, %s, %s, %s, %s, %s, %s, %s)''', (self.latestSessionInfo['session_name'], self.latestSessionInfo['results_table_name'], self.latestSessionInfo['aoi'], self.latestSessionInfo['municipalities'], self.latestSessionInfo['kt_table_name'], self.latestSessionInfo['kv_table_name'], self.latestSessionInfo['joli_table_name'], self.latestSessionInfo['sid'], self.latestSessionInfo['usr'], self.latestSessionInfo['starttime'], self.latestSessionInfo['baseyear'], self.latestSessionInfo['targetyear'],\
+            self.latestSessionInfo['calculationScenario'], self.latestSessionInfo['metodi'], self.latestSessionInfo['paastolaji'], ))
         self.conn.commit()
 
 
@@ -3970,7 +3996,15 @@ class YKRTool:
 
     def postError(self):
         '''Called after querytask is terminated. Closes session'''
-        self.cur.execute('DROP TABLE IF EXISTS user_input."ykr_{}"'.format(self.sessionParams['uuid']))
+        try:
+            self.cur.execute('UPDATE user_output.sessions_v2 SET results_table_name = NULL WHERE sid = %s', (self.sessionParams['uuid'],))
+            self.conn.commit()
+            self.cur.execute('DROP TABLE IF EXISTS user_input."ykr_{}"'.format(self.sessionParams['uuid']))
+        except Exception as e:
+            self.iface.messageBar().pushMessage(
+                self.tr('Error in cleaning up session after error ') + '{}'.format(self.sessionParams['uuid']),
+                str(e), Qgis.Warning, duration=0)
+            self.conn.rollback()
         self.cleanUpSession()
         self.iface.messageBar().pushMessage(self.tr('Error in performing calculation'),\
             self.tr('See further info in the error log'), Qgis.Critical, duration=0)
