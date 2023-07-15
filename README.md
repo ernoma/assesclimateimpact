@@ -35,7 +35,7 @@ Python-requests may be replaced by the QGIS built-in [QgsFileDownloader](https:/
 
 ***
 
-The below information is not fully uptodate.
+The below information is not fully uptodate. More general uptodate information can be found from: [Urban climate assessment action page of the Tampere Ilmastovahti](https://ilmastovahti.tampere.fi/actions/1.1.1).
 
 ***
 
