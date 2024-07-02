@@ -6,3 +6,6 @@ asetukset.bat
 Thumbs.db
 kehitys.txt
 docs/sessions2.sql
+sources/ykr_tool_transit_stop_emission_scenarios.py
+ui/ykr_tool_transit_stop_emission_scenarios.ui
+apu.py

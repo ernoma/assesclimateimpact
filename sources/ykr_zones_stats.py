@@ -19,21 +19,6 @@ class YKRZonesStats:
         self.connParams = connParams
 
 
-    def createDBConnection(self, retriesLeft=3):
-        conn = None
-        try:
-            conn = createDbConnection(self.connParams)
-        except Exception as e:
-            if retriesLeft > 0:
-                return self.addQueriesToDatabase(queries, retriesLeft - 1)
-            else:
-                self.iface.messageBar().pushMessage(
-                    self.tr('Error in connecting to the database'),
-                    str(e), Qgis.Warning, duration=0)
-                return None
-        return conn
-    
-
     def calculateYKRZoneEmissions(self, uuid, outputSchemaName, outputBaseTableName):
         tableNames = self.createYKRZoneEmissionsStatsTables(uuid, outputSchemaName, outputBaseTableName)
 
@@ -105,11 +90,26 @@ class YKRZonesStats:
                 ykrEmissions[zoneName][year] = {}
                 for emissionCalculationResultType in emissionCalculationResultTypes:
                     ykrEmissions[zoneName][year][emissionCalculationResultType] = 0
+        # 1.1. Add dictoinary entry for YKR zones that are not in predefined urban-rural zoning area dictionary
+        for ykrFeature in ykrLayer.getFeatures():
+            ykrZone = ykrFeature['zone']
+            ykrZoneName = str(self.ykrToolDictionaries.getPredefinedUrbanRuralZoningAreaName(str(ykrZone)))
+            if ykrZoneName not in ykrEmissions:
+                ykrEmissions[ykrZoneName] = {}
+                # iterate from base year to target year
+                for year in range(baseYear, targetYear + 1):
+                    ykrEmissions[ykrZoneName][year] = {}
+                    for emissionCalculationResultType in emissionCalculationResultTypes:
+                        ykrEmissions[ykrZoneName][year][emissionCalculationResultType] = 0
+
+        # # Log ykr zone names to QGIS log
+        # QgsMessageLog.logMessage(str(ykrEmissions.keys()), 'YKRTool', Qgis.Info)
+
         
         # 2. Calculate emission calculation result summaries for each YKR zone year by year
         for ykrFeature in ykrLayer.getFeatures():
             ykrZone = ykrFeature['zone']
-            ykrZoneName = self.ykrToolDictionaries.getPredefinedUrbanRuralZoningAreaName(str(ykrZone))
+            ykrZoneName = str(self.ykrToolDictionaries.getPredefinedUrbanRuralZoningAreaName(str(ykrZone)))
             year = ykrFeature['year'].year()
             for emissionCalculationResultType in emissionCalculationResultTypes:
                 if type(ykrFeature[emissionCalculationResultType]) == QVariant:
@@ -168,10 +168,10 @@ class YKRZonesStats:
         
 
 
-    def addQueriesToDatabase(self, queries, retriesLeft=3):
+    def addQueriesToDatabase(self, queries):
         if len(queries) > 0 and self.connParams is not None:
             conn = None
-            conn = self.createDBConnection()
+            conn = createDbConnection(self.connParams)
 
             try:
                 cur = conn.cursor()

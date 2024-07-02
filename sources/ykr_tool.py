@@ -447,7 +447,7 @@ class YKRTool:
         # Advanced settings
         #
         md.checkBoxIncludeLongDistance.setChecked(True)
-        md.checkBoxIncludeBusinessTravel.setChecked(False)
+        md.checkBoxIncludeBusinessTravel.setChecked(True)
         md.emissionsAllocation.clear()
         names = self.ykrToolDictionaries.getEmissionAllocationMethodNames()
         md.emissionsAllocation.addItems(names)
@@ -459,8 +459,8 @@ class YKRTool:
         md.checkBoxCalculateEmissionsPerJob.setChecked(True)
         md.checkBoxCalculateEmissionsPerFloorSpaceSquares.setChecked(True)
         md.checkBoxVisualizeTrafficEmissions.setChecked(True)
-        md.checkBoxVisualizeThermoEmissions.setChecked(False)
-        md.checkBoxVisualizeElectricityConsumptionEmissions.setChecked(False)
+        md.checkBoxVisualizeThermoEmissions.setChecked(True)
+        md.checkBoxVisualizeElectricityConsumptionEmissions.setChecked(True)
         md.checkBoxVisualizePopJobMix.setChecked(True)
         md.checkBoxVisualizeGoodZonesForPopJobDensityAndSustainableTransport.setChecked(True)
         md.checkBoxVisualizeFloorSpaceRatio.setChecked(True)
@@ -1320,7 +1320,9 @@ class YKRTool:
 
     def getOutputTableName(self):
         '''Returns the name of the output table'''
-        outputTableName = 'o_'
+        # outputTableName = 'o_'
+        # outputTableName = 'z_'
+        outputTableName = 'n_'
 
         if self.connParams != None and self.connParams['user'] != None and self.connParams['user'] != '':
             outputTableName += self.connParams['user'][:13] + '_'
@@ -1372,8 +1374,6 @@ class YKRTool:
         vals = {
             'municipalities': self.municipalitiesArrayString,
             'aoi': self.predefinedAreaDBTableName,
-            'includeLongDistance': 'true' if self.includeLongDistance else 'false',
-            'includeBusinessTravel': 'true' if self.includeBusinessTravel else 'false',
             # 'geomArea': self.geomArea,
             # 'popTable': (self.tableNames[self.ykrPopLayer]).lower(),
             # 'jobTable': (self.tableNames[self.ykrJobsLayer]).lower(),
@@ -1384,7 +1384,9 @@ class YKRTool:
             'elecEmissionType': self.elecEmissionType,
             'baseYear': self.sessionParams['baseYear'],
             # 'targetYear': 2023, #self.sessionParams['baseYear'],
-            'outputTableName': outputTableName
+            'outputTableName': outputTableName,
+            'includeLongDistance': 'true' if self.includeLongDistance else 'false',
+            'includeBusinessTravel': 'true' if self.includeBusinessTravel else 'false'
         }
         queries = []
         if not self.calculateFuture:
@@ -1393,7 +1395,7 @@ class YKRTool:
             # }
             # vals.update(presentYearVals)
             
-            query = '''CREATE TABLE user_output."{outputTableName}" AS SELECT * FROM CO2_CalculateEmissionsLoop({municipalities}, '{aoi}', {includeLongDistance}, {includeBusinessTravel}, '{pitkoScenario}', '{emissionsAllocation}', '{elecEmissionType}', '{baseYear}', '{baseYear}');'''.format(**vals)
+            query = '''CREATE TABLE user_output."{outputTableName}" AS SELECT * FROM CO2_CalculateEmissionsLoop({municipalities}, '{aoi}', '{pitkoScenario}', '{emissionsAllocation}', '{elecEmissionType}', '{baseYear}', '{baseYear}', NULL, NULL, NULL, {includeLongDistance}, {includeBusinessTravel});'''.format(**vals)
 
             # query = '''CREATE TABLE user_output."output_{0}" AS SELECT * FROM CO2_CalculateEmissions(array{1}, '{2}', {3}, {4}, array{5}, '{6}', '{7}', '{8}', {9}, {10});'''.format(self.sessionParams['uuid'], [837], self.predefinedAreaDBTableName, 'false' ,'true', [2023, 2023, 2023], self.pitkoScenario, self.emissionsAllocation, self.elecEmissionType, 2023, 2023)
 
@@ -1429,18 +1431,22 @@ class YKRTool:
         vals.update(futureVals)
         
         query = """CREATE TABLE user_output."{outputTableName}" AS
-        SELECT * FROM CO2_CalculateEmissionsLoop({municipalities}, '{aoi}', {includeLongDistance}, {includeBusinessTravel}, '{pitkoScenario}', '{emissionsAllocation}', '{elecEmissionType}', '{baseYear}', '{targetYear}', '{fAreas}'""".format(**vals)
+        SELECT * FROM CO2_CalculateEmissionsLoop({municipalities}, '{aoi}', '{pitkoScenario}', '{emissionsAllocation}', '{elecEmissionType}', '{baseYear}', '{targetYear}', '{fAreas}'""".format(**vals)
         # query = """CREATE TABLE user_output."output_dev_{uuid}" AS
         # SELECT * FROM CO2_CalculateEmissions({municipalities}, '{aoi}', {includeLongDistance}, {includeBusinessTravel}, {calculationYears}, '{pitkoScenario}', '{emissionsAllocation}', '{elecEmissionType}', '{baseYear}', '{targetYear}', '{fAreas}'""".format(**vals)
 
-        # futureNetworkTableName = (self.tableNames[self.futureNetworkLayer]).lower()
-        if self.futureNetworkLayerDBTableName:
-            query += ", '{}'".format(self.futureNetworkLayerDBTableName)
-        else:
-            query += ", NULL"
         # futureStopsTableName = (self.tableNames[self.futureStopsLayer]).lower()
         if self.futureStopsLayerDBTableName:
             query += ", '{}'".format(self.futureStopsLayerDBTableName)
+        # futureNetworkTableName = (self.tableNames[self.futureNetworkLayer]).lower()
+        else:
+            query += ", NULL"
+
+        if self.futureNetworkLayerDBTableName:
+            query += ", '{}'".format(self.futureNetworkLayerDBTableName)
+
+        query += ", {includeLongDistance}, {includeBusinessTravel}".format(**vals)
+
         query += ')'
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         QgsMessageLog.logMessage(query, 'YKRTool', Qgis.Info)

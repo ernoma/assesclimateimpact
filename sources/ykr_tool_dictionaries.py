@@ -9,7 +9,9 @@ class YKRToolDictionaries:
 
         self.PredefinedAreas = {
             "fi": {
+                'Nurmi-Sorila - karkea': 'user_input.nurmi_sorila_rajaus_karkea_3067',
                 # 'Tampereen kaupunkiseutu (2021)': 'user_input.tre_seutu_kunnat',
+                'Tampereen kantakaupunki': 'user_input.tre_kantakaupunki',
                 'Tampereen kaupunkiseudun rasu 2040 (2021)': 'user_input.seutu_rasu_2040_alue',
                 'Kangasala (2.4.2021)': 'user_input.tre_seutu_kunta_kangasala',
                 'Lempäälä (2.4.2021)': 'user_input.tre_seutu_kunta_lempaala',
@@ -22,7 +24,9 @@ class YKRToolDictionaries:
                 'Tre ksoyk (yk048)': 'user_input.tre_ksoyk'
             },
             "en": {
+                'Nurmi-Sorila - rough': 'user_input.nurmi_sorila_rajaus_karkea_3067',
                 # 'Tampere City Region (2021)': 'user_input.tre_seutu_kunnat',
+                'Tampere downtown': 'user_input.tre_kantakaupunki',
                 'Tampere City Region Structural Plan 2040 (2021)': 'user_input.seutu_rasu_2040_alue',
                 'Kangasala (2.4.2021)': 'user_input.tre_seutu_kunta_kangasala',
                 'Lempäälä (2.4.2021)': 'user_input.tre_seutu_kunta_lempaala',
@@ -69,13 +73,15 @@ class YKRToolDictionaries:
 
         self.PredefinedFutureZoningAreas = {
             "fi": {
-                'Tre kantakaupunki - yk049, valtuustokausi 2017-2021 - kaavaehdotus': 'user_input.kt_bau_kaavaehdotus',
+                'Tre asemakaavoitusohjelma 2024-2028 (20.10.2023)': 'user_input.kt_ak_24_28_20231020_dev',
                 'Tre asemakaavoitusohjelma 2023-2027 (13.12.2022)': 'user_input.kt_ak_23_27_20221213_dev',
+                'Tre kantakaupunki - yk049, valtuustokausi 2017-2021 - kaavaehdotus': 'user_input.kt_bau_kaavaehdotus',
                 'Nurmi-Sorila - yk049, valtuustokausi 2017-2021 - kaavaluonnos': 'user_input.kt_nurmi_sorila'
             },
             "en": {
-                'Tampere downtown - Local master plan, City Council’s term 2017-2021 - plan proposal': 'user_input.kt_bau_kaavaehdotus',
+                'Tre detailed land use planning program 2024-2028 (20.10.2023)': 'user_input.kt_ak_24_28_20231020_dev',
                 'Tre detailed land use planning program 2023-2027 (13.12.2022)': 'user_input.kt_ak_23_27_20221213_dev',
+                'Tampere downtown - Local master plan, City Council’s term 2017-2021 - plan proposal': 'user_input.kt_bau_kaavaehdotus',
                 'Tampere Nurmi-Sorila - Local master plan, City Council’s term 2017-2021 - plan draft': 'user_input.kt_nurmi_sorila'
             }
         }
@@ -148,11 +154,15 @@ class YKRToolDictionaries:
 
         self.PredefinedFuturePublicTransportStopsLayers = {
             "fi": {
+                'Pysäkkiverkko kaupunkiseutu, myös runkobussit, 2023/07 tilanne': 'user_input.joli_myos_runkobussit_seutu_2023_07',
+                'Pysäkkiverkko kaupunkiseutu, myös bussit, 2023/07 tilanne': 'user_input.joli_myos_bussit_seutu_2023_07',
                 'Juna-asema- ja raitiotiepysäkkiverkko kaupunkiseutu, myös suunniteltu, 2023/07 tilanne': 'user_input.joli_lahijuna_ja_raitiotie_seutu_myos_suunniteltu_2023_07',
                 'Juna-asema- ja raitiotiepysäkkiverkko kaupunkiseutu ja kantakaupunki - yk049, valtuustokausi 2017-2021 - kaavaehdotus': 'user_input.joli_lahijuna_ja_raitiotie_tre_seutu_ve_yk049_vaihekaava_ehdotu',
                 'Juna-asema- ja raitiotiepysäkkiverkko - Tre asemakaavoitusohjelma 2023-2027': 'user_input.joli_lahijuna_ja_raitiotie_ak_23_27_v2'
             },
             "en": {
+                'Public transport stops of Tampere city region, also trunk line buses, 2023/07 situation': 'user_input.joli_myos_runkobussit_seutu_2023_07',
+                'Public transport stops of Tampere city region, also buses, 2023/07 situation': 'user_input.joli_myos_bussit_seutu_2023_07',
                 'Railway and tram station transport stops of Tampere city region, also planned, 2023/07 situation': 'user_input.joli_lahijuna_ja_raitiotie_seutu_myos_suunniteltu_2023_07',
                 'Railway and tram station transport stops of Tampere city region and downtown - Local master plan, City Council’s term 2017-2021 - plan proposal': 'user_input.joli_lahijuna_ja_raitiotie_tre_seutu_ve_yk049_vaihekaava_ehdotu',
                 'Railway and tram station transport stops - Tre detailed land use planning program 2023-2027': 'user_input.joli_lahijuna_ja_raitiotie_ak_23_27_v2'
