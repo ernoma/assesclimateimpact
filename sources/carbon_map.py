@@ -1,7 +1,7 @@
 from PyQt5 import uic, QtNetwork
-from PyQt5.QtCore import QCoreApplication, QEventLoop, QUrl, QSettings
+from PyQt5.QtCore import QCoreApplication, QEventLoop, QUrl, QSettings, QVariant
 
-from qgis.core import (QgsTask, QgsMessageLog, Qgis, QgsVectorLayer, QgsProject)
+from qgis.core import (QgsTask, QgsMessageLog, Qgis, QgsVectorLayer, QgsProject, QgsField)
 
 import os.path
 import json
@@ -77,7 +77,7 @@ class CarbonMap:
                 # responseData = str(bytes_string, 'utf-8')
                 if not bytes_string.isEmpty():
                     responseData = bytes(bytes_string).decode("utf-8")
-                    self.iface.messageBar().pushMessage(self.tr('Success downloading data'), cmDialog.windowTitle(), Qgis.Info, duration=3)
+                    # self.iface.messageBar().pushMessage(self.tr('Success downloading data'), cmDialog.windowTitle(), Qgis.Info, duration=1)
                     # QgsMessageLog.logMessage('responseData: ' + responseData[:5], 'Carbon Map (YKRTool)', Qgis.Info)
 
                     save_path = cmDialog.mQgsFileWidgetDataLocation.filePath()
@@ -86,6 +86,10 @@ class CarbonMap:
 
                     completeNameTotals, completeNameAreas = self.saveReportData(responseData, save_path)
                     self.addMapLayers(responseData, completeNameTotals, completeNameAreas)
+
+                    complexResponseData = self.processDataToComplexFeatures(responseData)
+                    self.saveReportDataWithYearAttributeFeatures(complexResponseData, save_path)
+
                 else:
                     self.iface.messageBar().pushMessage(self.tr('The response data was empty'), cmDialog.windowTitle(), Qgis.Warning)
             else:
@@ -149,12 +153,46 @@ class CarbonMap:
         QgsProject.instance().addMapLayer(layer, False)
         rootGroup.addLayer(layer)
 
-        layer_name = data["name"] + " - areas (" + data["id"] + ")"
-        # layer = QgsVectorLayer(json.dumps(layerData), layer_name, 'memory')
-        layer = QgsVectorLayer(completeNameAreas, layer_name,"ogr")
+        ##
+        ## Areas
+        ##
+        
+        # Calculate carbon stock CO2-eq/ha and total change value for each plan area from year 2024 to year 2030 and visualization for the areas layer based on the value
 
-        QgsProject.instance().addMapLayer(layer, False)
-        rootGroup.addLayer(layer)
+        layer_name = data["name"] + " - areas (CO2-eq change 2024-2030, " + data["id"] + ")"
+        # layer = QgsVectorLayer(json.dumps(layerData), layer_name, 'memory')
+        layer_area_total = QgsVectorLayer(completeNameAreas, layer_name,"ogr")
+
+        QgsProject.instance().addMapLayer(layer_area_total, False)
+        rootGroup.addLayer(layer_area_total)
+    
+        symbology_path = os.path.join(self.plugin_dir, 'docs', 'carbon_map', 'carbon_total_change.qml')
+        layer_area_total.loadNamedStyle(symbology_path)
+        field = QgsField('carbon_total_planned_2024', QVariant.Double)
+        layer_area_total.addExpressionField(' ("ground_carbon_total_planned_2024" + "bio_carbon_total_planned_2024") ', field)
+        field = QgsField('carbon_total_planned_2030', QVariant.Double)
+        layer_area_total.addExpressionField(' ("ground_carbon_total_planned_2030" + "bio_carbon_total_planned_2030") ', field)
+        field = QgsField('carbon_total_change_planned_2024_2030', QVariant.Double)
+        layer_area_total.addExpressionField(' ("ground_carbon_total_planned_2030" + "bio_carbon_total_planned_2030") - ("ground_carbon_total_planned_2024" + "bio_carbon_total_planned_2024")', field)
+        layer_area_total.triggerRepaint()  
+
+
+        layer_name = data["name"] + " - areas (CO2-eq/ha change 2024-2030, " + data["id"] + ")"
+        # layer = QgsVectorLayer(json.dumps(layerData), layer_name, 'memory')
+        layer_area_ha = QgsVectorLayer(completeNameAreas, layer_name,"ogr")
+
+        QgsProject.instance().addMapLayer(layer_area_ha, False)
+        rootGroup.addLayer(layer_area_ha)
+
+        symbology_path = os.path.join(self.plugin_dir, 'docs', 'carbon_map', 'carbon_ha_change.qml')
+        layer_area_ha.loadNamedStyle(symbology_path)
+        field = QgsField('carbon_ha_planned_2024', QVariant.Double)
+        layer_area_ha.addExpressionField(' ("ground_carbon_ha_planned_2024" + "bio_carbon_ha_planned_2024") ', field)
+        field = QgsField('carbon_ha_planned_2030', QVariant.Double)
+        layer_area_ha.addExpressionField(' ("ground_carbon_ha_planned_2030" + "bio_carbon_ha_planned_2030") ', field)
+        field = QgsField('carbon_ha_change_planned_2024_2030', QVariant.Double)
+        layer_area_ha.addExpressionField(' ("ground_carbon_ha_planned_2030" + "bio_carbon_ha_planned_2030") - ("ground_carbon_ha_planned_2024" + "bio_carbon_ha_planned_2024") ', field)
+        layer_area_ha.triggerRepaint()  
 
         # for name in layerNames:
             #     layer = QgsVectorLayer(uri.uri(False), name[0], 'postgres')
@@ -164,3 +202,168 @@ class CarbonMap:
             #     renderer.updateClasses(layer, renderer.mode(), len(renderer.ranges()))
             # self.resultLayers.append(layer)
             
+
+
+    def processDataToComplexFeatures(self, responseData):
+        
+        data = json.loads(responseData)
+
+        comlexData = {
+            "id": data["id"],
+            "name": data["name"],
+            "reportData": {
+                "areas": {
+                    "type": "FeatureCollection",
+                    "features": []
+                },
+                "totals": {
+                    "type": "FeatureCollection",
+                    "features": []
+                }
+            }
+        }
+
+        for feature in data["report_data"]["areas"]["features"]:
+
+            newFeature = {
+                "id": feature["id"],
+                "type": feature["type"],
+                "geometry": feature["geometry"],
+                "properties": {
+                    "bio_carbon_total": {
+                        "nochange": {},
+                        "planned": {}
+                    },
+                    "ground_carbon_total": {
+                        "nochange": {},
+                        "planned": {}
+                    },
+                    "bio_carbon_ha": {
+                        "nochange": {},
+                        "planned": {}
+                    },
+                    "ground_carbon_ha": {
+                        "nochange": {},
+                        "planned": {}
+                    }
+                }
+            }
+
+            for key in feature['properties'].keys():
+                value = feature['properties'][key]
+                if "_nochange_" in key:
+                    parts = key.split('_nochange_')
+                    newFeature["properties"][parts[0]]["nochange"][parts[1]] = value
+                elif "_planned_" in key:
+                    parts = key.split('_planned_')
+                    newFeature["properties"][parts[0]]["planned"][parts[1]] = value
+                else:
+                    newFeature["properties"][key] = value
+                    if key != "area" and key != "zoning_code":
+                        QgsMessageLog.logMessage('Unknown feature property type: ' + key, 'Carbon Map (YKRTool)', Qgis.Info)
+
+            comlexData["reportData"]["areas"]["features"].append(newFeature)
+
+
+        for feature in data["report_data"]["totals"]["features"]:
+
+            newFeature = {
+                "id": feature["id"],
+                "type": feature["type"],
+                "geometry": feature["geometry"],
+                "properties": {
+                    "bio_carbon_total": {
+                        "nochange": {},
+                        "planned": {}
+                    },
+                    "ground_carbon_total": {
+                        "nochange": {},
+                        "planned": {}
+                    },
+                    "bio_carbon_ha": {
+                        "nochange": {},
+                        "planned": {}
+                    },
+                    "ground_carbon_ha": {
+                        "nochange": {},
+                        "planned": {}
+                    }
+                }
+            }
+
+            for key in feature['properties'].keys():
+                value = feature['properties'][key]
+                if "_nochange_" in key:
+                    parts = key.split('_nochange_')
+                    newFeature["properties"][parts[0]]["nochange"][parts[1]] = value
+                elif "_planned_" in key:
+                    parts = key.split('_planned_')
+                    newFeature["properties"][parts[0]]["planned"][parts[1]] = value
+                else:
+                    newFeature["properties"][key] = value
+                    if key != "area" and key != "zoning_code":
+                        QgsMessageLog.logMessage('Unknown feature property type: ' + key, 'Carbon Map (YKRTool)', Qgis.Info)
+
+            comlexData["reportData"]["totals"]["features"].append(newFeature)
+
+
+        # QgsMessageLog.logMessage(str(comlexData), 'Carbon Map (YKRTool)', Qgis.Info)
+
+        return comlexData
+    
+    
+    def saveReportDataWithYearAttributeFeatures(self, complexResponseData, save_path):
+
+
+        origFeatures = complexResponseData["reportData"]["totals"]["features"]
+
+        layerData = {
+            "type": "FeatureCollection",
+            "features": []
+        }
+
+        for feature in origFeatures:
+            years = feature["properties"]["bio_carbon_total"]["nochange"].keys()
+
+            for year in years:
+                newFeature = {
+                    "id": feature["id"],
+                    "type": feature["type"],
+                    "geometry": feature["geometry"],
+                    "properties": {
+                        "year": year,
+                        "bio_carbon_total_nochange": None,
+                        "bio_carbon_total_planned": None,
+                        "ground_carbon_total_nochange": None,
+                        "ground_carbon_total_planned": None,
+                        "bio_carbon_ha_nochange": None,
+                        "bio_carbon_ha_planned": None,
+                        "ground_carbon_ha_nochange": None,
+                        "ground_carbon_ha_planned": None
+                    }
+                }
+                
+                newFeature["properties"]["bio_carbon_total_nochange"] = feature["properties"]["bio_carbon_total"]["nochange"][year]
+                newFeature["properties"]["bio_carbon_total_planned"] = feature["properties"]["bio_carbon_total"]["planned"][year]
+                newFeature["properties"]["ground_carbon_total_nochange"] = feature["properties"]["ground_carbon_total"]["nochange"][year]
+                newFeature["properties"]["ground_carbon_total_planned"] = feature["properties"]["ground_carbon_total"]["planned"][year]
+                newFeature["properties"]["bio_carbon_ha_nochange"] = feature["properties"]["bio_carbon_ha"]["nochange"][year]
+                newFeature["properties"]["bio_carbon_ha_planned"] = feature["properties"]["bio_carbon_ha"]["planned"][year]
+                newFeature["properties"]["ground_carbon_ha_nochange"] = feature["properties"]["ground_carbon_ha"]["nochange"][year]
+                newFeature["properties"]["ground_carbon_ha_planned"] = feature["properties"]["ground_carbon_ha"]["planned"][year]
+
+                layerData["features"].append(newFeature)
+
+
+        file_name = complexResponseData["name"] + "_totals_with_year_" + complexResponseData["id"]
+        completeNameTotals = os.path.join(save_path, file_name + ".geojson")
+        index = 0
+        while os.path.exists(completeNameTotals):
+            index += 1
+            completeNameTotals = os.path.join(save_path, file_name + " (" + str(index) + ").geojson")
+        file1 = open(completeNameTotals, "wt")
+        file1.write(json.dumps(layerData))
+        file1.close()
+
+
+        return completeNameTotals
