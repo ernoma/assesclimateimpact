@@ -1,0 +1,736 @@
+{
+    "id": "9f3e609d-3c8c-40bd-a2af-47e617ffc21a",
+    "name": "Kaupinlaakso testi",
+    "report_data": {
+        "totals": {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "id": "0",
+                    "type": "Feature",
+                    "properties": {
+                        "bio_carbon_total_nochange_2024": 639.226814492539,
+                        "bio_carbon_total_nochange_2030": 662.8209277549605,
+                        "bio_carbon_total_nochange_2035": 682.4826888069787,
+                        "bio_carbon_total_nochange_2040": 702.1444498589966,
+                        "bio_carbon_total_nochange_2045": 721.8062109110147,
+                        "bio_carbon_total_nochange_2050": 741.4679719630327,
+                        "bio_carbon_total_nochange_2055": 761.1297330150506,
+                        "bio_carbon_total_nochange_2060": 780.7914940670686,
+                        "bio_carbon_total_nochange_2065": 800.4532551190867,
+                        "bio_carbon_total_nochange_2070": 820.1150161711045,
+                        "bio_carbon_total_nochange_2075": 839.7767772231226,
+                        "bio_carbon_total_nochange_2080": 859.4385382751406,
+                        "bio_carbon_total_nochange_2085": 879.1002993271587,
+                        "bio_carbon_total_nochange_2090": 898.7620603791767,
+                        "bio_carbon_total_nochange_2095": 918.4238214311948,
+                        "bio_carbon_total_planned_2024": 639.226814492539,
+                        "bio_carbon_total_planned_2030": 44.57200425984862,
+                        "bio_carbon_total_planned_2035": 45.904322857713744,
+                        "bio_carbon_total_planned_2040": 47.23664145557887,
+                        "bio_carbon_total_planned_2045": 48.568960053443995,
+                        "bio_carbon_total_planned_2050": 49.90127865130911,
+                        "bio_carbon_total_planned_2055": 51.23359724917424,
+                        "bio_carbon_total_planned_2060": 52.56591584703935,
+                        "bio_carbon_total_planned_2065": 53.89823444490447,
+                        "bio_carbon_total_planned_2070": 55.23055304276958,
+                        "bio_carbon_total_planned_2075": 56.562871640634704,
+                        "bio_carbon_total_planned_2080": 57.89519023849983,
+                        "bio_carbon_total_planned_2085": 59.227508836364954,
+                        "bio_carbon_total_planned_2090": 60.559827434230066,
+                        "bio_carbon_total_planned_2095": 61.892146032095205,
+                        "ground_carbon_total_nochange_2024": 3283.661470833333,
+                        "ground_carbon_total_nochange_2030": 3283.661470833333,
+                        "ground_carbon_total_nochange_2035": 3283.661470833333,
+                        "ground_carbon_total_nochange_2040": 3283.661470833333,
+                        "ground_carbon_total_nochange_2045": 3283.661470833333,
+                        "ground_carbon_total_nochange_2050": 3283.661470833333,
+                        "ground_carbon_total_nochange_2055": 3283.661470833333,
+                        "ground_carbon_total_nochange_2060": 3283.661470833333,
+                        "ground_carbon_total_nochange_2065": 3283.661470833333,
+                        "ground_carbon_total_nochange_2070": 3283.661470833333,
+                        "ground_carbon_total_nochange_2075": 3283.661470833333,
+                        "ground_carbon_total_nochange_2080": 3283.661470833333,
+                        "ground_carbon_total_nochange_2085": 3283.661470833333,
+                        "ground_carbon_total_nochange_2090": 3283.661470833333,
+                        "ground_carbon_total_nochange_2095": 3283.661470833333,
+                        "ground_carbon_total_planned_2024": 3283.661470833333,
+                        "ground_carbon_total_planned_2030": 1100.9242273333334,
+                        "ground_carbon_total_planned_2035": 1100.9242273333334,
+                        "ground_carbon_total_planned_2040": 1100.9242273333334,
+                        "ground_carbon_total_planned_2045": 1100.9242273333334,
+                        "ground_carbon_total_planned_2050": 1100.9242273333334,
+                        "ground_carbon_total_planned_2055": 1100.9242273333334,
+                        "ground_carbon_total_planned_2060": 1100.9242273333334,
+                        "ground_carbon_total_planned_2065": 1100.9242273333334,
+                        "ground_carbon_total_planned_2070": 1100.9242273333334,
+                        "ground_carbon_total_planned_2075": 1100.9242273333334,
+                        "ground_carbon_total_planned_2080": 1100.9242273333334,
+                        "ground_carbon_total_planned_2085": 1100.9242273333334,
+                        "ground_carbon_total_planned_2090": 1100.9242273333334,
+                        "ground_carbon_total_planned_2095": 1100.9242273333334,
+                        "bio_carbon_ha_nochange_2024": 47.19244265926262,
+                        "bio_carbon_ha_nochange_2030": 48.93433428831907,
+                        "bio_carbon_ha_nochange_2035": 50.38591064586613,
+                        "bio_carbon_ha_nochange_2040": 51.83748700341317,
+                        "bio_carbon_ha_nochange_2045": 53.28906336096023,
+                        "bio_carbon_ha_nochange_2050": 54.740639718507275,
+                        "bio_carbon_ha_nochange_2055": 56.19221607605432,
+                        "bio_carbon_ha_nochange_2060": 57.64379243360136,
+                        "bio_carbon_ha_nochange_2065": 59.095368791148424,
+                        "bio_carbon_ha_nochange_2070": 60.54694514869545,
+                        "bio_carbon_ha_nochange_2075": 61.99852150624251,
+                        "bio_carbon_ha_nochange_2080": 63.45009786378956,
+                        "bio_carbon_ha_nochange_2085": 64.90167422133662,
+                        "bio_carbon_ha_nochange_2090": 66.35325057888366,
+                        "bio_carbon_ha_nochange_2095": 67.80482693643071,
+                        "bio_carbon_ha_planned_2024": 47.19244265926262,
+                        "bio_carbon_ha_planned_2030": 3.290634415753012,
+                        "bio_carbon_ha_planned_2035": 3.3889960107426305,
+                        "bio_carbon_ha_planned_2040": 3.487357605732249,
+                        "bio_carbon_ha_planned_2045": 3.5857192007218677,
+                        "bio_carbon_ha_planned_2050": 3.6840807957114854,
+                        "bio_carbon_ha_planned_2055": 3.782442390701104,
+                        "bio_carbon_ha_planned_2060": 3.8808039856907213,
+                        "bio_carbon_ha_planned_2065": 3.9791655806803394,
+                        "bio_carbon_ha_planned_2070": 4.077527175669957,
+                        "bio_carbon_ha_planned_2075": 4.175888770659575,
+                        "bio_carbon_ha_planned_2080": 4.274250365649194,
+                        "bio_carbon_ha_planned_2085": 4.372611960638812,
+                        "bio_carbon_ha_planned_2090": 4.470973555628429,
+                        "bio_carbon_ha_planned_2095": 4.569335150618049,
+                        "ground_carbon_ha_nochange_2024": 242.42413203168397,
+                        "ground_carbon_ha_nochange_2030": 242.42413203168397,
+                        "ground_carbon_ha_nochange_2035": 242.42413203168397,
+                        "ground_carbon_ha_nochange_2040": 242.42413203168397,
+                        "ground_carbon_ha_nochange_2045": 242.42413203168397,
+                        "ground_carbon_ha_nochange_2050": 242.42413203168397,
+                        "ground_carbon_ha_nochange_2055": 242.42413203168397,
+                        "ground_carbon_ha_nochange_2060": 242.42413203168397,
+                        "ground_carbon_ha_nochange_2065": 242.42413203168397,
+                        "ground_carbon_ha_nochange_2070": 242.42413203168397,
+                        "ground_carbon_ha_nochange_2075": 242.42413203168397,
+                        "ground_carbon_ha_nochange_2080": 242.42413203168397,
+                        "ground_carbon_ha_nochange_2085": 242.42413203168397,
+                        "ground_carbon_ha_nochange_2090": 242.42413203168397,
+                        "ground_carbon_ha_nochange_2095": 242.42413203168397,
+                        "ground_carbon_ha_planned_2024": 242.42413203168397,
+                        "ground_carbon_ha_planned_2030": 81.27835424405176,
+                        "ground_carbon_ha_planned_2035": 81.27835424405176,
+                        "ground_carbon_ha_planned_2040": 81.27835424405176,
+                        "ground_carbon_ha_planned_2045": 81.27835424405176,
+                        "ground_carbon_ha_planned_2050": 81.27835424405176,
+                        "ground_carbon_ha_planned_2055": 81.27835424405176,
+                        "ground_carbon_ha_planned_2060": 81.27835424405176,
+                        "ground_carbon_ha_planned_2065": 81.27835424405176,
+                        "ground_carbon_ha_planned_2070": 81.27835424405176,
+                        "ground_carbon_ha_planned_2075": 81.27835424405176,
+                        "ground_carbon_ha_planned_2080": 81.27835424405176,
+                        "ground_carbon_ha_planned_2085": 81.27835424405176,
+                        "ground_carbon_ha_planned_2090": 81.27835424405176,
+                        "ground_carbon_ha_planned_2095": 81.27835424405176,
+                        "area": 135451.09735214687
+                    },
+                    "geometry": {
+                        "type": "MultiPolygon",
+                        "coordinates": [
+                            [
+                                [
+                                    [
+                                        23.85932775977112,
+                                        61.50382771112057
+                                    ],
+                                    [
+                                        23.855846280619087,
+                                        61.504039213501926
+                                    ],
+                                    [
+                                        23.850210242610583,
+                                        61.50509237129363
+                                    ],
+                                    [
+                                        23.84556577899419,
+                                        61.505730598372146
+                                    ],
+                                    [
+                                        23.84742616715509,
+                                        61.506454434787
+                                    ],
+                                    [
+                                        23.859828044556718,
+                                        61.504584866090866
+                                    ],
+                                    [
+                                        23.85962582760852,
+                                        61.50389941619524
+                                    ],
+                                    [
+                                        23.85932775977112,
+                                        61.50382771112057
+                                    ]
+                                ]
+                            ],
+                            [
+                                [
+                                    [
+                                        23.853253820277562,
+                                        61.50686465302876
+                                    ],
+                                    [
+                                        23.852813175621847,
+                                        61.506189895957974
+                                    ],
+                                    [
+                                        23.85013061058725,
+                                        61.506549376018526
+                                    ],
+                                    [
+                                        23.850506780734456,
+                                        61.50719023414989
+                                    ],
+                                    [
+                                        23.853253820277562,
+                                        61.50686465302876
+                                    ]
+                                ]
+                            ],
+                            [
+                                [
+                                    [
+                                        23.854588275035397,
+                                        61.508094944505274
+                                    ],
+                                    [
+                                        23.85510648979323,
+                                        61.50867422820868
+                                    ],
+                                    [
+                                        23.856190125260575,
+                                        61.50835882819303
+                                    ],
+                                    [
+                                        23.855899027486934,
+                                        61.50788204358193
+                                    ],
+                                    [
+                                        23.861315583987103,
+                                        61.5073260801049
+                                    ],
+                                    [
+                                        23.860976710471306,
+                                        61.50631330058157
+                                    ],
+                                    [
+                                        23.85432221245086,
+                                        61.50703519715832
+                                    ],
+                                    [
+                                        23.854588275035397,
+                                        61.508094944505274
+                                    ]
+                                ]
+                            ]
+                        ]
+                    }
+                }
+            ]
+        },
+        "areas": {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "id": "0",
+                    "type": "Feature",
+                    "properties": {
+                        "bio_carbon_total_nochange_2024": 254.05953952475457,
+                        "bio_carbon_total_nochange_2030": 263.68443097660736,
+                        "bio_carbon_total_nochange_2035": 271.7051738531514,
+                        "bio_carbon_total_nochange_2040": 279.72591672969537,
+                        "bio_carbon_total_nochange_2045": 287.7466596062394,
+                        "bio_carbon_total_nochange_2050": 295.7674024827834,
+                        "bio_carbon_total_nochange_2055": 303.7881453593274,
+                        "bio_carbon_total_nochange_2060": 311.80888823587134,
+                        "bio_carbon_total_nochange_2065": 319.82963111241537,
+                        "bio_carbon_total_nochange_2070": 327.8503739889593,
+                        "bio_carbon_total_nochange_2075": 335.8711168655034,
+                        "bio_carbon_total_nochange_2080": 343.8918597420473,
+                        "bio_carbon_total_nochange_2085": 351.9126026185914,
+                        "bio_carbon_total_nochange_2090": 359.93334549513537,
+                        "bio_carbon_total_nochange_2095": 367.95408837167935,
+                        "bio_carbon_total_planned_2024": 254.05953952475457,
+                        "bio_carbon_total_planned_2030": 13.184221548830369,
+                        "bio_carbon_total_planned_2035": 13.58525869265757,
+                        "bio_carbon_total_planned_2040": 13.98629583648477,
+                        "bio_carbon_total_planned_2045": 14.387332980311971,
+                        "bio_carbon_total_planned_2050": 14.78837012413917,
+                        "bio_carbon_total_planned_2055": 15.189407267966372,
+                        "bio_carbon_total_planned_2060": 15.590444411793568,
+                        "bio_carbon_total_planned_2065": 15.99148155562077,
+                        "bio_carbon_total_planned_2070": 16.392518699447965,
+                        "bio_carbon_total_planned_2075": 16.79355584327517,
+                        "bio_carbon_total_planned_2080": 17.194592987102364,
+                        "bio_carbon_total_planned_2085": 17.59563013092957,
+                        "bio_carbon_total_planned_2090": 17.99666727475677,
+                        "bio_carbon_total_planned_2095": 18.397704418583967,
+                        "ground_carbon_total_nochange_2024": 1797.6288,
+                        "ground_carbon_total_nochange_2030": 1797.6288,
+                        "ground_carbon_total_nochange_2035": 1797.6288,
+                        "ground_carbon_total_nochange_2040": 1797.6288,
+                        "ground_carbon_total_nochange_2045": 1797.6288,
+                        "ground_carbon_total_nochange_2050": 1797.6288,
+                        "ground_carbon_total_nochange_2055": 1797.6288,
+                        "ground_carbon_total_nochange_2060": 1797.6288,
+                        "ground_carbon_total_nochange_2065": 1797.6288,
+                        "ground_carbon_total_nochange_2070": 1797.6288,
+                        "ground_carbon_total_nochange_2075": 1797.6288,
+                        "ground_carbon_total_nochange_2080": 1797.6288,
+                        "ground_carbon_total_nochange_2085": 1797.6288,
+                        "ground_carbon_total_nochange_2090": 1797.6288,
+                        "ground_carbon_total_nochange_2095": 1797.6288,
+                        "ground_carbon_total_planned_2024": 1797.6288,
+                        "ground_carbon_total_planned_2030": 503.336064,
+                        "ground_carbon_total_planned_2035": 503.336064,
+                        "ground_carbon_total_planned_2040": 503.336064,
+                        "ground_carbon_total_planned_2045": 503.336064,
+                        "ground_carbon_total_planned_2050": 503.336064,
+                        "ground_carbon_total_planned_2055": 503.336064,
+                        "ground_carbon_total_planned_2060": 503.336064,
+                        "ground_carbon_total_planned_2065": 503.336064,
+                        "ground_carbon_total_planned_2070": 503.336064,
+                        "ground_carbon_total_planned_2075": 503.336064,
+                        "ground_carbon_total_planned_2080": 503.336064,
+                        "ground_carbon_total_planned_2085": 503.336064,
+                        "ground_carbon_total_planned_2090": 503.336064,
+                        "ground_carbon_total_planned_2095": 503.336064,
+                        "bio_carbon_ha_nochange_2024": 32.392831475368894,
+                        "bio_carbon_ha_nochange_2030": 33.62001423477954,
+                        "bio_carbon_ha_nochange_2035": 34.642666534288416,
+                        "bio_carbon_ha_nochange_2040": 35.665318833797286,
+                        "bio_carbon_ha_nochange_2045": 36.68797113330616,
+                        "bio_carbon_ha_nochange_2050": 37.710623432815034,
+                        "bio_carbon_ha_nochange_2055": 38.733275732323904,
+                        "bio_carbon_ha_nochange_2060": 39.75592803183277,
+                        "bio_carbon_ha_nochange_2065": 40.778580331341644,
+                        "bio_carbon_ha_nochange_2070": 41.80123263085051,
+                        "bio_carbon_ha_nochange_2075": 42.82388493035939,
+                        "bio_carbon_ha_nochange_2080": 43.84653722986825,
+                        "bio_carbon_ha_nochange_2085": 44.86918952937713,
+                        "bio_carbon_ha_nochange_2090": 45.891841828886,
+                        "bio_carbon_ha_nochange_2095": 46.91449412839487,
+                        "bio_carbon_ha_planned_2024": 32.392831475368894,
+                        "bio_carbon_ha_planned_2030": 1.6810007117389771,
+                        "bio_carbon_ha_planned_2035": 1.7321333267144208,
+                        "bio_carbon_ha_planned_2040": 1.7832659416898644,
+                        "bio_carbon_ha_planned_2045": 1.8343985566653083,
+                        "bio_carbon_ha_planned_2050": 1.8855311716407517,
+                        "bio_carbon_ha_planned_2055": 1.9366637866161955,
+                        "bio_carbon_ha_planned_2060": 1.9877964015916385,
+                        "bio_carbon_ha_planned_2065": 2.0389290165670824,
+                        "bio_carbon_ha_planned_2070": 2.0900616315425253,
+                        "bio_carbon_ha_planned_2075": 2.141194246517969,
+                        "bio_carbon_ha_planned_2080": 2.1923268614934126,
+                        "bio_carbon_ha_planned_2085": 2.243459476468857,
+                        "bio_carbon_ha_planned_2090": 2.2945920914443003,
+                        "bio_carbon_ha_planned_2095": 2.3457247064197433,
+                        "ground_carbon_ha_nochange_2024": 229.19937146464002,
+                        "ground_carbon_ha_nochange_2030": 229.19937146464002,
+                        "ground_carbon_ha_nochange_2035": 229.19937146464002,
+                        "ground_carbon_ha_nochange_2040": 229.19937146464002,
+                        "ground_carbon_ha_nochange_2045": 229.19937146464002,
+                        "ground_carbon_ha_nochange_2050": 229.19937146464002,
+                        "ground_carbon_ha_nochange_2055": 229.19937146464002,
+                        "ground_carbon_ha_nochange_2060": 229.19937146464002,
+                        "ground_carbon_ha_nochange_2065": 229.19937146464002,
+                        "ground_carbon_ha_nochange_2070": 229.19937146464002,
+                        "ground_carbon_ha_nochange_2075": 229.19937146464002,
+                        "ground_carbon_ha_nochange_2080": 229.19937146464002,
+                        "ground_carbon_ha_nochange_2085": 229.19937146464002,
+                        "ground_carbon_ha_nochange_2090": 229.19937146464002,
+                        "ground_carbon_ha_nochange_2095": 229.19937146464002,
+                        "ground_carbon_ha_planned_2024": 229.19937146464002,
+                        "ground_carbon_ha_planned_2030": 64.1758240100992,
+                        "ground_carbon_ha_planned_2035": 64.1758240100992,
+                        "ground_carbon_ha_planned_2040": 64.1758240100992,
+                        "ground_carbon_ha_planned_2045": 64.1758240100992,
+                        "ground_carbon_ha_planned_2050": 64.1758240100992,
+                        "ground_carbon_ha_planned_2055": 64.1758240100992,
+                        "ground_carbon_ha_planned_2060": 64.1758240100992,
+                        "ground_carbon_ha_planned_2065": 64.1758240100992,
+                        "ground_carbon_ha_planned_2070": 64.1758240100992,
+                        "ground_carbon_ha_planned_2075": 64.1758240100992,
+                        "ground_carbon_ha_planned_2080": 64.1758240100992,
+                        "ground_carbon_ha_planned_2085": 64.1758240100992,
+                        "ground_carbon_ha_planned_2090": 64.1758240100992,
+                        "ground_carbon_ha_planned_2095": 64.1758240100992,
+                        "area": 78430.79099705695,
+                        "zoning_code": "AK"
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [
+                                    23.85962582760852,
+                                    61.50389941619524
+                                ],
+                                [
+                                    23.859828044556718,
+                                    61.504584866090866
+                                ],
+                                [
+                                    23.84742616715509,
+                                    61.506454434787
+                                ],
+                                [
+                                    23.84556577899419,
+                                    61.505730598372146
+                                ],
+                                [
+                                    23.850210242610583,
+                                    61.50509237129363
+                                ],
+                                [
+                                    23.855846280619087,
+                                    61.504039213501926
+                                ],
+                                [
+                                    23.85932775977112,
+                                    61.50382771112057
+                                ],
+                                [
+                                    23.85962582760852,
+                                    61.50389941619524
+                                ]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "id": "1",
+                    "type": "Feature",
+                    "properties": {
+                        "bio_carbon_total_nochange_2024": 358.01042340528437,
+                        "bio_carbon_total_nochange_2030": 371.97964521585317,
+                        "bio_carbon_total_nochange_2035": 383.6206633913272,
+                        "bio_carbon_total_nochange_2040": 395.2616815668012,
+                        "bio_carbon_total_nochange_2045": 406.9026997422752,
+                        "bio_carbon_total_nochange_2050": 418.54371791774923,
+                        "bio_carbon_total_nochange_2055": 430.18473609322325,
+                        "bio_carbon_total_nochange_2060": 441.8257542686972,
+                        "bio_carbon_total_nochange_2065": 453.4667724441713,
+                        "bio_carbon_total_nochange_2070": 465.1077906196452,
+                        "bio_carbon_total_nochange_2075": 476.7488087951192,
+                        "bio_carbon_total_nochange_2080": 488.3898269705933,
+                        "bio_carbon_total_nochange_2085": 500.0308451460673,
+                        "bio_carbon_total_nochange_2090": 511.6718633215412,
+                        "bio_carbon_total_nochange_2095": 523.3128814970154,
+                        "bio_carbon_total_planned_2024": 358.01042340528437,
+                        "bio_carbon_total_planned_2030": 29.758371617268253,
+                        "bio_carbon_total_planned_2035": 30.689653071306175,
+                        "bio_carbon_total_planned_2040": 31.620934525344097,
+                        "bio_carbon_total_planned_2045": 32.55221597938202,
+                        "bio_carbon_total_planned_2050": 33.48349743341994,
+                        "bio_carbon_total_planned_2055": 34.414778887457864,
+                        "bio_carbon_total_planned_2060": 35.34606034149578,
+                        "bio_carbon_total_planned_2065": 36.2773417955337,
+                        "bio_carbon_total_planned_2070": 37.208623249571616,
+                        "bio_carbon_total_planned_2075": 38.13990470360954,
+                        "bio_carbon_total_planned_2080": 39.07118615764746,
+                        "bio_carbon_total_planned_2085": 40.00246761168538,
+                        "bio_carbon_total_planned_2090": 40.9337490657233,
+                        "bio_carbon_total_planned_2095": 41.865030519761234,
+                        "ground_carbon_total_nochange_2024": 1201.5265166666666,
+                        "ground_carbon_total_nochange_2030": 1201.5265166666666,
+                        "ground_carbon_total_nochange_2035": 1201.5265166666666,
+                        "ground_carbon_total_nochange_2040": 1201.5265166666666,
+                        "ground_carbon_total_nochange_2045": 1201.5265166666666,
+                        "ground_carbon_total_nochange_2050": 1201.5265166666666,
+                        "ground_carbon_total_nochange_2055": 1201.5265166666666,
+                        "ground_carbon_total_nochange_2060": 1201.5265166666666,
+                        "ground_carbon_total_nochange_2065": 1201.5265166666666,
+                        "ground_carbon_total_nochange_2070": 1201.5265166666666,
+                        "ground_carbon_total_nochange_2075": 1201.5265166666666,
+                        "ground_carbon_total_nochange_2080": 1201.5265166666666,
+                        "ground_carbon_total_nochange_2085": 1201.5265166666666,
+                        "ground_carbon_total_nochange_2090": 1201.5265166666666,
+                        "ground_carbon_total_nochange_2095": 1201.5265166666666,
+                        "ground_carbon_total_planned_2024": 1201.5265166666666,
+                        "ground_carbon_total_planned_2030": 540.6869325,
+                        "ground_carbon_total_planned_2035": 540.6869325,
+                        "ground_carbon_total_planned_2040": 540.6869325,
+                        "ground_carbon_total_planned_2045": 540.6869325,
+                        "ground_carbon_total_planned_2050": 540.6869325,
+                        "ground_carbon_total_planned_2055": 540.6869325,
+                        "ground_carbon_total_planned_2060": 540.6869325,
+                        "ground_carbon_total_planned_2065": 540.6869325,
+                        "ground_carbon_total_planned_2070": 540.6869325,
+                        "ground_carbon_total_planned_2075": 540.6869325,
+                        "ground_carbon_total_planned_2080": 540.6869325,
+                        "ground_carbon_total_planned_2085": 540.6869325,
+                        "ground_carbon_total_planned_2090": 540.6869325,
+                        "ground_carbon_total_planned_2095": 540.6869325,
+                        "bio_carbon_ha_nochange_2024": 78.51839397967639,
+                        "bio_carbon_ha_nochange_2030": 81.582106067383,
+                        "bio_carbon_ha_nochange_2035": 84.13519947380517,
+                        "bio_carbon_ha_nochange_2040": 86.68829288022735,
+                        "bio_carbon_ha_nochange_2045": 89.24138628664952,
+                        "bio_carbon_ha_nochange_2050": 91.7944796930717,
+                        "bio_carbon_ha_nochange_2055": 94.34757309949387,
+                        "bio_carbon_ha_nochange_2060": 96.90066650591604,
+                        "bio_carbon_ha_nochange_2065": 99.45375991233821,
+                        "bio_carbon_ha_nochange_2070": 102.00685331876036,
+                        "bio_carbon_ha_nochange_2075": 104.55994672518254,
+                        "bio_carbon_ha_nochange_2080": 107.11304013160473,
+                        "bio_carbon_ha_nochange_2085": 109.6661335380269,
+                        "bio_carbon_ha_nochange_2090": 112.21922694444905,
+                        "bio_carbon_ha_nochange_2095": 114.77232035087127,
+                        "bio_carbon_ha_planned_2024": 78.51839397967639,
+                        "bio_carbon_ha_planned_2030": 6.52656848539064,
+                        "bio_carbon_ha_planned_2035": 6.730815957904414,
+                        "bio_carbon_ha_planned_2040": 6.935063430418188,
+                        "bio_carbon_ha_planned_2045": 7.139310902931962,
+                        "bio_carbon_ha_planned_2050": 7.3435583754457365,
+                        "bio_carbon_ha_planned_2055": 7.54780584795951,
+                        "bio_carbon_ha_planned_2060": 7.752053320473283,
+                        "bio_carbon_ha_planned_2065": 7.956300792987057,
+                        "bio_carbon_ha_planned_2070": 8.16054826550083,
+                        "bio_carbon_ha_planned_2075": 8.364795738014603,
+                        "bio_carbon_ha_planned_2080": 8.569043210528378,
+                        "bio_carbon_ha_planned_2085": 8.773290683042152,
+                        "bio_carbon_ha_planned_2090": 8.977538155555925,
+                        "bio_carbon_ha_planned_2095": 9.181785628069703,
+                        "ground_carbon_ha_nochange_2024": 263.5172783946073,
+                        "ground_carbon_ha_nochange_2030": 263.5172783946073,
+                        "ground_carbon_ha_nochange_2035": 263.5172783946073,
+                        "ground_carbon_ha_nochange_2040": 263.5172783946073,
+                        "ground_carbon_ha_nochange_2045": 263.5172783946073,
+                        "ground_carbon_ha_nochange_2050": 263.5172783946073,
+                        "ground_carbon_ha_nochange_2055": 263.5172783946073,
+                        "ground_carbon_ha_nochange_2060": 263.5172783946073,
+                        "ground_carbon_ha_nochange_2065": 263.5172783946073,
+                        "ground_carbon_ha_nochange_2070": 263.5172783946073,
+                        "ground_carbon_ha_nochange_2075": 263.5172783946073,
+                        "ground_carbon_ha_nochange_2080": 263.5172783946073,
+                        "ground_carbon_ha_nochange_2085": 263.5172783946073,
+                        "ground_carbon_ha_nochange_2090": 263.5172783946073,
+                        "ground_carbon_ha_nochange_2095": 263.5172783946073,
+                        "ground_carbon_ha_planned_2024": 263.5172783946073,
+                        "ground_carbon_ha_planned_2030": 118.58277527757328,
+                        "ground_carbon_ha_planned_2035": 118.58277527757328,
+                        "ground_carbon_ha_planned_2040": 118.58277527757328,
+                        "ground_carbon_ha_planned_2045": 118.58277527757328,
+                        "ground_carbon_ha_planned_2050": 118.58277527757328,
+                        "ground_carbon_ha_planned_2055": 118.58277527757328,
+                        "ground_carbon_ha_planned_2060": 118.58277527757328,
+                        "ground_carbon_ha_planned_2065": 118.58277527757328,
+                        "ground_carbon_ha_planned_2070": 118.58277527757328,
+                        "ground_carbon_ha_planned_2075": 118.58277527757328,
+                        "ground_carbon_ha_planned_2080": 118.58277527757328,
+                        "ground_carbon_ha_planned_2085": 118.58277527757328,
+                        "ground_carbon_ha_planned_2090": 118.58277527757328,
+                        "ground_carbon_ha_planned_2095": 118.58277527757328,
+                        "area": 45595.7394515674,
+                        "zoning_code": "A"
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [
+                                    23.860976710471306,
+                                    61.50631330058157
+                                ],
+                                [
+                                    23.85432221245086,
+                                    61.50703519715832
+                                ],
+                                [
+                                    23.854588275035397,
+                                    61.508094944505274
+                                ],
+                                [
+                                    23.85510648979323,
+                                    61.50867422820868
+                                ],
+                                [
+                                    23.856190125260575,
+                                    61.50835882819303
+                                ],
+                                [
+                                    23.855899027486934,
+                                    61.50788204358193
+                                ],
+                                [
+                                    23.861315583987103,
+                                    61.5073260801049
+                                ],
+                                [
+                                    23.860976710471306,
+                                    61.50631330058157
+                                ]
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "id": "2",
+                    "type": "Feature",
+                    "properties": {
+                        "bio_carbon_total_nochange_2024": 27.1568515625,
+                        "bio_carbon_total_nochange_2030": 27.1568515625,
+                        "bio_carbon_total_nochange_2035": 27.1568515625,
+                        "bio_carbon_total_nochange_2040": 27.1568515625,
+                        "bio_carbon_total_nochange_2045": 27.1568515625,
+                        "bio_carbon_total_nochange_2050": 27.1568515625,
+                        "bio_carbon_total_nochange_2055": 27.1568515625,
+                        "bio_carbon_total_nochange_2060": 27.1568515625,
+                        "bio_carbon_total_nochange_2065": 27.1568515625,
+                        "bio_carbon_total_nochange_2070": 27.1568515625,
+                        "bio_carbon_total_nochange_2075": 27.1568515625,
+                        "bio_carbon_total_nochange_2080": 27.1568515625,
+                        "bio_carbon_total_nochange_2085": 27.1568515625,
+                        "bio_carbon_total_nochange_2090": 27.1568515625,
+                        "bio_carbon_total_nochange_2095": 27.1568515625,
+                        "bio_carbon_total_planned_2024": 27.1568515625,
+                        "bio_carbon_total_planned_2030": 1.6294110937500002,
+                        "bio_carbon_total_planned_2035": 1.6294110937500002,
+                        "bio_carbon_total_planned_2040": 1.6294110937500002,
+                        "bio_carbon_total_planned_2045": 1.6294110937500002,
+                        "bio_carbon_total_planned_2050": 1.6294110937500002,
+                        "bio_carbon_total_planned_2055": 1.6294110937500002,
+                        "bio_carbon_total_planned_2060": 1.6294110937500002,
+                        "bio_carbon_total_planned_2065": 1.6294110937500002,
+                        "bio_carbon_total_planned_2070": 1.6294110937500002,
+                        "bio_carbon_total_planned_2075": 1.6294110937500002,
+                        "bio_carbon_total_planned_2080": 1.6294110937500002,
+                        "bio_carbon_total_planned_2085": 1.6294110937500002,
+                        "bio_carbon_total_planned_2090": 1.6294110937500002,
+                        "bio_carbon_total_planned_2095": 1.6294110937500002,
+                        "ground_carbon_total_nochange_2024": 284.5061541666667,
+                        "ground_carbon_total_nochange_2030": 284.5061541666667,
+                        "ground_carbon_total_nochange_2035": 284.5061541666667,
+                        "ground_carbon_total_nochange_2040": 284.5061541666667,
+                        "ground_carbon_total_nochange_2045": 284.5061541666667,
+                        "ground_carbon_total_nochange_2050": 284.5061541666667,
+                        "ground_carbon_total_nochange_2055": 284.5061541666667,
+                        "ground_carbon_total_nochange_2060": 284.5061541666667,
+                        "ground_carbon_total_nochange_2065": 284.5061541666667,
+                        "ground_carbon_total_nochange_2070": 284.5061541666667,
+                        "ground_carbon_total_nochange_2075": 284.5061541666667,
+                        "ground_carbon_total_nochange_2080": 284.5061541666667,
+                        "ground_carbon_total_nochange_2085": 284.5061541666667,
+                        "ground_carbon_total_nochange_2090": 284.5061541666667,
+                        "ground_carbon_total_nochange_2095": 284.5061541666667,
+                        "ground_carbon_total_planned_2024": 284.5061541666667,
+                        "ground_carbon_total_planned_2030": 56.901230833333344,
+                        "ground_carbon_total_planned_2035": 56.901230833333344,
+                        "ground_carbon_total_planned_2040": 56.901230833333344,
+                        "ground_carbon_total_planned_2045": 56.901230833333344,
+                        "ground_carbon_total_planned_2050": 56.901230833333344,
+                        "ground_carbon_total_planned_2055": 56.901230833333344,
+                        "ground_carbon_total_planned_2060": 56.901230833333344,
+                        "ground_carbon_total_planned_2065": 56.901230833333344,
+                        "ground_carbon_total_planned_2070": 56.901230833333344,
+                        "ground_carbon_total_planned_2075": 56.901230833333344,
+                        "ground_carbon_total_planned_2080": 56.901230833333344,
+                        "ground_carbon_total_planned_2085": 56.901230833333344,
+                        "ground_carbon_total_planned_2090": 56.901230833333344,
+                        "ground_carbon_total_planned_2095": 56.901230833333344,
+                        "bio_carbon_ha_nochange_2024": 23.770574228904557,
+                        "bio_carbon_ha_nochange_2030": 23.770574228904557,
+                        "bio_carbon_ha_nochange_2035": 23.770574228904557,
+                        "bio_carbon_ha_nochange_2040": 23.770574228904557,
+                        "bio_carbon_ha_nochange_2045": 23.770574228904557,
+                        "bio_carbon_ha_nochange_2050": 23.770574228904557,
+                        "bio_carbon_ha_nochange_2055": 23.770574228904557,
+                        "bio_carbon_ha_nochange_2060": 23.770574228904557,
+                        "bio_carbon_ha_nochange_2065": 23.770574228904557,
+                        "bio_carbon_ha_nochange_2070": 23.770574228904557,
+                        "bio_carbon_ha_nochange_2075": 23.770574228904557,
+                        "bio_carbon_ha_nochange_2080": 23.770574228904557,
+                        "bio_carbon_ha_nochange_2085": 23.770574228904557,
+                        "bio_carbon_ha_nochange_2090": 23.770574228904557,
+                        "bio_carbon_ha_nochange_2095": 23.770574228904557,
+                        "bio_carbon_ha_planned_2024": 23.770574228904557,
+                        "bio_carbon_ha_planned_2030": 1.4262344537342735,
+                        "bio_carbon_ha_planned_2035": 1.4262344537342735,
+                        "bio_carbon_ha_planned_2040": 1.4262344537342735,
+                        "bio_carbon_ha_planned_2045": 1.4262344537342735,
+                        "bio_carbon_ha_planned_2050": 1.4262344537342735,
+                        "bio_carbon_ha_planned_2055": 1.4262344537342735,
+                        "bio_carbon_ha_planned_2060": 1.4262344537342735,
+                        "bio_carbon_ha_planned_2065": 1.4262344537342735,
+                        "bio_carbon_ha_planned_2070": 1.4262344537342735,
+                        "bio_carbon_ha_planned_2075": 1.4262344537342735,
+                        "bio_carbon_ha_planned_2080": 1.4262344537342735,
+                        "bio_carbon_ha_planned_2085": 1.4262344537342735,
+                        "bio_carbon_ha_planned_2090": 1.4262344537342735,
+                        "bio_carbon_ha_planned_2095": 1.4262344537342735,
+                        "ground_carbon_ha_nochange_2024": 249.0301440369304,
+                        "ground_carbon_ha_nochange_2030": 249.0301440369304,
+                        "ground_carbon_ha_nochange_2035": 249.0301440369304,
+                        "ground_carbon_ha_nochange_2040": 249.0301440369304,
+                        "ground_carbon_ha_nochange_2045": 249.0301440369304,
+                        "ground_carbon_ha_nochange_2050": 249.0301440369304,
+                        "ground_carbon_ha_nochange_2055": 249.0301440369304,
+                        "ground_carbon_ha_nochange_2060": 249.0301440369304,
+                        "ground_carbon_ha_nochange_2065": 249.0301440369304,
+                        "ground_carbon_ha_nochange_2070": 249.0301440369304,
+                        "ground_carbon_ha_nochange_2075": 249.0301440369304,
+                        "ground_carbon_ha_nochange_2080": 249.0301440369304,
+                        "ground_carbon_ha_nochange_2085": 249.0301440369304,
+                        "ground_carbon_ha_nochange_2090": 249.0301440369304,
+                        "ground_carbon_ha_nochange_2095": 249.0301440369304,
+                        "ground_carbon_ha_planned_2024": 249.0301440369304,
+                        "ground_carbon_ha_planned_2030": 49.806028807386085,
+                        "ground_carbon_ha_planned_2035": 49.806028807386085,
+                        "ground_carbon_ha_planned_2040": 49.806028807386085,
+                        "ground_carbon_ha_planned_2045": 49.806028807386085,
+                        "ground_carbon_ha_planned_2050": 49.806028807386085,
+                        "ground_carbon_ha_planned_2055": 49.806028807386085,
+                        "ground_carbon_ha_planned_2060": 49.806028807386085,
+                        "ground_carbon_ha_planned_2065": 49.806028807386085,
+                        "ground_carbon_ha_planned_2070": 49.806028807386085,
+                        "ground_carbon_ha_planned_2075": 49.806028807386085,
+                        "ground_carbon_ha_planned_2080": 49.806028807386085,
+                        "ground_carbon_ha_planned_2085": 49.806028807386085,
+                        "ground_carbon_ha_planned_2090": 49.806028807386085,
+                        "ground_carbon_ha_planned_2095": 49.806028807386085,
+                        "area": 11424.566904016057,
+                        "zoning_code": "P"
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [
+                                    23.85013061058725,
+                                    61.506549376018526
+                                ],
+                                [
+                                    23.852813175621847,
+                                    61.506189895957974
+                                ],
+                                [
+                                    23.853253820277562,
+                                    61.50686465302876
+                                ],
+                                [
+                                    23.850506780734456,
+                                    61.50719023414989
+                                ],
+                                [
+                                    23.85013061058725,
+                                    61.506549376018526
+                                ]
+                            ]
+                        ]
+                    }
+                }
+            ]
+        },
+        "metadata": {
+            "calculated_ts": null
+        }
+    }
+}

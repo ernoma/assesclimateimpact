@@ -51,6 +51,8 @@ from .createdbconnection import createDbConnection
 from .ykr_zones_stats import YKRZonesStats
 from .ykr_tool_upload_layer import YKRToolUploadLayer
 
+from .carbon_map import CarbonMap
+
 class YKRTool:
     """QGIS Plugin Implementation."""
 
@@ -123,6 +125,7 @@ class YKRTool:
 
         self.ykrToolDictionaries = YKRToolDictionaries(self.iface, locale)
         self.ykrZonesStats = YKRZonesStats(self.ykrToolDictionaries, self.connParams, self.iface)
+        self.carbonMap = CarbonMap(self.ykrToolDictionaries, self.plugin_dir, self.iface)
         self.ykrToolUploadLayer = YKRToolUploadLayer(self.iface)
 
         self.investigatedAreaMapLayer = None
@@ -246,6 +249,13 @@ class YKRTool:
             icon_path,
             text=self.tr(u'CO2 Emissions Tool'),
             callback=self.run,
+            parent=self.iface.mainWindow())
+        
+        icon_path = ':/plugins/ykr_tool/icon.png'
+        self.add_action(
+            icon_path,
+            text=self.tr(u'Download Carbon Map Result(s)'),
+            callback=self.carbonMap.downloadCarbonMapResults,
             parent=self.iface.mainWindow())
         
         # self.add_action(
