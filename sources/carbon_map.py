@@ -1,5 +1,5 @@
 from PyQt5 import uic, QtNetwork
-from PyQt5.QtCore import QCoreApplication, QEventLoop, QUrl
+from PyQt5.QtCore import QCoreApplication, QEventLoop, QUrl, QSettings
 
 from qgis.core import (QgsTask, QgsMessageLog, Qgis, QgsVectorLayer, QgsProject)
 
@@ -34,6 +34,11 @@ class CarbonMap:
 
     def downloadCarbonMapResults(self):
         """User has chosen to download Carbon Map results"""
+
+        save_path = QSettings().value("/YKRTool/CarbonMapDataFilePath", "", type=str)
+        if save_path != "":
+            self.carbonMapDataDownloadDialog.mQgsFileWidgetDataLocation.setFilePath(save_path)
+
         self.carbonMapDataDownloadDialog.show()
         # Run the dialog event loop
         result = self.carbonMapDataDownloadDialog.exec_()
@@ -76,6 +81,8 @@ class CarbonMap:
                     # QgsMessageLog.logMessage('responseData: ' + responseData[:5], 'Carbon Map (YKRTool)', Qgis.Info)
 
                     save_path = cmDialog.mQgsFileWidgetDataLocation.filePath()
+                    if save_path != "":
+                        QSettings().setValue("/YKRTool/CarbonMapDataFilePath", save_path)
 
                     completeNameTotals, completeNameAreas = self.saveReportData(responseData, save_path)
                     self.addMapLayers(responseData, completeNameTotals, completeNameAreas)
@@ -89,20 +96,32 @@ class CarbonMap:
         # TODO Create map layers of the responseData GeoJSON and add them to the project
         data = json.loads(responseData)
 
+
         layerData = data["report_data"]["totals"]
         file_name = data["name"] + "_totals_" + data["id"]
 
         completeNameTotals = os.path.join(save_path, file_name + ".geojson")
-        # print(completeName + " saved")
+        index = 0
+
+        while os.path.exists(completeNameTotals):
+            index += 1
+            completeNameTotals = os.path.join(save_path, file_name + " (" + str(index) + ").geojson")
+
         file1 = open(completeNameTotals, "wt")
         file1.write(json.dumps(layerData))
         file1.close()
+
 
         layerData = data["report_data"]["areas"]
         file_name = data["name"] + "_areas_" + data["id"]
 
         completeNameAreas = os.path.join(save_path, file_name + ".geojson")
-        # print(completeName + " saved")
+        index = 0
+
+        while os.path.exists(completeNameAreas):
+            index += 1
+            completeNameAreas = os.path.join(save_path, file_name + " (" + str(index) + ").geojson")
+
         file1 = open(completeNameAreas, "wt")
         file1.write(json.dumps(layerData))
         file1.close()
