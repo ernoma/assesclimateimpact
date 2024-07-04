@@ -232,42 +232,52 @@ class CarbonMap:
         ## Areas
         ##
         
-        # Calculate carbon stock CO2-eq/ha and total change value for each plan area from year 2024 to year 2030 and visualization for the areas layer based on the value
+        # Calculate carbon stock CO2-eq/ha and total change value for each plan area from earliest year to year 2030 and visualization for the areas layer based on the value
 
-        layer_name = data["name"] + " - areas (CO2-eq change 2024-2030, " + data["id"] + ")"
-        # layer = QgsVectorLayer(json.dumps(layerData), layer_name, 'memory')
-        layer_area_total = QgsVectorLayer(completeNameAreas, layer_name,"ogr")
+        features = data["report_data"]["areas"]["features"]
+        if len(features) > 0:
+            first_year = 2100
+            for key in features[0]["properties"].keys():
+                if "ground_carbon_total_planned" in key:
+                    parts = key.split("_planned_")
+                    year = int(parts[1])
+                    if year < first_year:
+                        first_year = year
 
-        QgsProject.instance().addMapLayer(layer_area_total, False)
-        rootGroup.addLayer(layer_area_total)
-    
-        symbology_path = os.path.join(self.plugin_dir, 'docs', 'carbon_map', 'carbon_total_change.qml')
-        layer_area_total.loadNamedStyle(symbology_path)
-        field = QgsField('carbon_total_planned_2024', QVariant.Double)
-        layer_area_total.addExpressionField(' ("ground_carbon_total_planned_2024" + "bio_carbon_total_planned_2024") ', field)
-        field = QgsField('carbon_total_planned_2030', QVariant.Double)
-        layer_area_total.addExpressionField(' ("ground_carbon_total_planned_2030" + "bio_carbon_total_planned_2030") ', field)
-        field = QgsField('carbon_total_change_planned_2024_2030', QVariant.Double)
-        layer_area_total.addExpressionField(' ("ground_carbon_total_planned_2030" + "bio_carbon_total_planned_2030") - ("ground_carbon_total_planned_2024" + "bio_carbon_total_planned_2024")', field)
-        layer_area_total.triggerRepaint()  
+            layer_name = data["name"] + " - areas (CO2-eq change " + str(first_year) + "-2030, " + data["id"] + ")"
+            # layer = QgsVectorLayer(json.dumps(layerData), layer_name, 'memory')
+            layer_area_total = QgsVectorLayer(completeNameAreas, layer_name,"ogr")
+
+            QgsProject.instance().addMapLayer(layer_area_total, False)
+            rootGroup.addLayer(layer_area_total)
+        
+            symbology_path = os.path.join(self.plugin_dir, 'docs', 'carbon_map', 'carbon_total_change.qml')
+            layer_area_total.loadNamedStyle(symbology_path)
+            field = QgsField('carbon_total_planned_' + str(first_year), QVariant.Double)
+            layer_area_total.addExpressionField(' ("ground_carbon_total_planned_' + str(first_year) + '" + "bio_carbon_total_planned_' + str(first_year) + '") ', field)
+            field = QgsField('carbon_total_planned_2030', QVariant.Double)
+            layer_area_total.addExpressionField(' ("ground_carbon_total_planned_2030" + "bio_carbon_total_planned_2030") ', field)
+            field = QgsField('carbon_total_change_planned_' + str(first_year) + '_2030', QVariant.Double)
+            layer_area_total.addExpressionField(' ("ground_carbon_total_planned_2030" + "bio_carbon_total_planned_2030") - ("ground_carbon_total_planned_' + str(first_year) + '" + "bio_carbon_total_planned_' + str(first_year) + '")', field)
+            layer_area_total.triggerRepaint()  
 
 
-        layer_name = data["name"] + " - areas (CO2-eq/ha change 2024-2030, " + data["id"] + ")"
-        # layer = QgsVectorLayer(json.dumps(layerData), layer_name, 'memory')
-        layer_area_ha = QgsVectorLayer(completeNameAreas, layer_name,"ogr")
+            layer_name = data["name"] + " - areas (CO2-eq/ha change " + str(first_year) + "-2030, " + data["id"] + ")"
+            # layer = QgsVectorLayer(json.dumps(layerData), layer_name, 'memory')
+            layer_area_ha = QgsVectorLayer(completeNameAreas, layer_name,"ogr")
 
-        QgsProject.instance().addMapLayer(layer_area_ha, False)
-        rootGroup.addLayer(layer_area_ha)
+            QgsProject.instance().addMapLayer(layer_area_ha, False)
+            rootGroup.addLayer(layer_area_ha)
 
-        symbology_path = os.path.join(self.plugin_dir, 'docs', 'carbon_map', 'carbon_ha_change.qml')
-        layer_area_ha.loadNamedStyle(symbology_path)
-        field = QgsField('carbon_ha_planned_2024', QVariant.Double)
-        layer_area_ha.addExpressionField(' ("ground_carbon_ha_planned_2024" + "bio_carbon_ha_planned_2024") ', field)
-        field = QgsField('carbon_ha_planned_2030', QVariant.Double)
-        layer_area_ha.addExpressionField(' ("ground_carbon_ha_planned_2030" + "bio_carbon_ha_planned_2030") ', field)
-        field = QgsField('carbon_ha_change_planned_2024_2030', QVariant.Double)
-        layer_area_ha.addExpressionField(' ("ground_carbon_ha_planned_2030" + "bio_carbon_ha_planned_2030") - ("ground_carbon_ha_planned_2024" + "bio_carbon_ha_planned_2024") ', field)
-        layer_area_ha.triggerRepaint()  
+            symbology_path = os.path.join(self.plugin_dir, 'docs', 'carbon_map', 'carbon_ha_change.qml')
+            layer_area_ha.loadNamedStyle(symbology_path)
+            field = QgsField('carbon_ha_planned_' + str(first_year), QVariant.Double)
+            layer_area_ha.addExpressionField(' ("ground_carbon_ha_planned_' + str(first_year) + '" + "bio_carbon_ha_planned_' + str(first_year) + '") ', field)
+            field = QgsField('carbon_ha_planned_2030', QVariant.Double)
+            layer_area_ha.addExpressionField(' ("ground_carbon_ha_planned_2030" + "bio_carbon_ha_planned_2030") ', field)
+            field = QgsField('carbon_ha_change_planned_' + str(first_year) + '_2030', QVariant.Double)
+            layer_area_ha.addExpressionField(' ("ground_carbon_ha_planned_2030" + "bio_carbon_ha_planned_2030") - ("ground_carbon_ha_planned_' + str(first_year) + '" + "bio_carbon_ha_planned_' + str(first_year) + '") ', field)
+            layer_area_ha.triggerRepaint()  
 
         # for name in layerNames:
             #     layer = QgsVectorLayer(uri.uri(False), name[0], 'postgres')
