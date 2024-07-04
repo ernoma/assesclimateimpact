@@ -254,8 +254,8 @@ class YKRTool:
         icon_path = ':/plugins/ykr_tool/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u'Download Carbon Map Result(s)'),
-            callback=self.carbonMap.downloadCarbonMapResults,
+            text=self.tr(u'Import Carbon Map Result(s)'),
+            callback=self.carbonMap.importCarbonMapResults,
             parent=self.iface.mainWindow())
         
         # self.add_action(

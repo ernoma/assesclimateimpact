@@ -16,6 +16,8 @@ class CarbonMap:
 
         self.nManager = QtNetwork.QNetworkAccessManager()
 
+        self.first_start = True
+
 
     def tr(self, message):
         """Get the translation for a string using Qt translation API.
@@ -30,10 +32,42 @@ class CarbonMap:
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('YKRTool', message)
-    
 
-    def downloadCarbonMapResults(self):
-        """User has chosen to download Carbon Map results"""
+
+    def setupCarbonMapDataDownloadDialog(self):
+        cmDialog = self.carbonMapDataDownloadDialog
+        cmDialog.radioButtonDownloadReportData.clicked.connect(self.handleRadioButtonDownloadReportDataToggle)
+        cmDialog.radioButtonImportSessionData.clicked.connect(self.handleRadioButtonImportSessionDataToggle)
+
+
+    def handleRadioButtonDownloadReportDataToggle(self, checked):
+        cmDialog = self.carbonMapDataDownloadDialog
+
+        if checked:
+             cmDialog.groupBoxDownloadReportData.setEnabled(True)
+             cmDialog.plainTextEditSessionData.setEnabled(False)
+        else:
+            cmDialog.groupBoxDownloadReportData.setEnabled(False)
+            cmDialog.plainTextEditSessionData.setEnabled(True)
+
+
+    def handleRadioButtonImportSessionDataToggle(self, checked):
+        cmDialog = self.carbonMapDataDownloadDialog
+
+        if checked:
+             cmDialog.groupBoxDownloadReportData.setEnabled(False)
+             cmDialog.plainTextEditSessionData.setEnabled(True)
+        else:
+            cmDialog.groupBoxDownloadReportData.setEnabled(True)
+            cmDialog.plainTextEditSessionData.setEnabled(False)
+
+
+    def importCarbonMapResults(self):
+        """User has chosen to Import Carbon Map results"""
+
+        if self.first_start:
+            self.first_start = False
+            self.setupCarbonMapDataDownloadDialog()
 
         save_path = QSettings().value("/YKRTool/CarbonMapDataFilePath", "", type=str)
         if save_path != "":
@@ -44,8 +78,44 @@ class CarbonMap:
         result = self.carbonMapDataDownloadDialog.exec_()
         # See if OK was pressed
         if result:
-            self.downloadData()
+            if self.carbonMapDataDownloadDialog.radioButtonDownloadReportData.isChecked():
+                self.downloadData()
+            else:
+                self.importSessionData()
 
+    
+    def importSessionData(self):
+        cmDialog = self.carbonMapDataDownloadDialog
+
+        session_data = cmDialog.plainTextEditSessionData.toPlainText()
+
+        QgsMessageLog.logMessage(session_data, 'Carbon Map (YKRTool)', Qgis.Info)
+
+        json_data = json.loads(session_data)
+
+        save_path = cmDialog.mQgsFileWidgetDataLocation.filePath()
+        if save_path != "":
+            QSettings().setValue("/YKRTool/CarbonMapDataFilePath", save_path)
+
+        for key in json_data["state"]["planConfs"].keys():
+            data = json_data["state"]["planConfs"][key]
+            simpleResponseData = self.processDataToSimpleFeatures(data)
+            report_data = json.dumps(simpleResponseData)
+            completeNameTotals, completeNameAreas = self.saveReportData(report_data, save_path)
+            self.addMapLayers(report_data, completeNameTotals, completeNameAreas)
+
+            complexResponseData = self.processDataToComplexFeatures(report_data)
+            self.saveReportDataWithYearAttributeFeatures(complexResponseData, save_path)
+
+        for key in json_data["state"]["externalPlanConfs"].keys():
+            data = json_data["state"]["externalPlanConfs"][key]
+            simpleResponseData = self.processDataToSimpleFeatures(data)
+            report_data = json.dumps(simpleResponseData)
+            completeNameTotals, completeNameAreas = self.saveReportData(report_data, save_path)
+            self.addMapLayers(report_data, completeNameTotals, completeNameAreas)
+
+            complexResponseData = self.processDataToComplexFeatures(report_data)
+            self.saveReportDataWithYearAttributeFeatures(complexResponseData, save_path)
 
     def downloadData(self):
         cmDialog = self.carbonMapDataDownloadDialog
@@ -208,6 +278,116 @@ class CarbonMap:
             # self.resultLayers.append(layer)
             
 
+    def processDataToSimpleFeatures(self, data):
+        simpleData = {
+            "id": data["serverId"],
+            "name": data["name"],
+            "report_data": {
+                "areas": {
+                    "type": "FeatureCollection",
+                    "features": []
+                },
+                "totals": {
+                    "type": "FeatureCollection",
+                    "features": []
+                }
+            }
+        }
+
+        for feature in data["reportData"]["areas"]["features"]:
+            newFeature = {
+                "id": feature["id"],
+                "type": feature["type"],
+                "geometry": feature["geometry"],
+                "properties": {
+        
+                }
+            }
+
+            for key in feature['properties'].keys():
+                if key == "bio_carbon_total":
+                    for yearKey in feature['properties'][key]["nochange"].keys():
+                        value = feature['properties'][key]["nochange"][yearKey]
+                        newFeature["properties"]["bio_carbon_total" + "_" + "nochange" + "_" + yearKey] = value
+                    for yearKey in feature['properties'][key]["planned"].keys():
+                        value = feature['properties'][key]["planned"][yearKey]
+                        newFeature["properties"]["bio_carbon_total" + "_" + "planned" + "_" + yearKey] = value
+                elif key == "ground_carbon_total":
+                    for yearKey in feature['properties'][key]["nochange"].keys():
+                        value = feature['properties'][key]["nochange"][yearKey]
+                        newFeature["properties"]["ground_carbon_total" + "_" + "nochange" + "_" + yearKey] = value
+                    for yearKey in feature['properties'][key]["planned"].keys():
+                        value = feature['properties'][key]["planned"][yearKey]
+                        newFeature["properties"]["ground_carbon_total" + "_" + "planned" + "_" + yearKey] = value
+                elif key == "bio_carbon_ha":
+                    for yearKey in feature['properties'][key]["nochange"].keys():
+                        value = feature['properties'][key]["nochange"][yearKey]
+                        newFeature["properties"]["bio_carbon_ha" + "_" + "nochange" + "_" + yearKey] = value
+                    for yearKey in feature['properties'][key]["planned"].keys():
+                        value = feature['properties'][key]["planned"][yearKey]
+                        newFeature["properties"]["bio_carbon_ha" + "_" + "planned" + "_" + yearKey] = value
+                elif key == "ground_carbon_ha":
+                    for yearKey in feature['properties'][key]["nochange"].keys():
+                        value = feature['properties'][key]["nochange"][yearKey]
+                        newFeature["properties"]["ground_carbon_ha" + "_" + "nochange" + "_" + yearKey] = value
+                    for yearKey in feature['properties'][key]["planned"].keys():
+                        value = feature['properties'][key]["planned"][yearKey]
+                        newFeature["properties"]["ground_carbon_ha" + "_" + "planned" + "_" + yearKey] = value
+                else:
+                    newFeature["properties"][key] = feature['properties'][key]
+                    if key != "area" and key != "zoning_code":
+                        QgsMessageLog.logMessage('Unknown feature property type: ' + key, 'Carbon Map (YKRTool)', Qgis.Info)
+    
+            simpleData["report_data"]["areas"]["features"].append(newFeature)
+
+        for feature in data["reportData"]["totals"]["features"]:
+            newFeature = {
+                "id": feature["id"],
+                "type": feature["type"],
+                "geometry": feature["geometry"],
+                "properties": {
+        
+                }
+            }
+
+            for key in feature['properties'].keys():
+                if key == "bio_carbon_total":
+                    for yearKey in feature['properties'][key]["nochange"].keys():
+                        value = feature['properties'][key]["nochange"][yearKey]
+                        newFeature["properties"]["bio_carbon_total" + "_" + "nochange" + "_" + yearKey] = value
+                    for yearKey in feature['properties'][key]["planned"].keys():
+                        value = feature['properties'][key]["planned"][yearKey]
+                        newFeature["properties"]["bio_carbon_total" + "_" + "planned" + "_" + yearKey] = value
+                elif key == "ground_carbon_total":
+                    for yearKey in feature['properties'][key]["nochange"].keys():
+                        value = feature['properties'][key]["nochange"][yearKey]
+                        newFeature["properties"]["ground_carbon_total" + "_" + "nochange" + "_" + yearKey] = value
+                    for yearKey in feature['properties'][key]["planned"].keys():
+                        value = feature['properties'][key]["planned"][yearKey]
+                        newFeature["properties"]["ground_carbon_total" + "_" + "planned" + "_" + yearKey] = value
+                elif key == "bio_carbon_ha":
+                    for yearKey in feature['properties'][key]["nochange"].keys():
+                        value = feature['properties'][key]["nochange"][yearKey]
+                        newFeature["properties"]["bio_carbon_ha" + "_" + "nochange" + "_" + yearKey] = value
+                    for yearKey in feature['properties'][key]["planned"].keys():
+                        value = feature['properties'][key]["planned"][yearKey]
+                        newFeature["properties"]["bio_carbon_ha" + "_" + "planned" + "_" + yearKey] = value
+                elif key == "ground_carbon_ha":
+                    for yearKey in feature['properties'][key]["nochange"].keys():
+                        value = feature['properties'][key]["nochange"][yearKey]
+                        newFeature["properties"]["ground_carbon_ha" + "_" + "nochange" + "_" + yearKey] = value
+                    for yearKey in feature['properties'][key]["planned"].keys():
+                        value = feature['properties'][key]["planned"][yearKey]
+                        newFeature["properties"]["ground_carbon_ha" + "_" + "planned" + "_" + yearKey] = value
+                else:
+                    newFeature["properties"][key] = feature['properties'][key]
+                    if key != "area" and key != "zoning_code":
+                        QgsMessageLog.logMessage('Unknown feature property type: ' + key, 'Carbon Map (YKRTool)', Qgis.Info)
+    
+            simpleData["report_data"]["totals"]["features"].append(newFeature)
+
+        return simpleData
+
 
     def processDataToComplexFeatures(self, responseData):
         
@@ -311,15 +491,12 @@ class CarbonMap:
 
             comlexData["reportData"]["totals"]["features"].append(newFeature)
 
-
         # QgsMessageLog.logMessage(str(comlexData), 'Carbon Map (YKRTool)', Qgis.Info)
 
         return comlexData
     
     
     def saveReportDataWithYearAttributeFeatures(self, complexResponseData, save_path):
-
-
         origFeatures = complexResponseData["reportData"]["totals"]["features"]
 
         layerData = {
