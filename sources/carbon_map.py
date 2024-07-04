@@ -53,47 +53,52 @@ class CarbonMap:
         if link_text == '':
             self.iface.messageBar().pushMessage(self.tr('Link to report was not provided'), cmDialog.windowTitle(), Qgis.Info, duration=3)
         else:
-            link_parts = link_text.split('?')
-            base_url = link_parts[0].split('/raportti')
+            link_parts = link_text.split('?id=')
+            base_url = link_parts[0].split('/raportti')[0]
             ids = link_parts[1].split(',')
+            # http://localhost:3000/raportti?id=9f3e609d-3c8c-40bd-a2af-47e617ffc21a,9f3e609d-3c8c-40bd-a2af-47e617ffc21b
 
-            request = QtNetwork.QNetworkRequest(QUrl(link_text))
-            # userAgent = b'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36'
-            userAgent = b'Urban Structure Climate Impact Assessment Tool (USCIAT)'
-            request.setRawHeader(b'User-Agent', userAgent)
-            reply = self.nManager.get(request) # QNetworkReply
-            reply.deleteLater()
-            loop = QEventLoop()
-            reply.finished.connect(loop.quit)
-            loop.exec_()
-            bytes_string = reply.readAll()
+            for id in ids:
+                url = base_url + "/" + "api/report?id=" + id
+                QgsMessageLog.logMessage('url: ' + url, 'Carbon Map (YKRTool)', Qgis.Info)
 
-            if reply.error() == QtNetwork.QNetworkReply.NoError:
+                request = QtNetwork.QNetworkRequest(QUrl(url))
+                # userAgent = b'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36'
+                userAgent = b'Urban Structure Climate Impact Assessment Tool (USCIAT)'
+                request.setRawHeader(b'User-Agent', userAgent)
+                reply = self.nManager.get(request) # QNetworkReply
+                reply.deleteLater()
+                loop = QEventLoop()
+                reply.finished.connect(loop.quit)
+                loop.exec_()
+                bytes_string = reply.readAll()
 
-                # contentTypeHeader = reply.header(QtNetwork.QNetworkRequest.ContentTypeHeader)
-                # if isinstance(contentTypeHeader, str):
-                #     QgsMessageLog.logMessage('Header: ' + contentTypeHeader, 'Carbon Map (YKRTool)', Qgis.Info)
+                if reply.error() == QtNetwork.QNetworkReply.NoError:
 
-                # responseData = str(bytes_string, 'utf-8')
-                if not bytes_string.isEmpty():
-                    responseData = bytes(bytes_string).decode("utf-8")
-                    # self.iface.messageBar().pushMessage(self.tr('Success downloading data'), cmDialog.windowTitle(), Qgis.Info, duration=1)
-                    # QgsMessageLog.logMessage('responseData: ' + responseData[:5], 'Carbon Map (YKRTool)', Qgis.Info)
+                    # contentTypeHeader = reply.header(QtNetwork.QNetworkRequest.ContentTypeHeader)
+                    # if isinstance(contentTypeHeader, str):
+                    #     QgsMessageLog.logMessage('Header: ' + contentTypeHeader, 'Carbon Map (YKRTool)', Qgis.Info)
 
-                    save_path = cmDialog.mQgsFileWidgetDataLocation.filePath()
-                    if save_path != "":
-                        QSettings().setValue("/YKRTool/CarbonMapDataFilePath", save_path)
+                    # responseData = str(bytes_string, 'utf-8')
+                    if not bytes_string.isEmpty():
+                        responseData = bytes(bytes_string).decode("utf-8")
+                        # self.iface.messageBar().pushMessage(self.tr('Success downloading data'), cmDialog.windowTitle(), Qgis.Info, duration=1)
+                        # QgsMessageLog.logMessage('responseData: ' + responseData[:5], 'Carbon Map (YKRTool)', Qgis.Info)
 
-                    completeNameTotals, completeNameAreas = self.saveReportData(responseData, save_path)
-                    self.addMapLayers(responseData, completeNameTotals, completeNameAreas)
+                        save_path = cmDialog.mQgsFileWidgetDataLocation.filePath()
+                        if save_path != "":
+                            QSettings().setValue("/YKRTool/CarbonMapDataFilePath", save_path)
 
-                    complexResponseData = self.processDataToComplexFeatures(responseData)
-                    self.saveReportDataWithYearAttributeFeatures(complexResponseData, save_path)
+                        completeNameTotals, completeNameAreas = self.saveReportData(responseData, save_path)
+                        self.addMapLayers(responseData, completeNameTotals, completeNameAreas)
 
+                        complexResponseData = self.processDataToComplexFeatures(responseData)
+                        self.saveReportDataWithYearAttributeFeatures(complexResponseData, save_path)
+
+                    else:
+                        self.iface.messageBar().pushMessage(self.tr('The response data was empty'), cmDialog.windowTitle(), Qgis.Warning)
                 else:
-                    self.iface.messageBar().pushMessage(self.tr('The response data was empty'), cmDialog.windowTitle(), Qgis.Warning)
-            else:
-                self.iface.messageBar().pushMessage(self.tr('Error downloading data'), cmDialog.windowTitle(), Qgis.Warning)
+                    self.iface.messageBar().pushMessage(self.tr('Error downloading data'), cmDialog.windowTitle(), Qgis.Warning)
             
 
     def saveReportData(self, responseData, save_path):
