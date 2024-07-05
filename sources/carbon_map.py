@@ -89,7 +89,7 @@ class CarbonMap:
 
         session_data = cmDialog.plainTextEditSessionData.toPlainText()
 
-        QgsMessageLog.logMessage(session_data, 'Carbon Map (YKRTool)', Qgis.Info)
+        # QgsMessageLog.logMessage(session_data, 'Carbon Map (YKRTool)', Qgis.Info)
 
         json_data = json.loads(session_data)
 
@@ -97,25 +97,19 @@ class CarbonMap:
         if save_path != "":
             QSettings().setValue("/YKRTool/CarbonMapDataFilePath", save_path)
 
-        for key in json_data["state"]["planConfs"].keys():
-            data = json_data["state"]["planConfs"][key]
-            simpleResponseData = self.processDataToSimpleFeatures(data)
-            report_data = json.dumps(simpleResponseData)
-            completeNameTotals, completeNameAreas = self.saveReportData(report_data, save_path)
-            self.addMapLayers(report_data, completeNameTotals, completeNameAreas)
+        confTypes = ["planConfs", "externalPlanConfs"]
 
-            complexResponseData = self.processDataToComplexFeatures(report_data)
-            self.saveReportDataWithYearAttributeFeatures(complexResponseData, save_path)
+        for confType in confTypes:
+            for key in json_data["state"][confType].keys():
+                data = json_data["state"][confType][key]
+                simpleResponseData = self.processDataToSimpleFeatures(data)
+                report_data = json.dumps(simpleResponseData)
+                completeNameTotals, completeNameAreas = self.saveReportData(report_data, save_path)
+                self.addMapLayers(report_data, completeNameTotals, completeNameAreas)
 
-        for key in json_data["state"]["externalPlanConfs"].keys():
-            data = json_data["state"]["externalPlanConfs"][key]
-            simpleResponseData = self.processDataToSimpleFeatures(data)
-            report_data = json.dumps(simpleResponseData)
-            completeNameTotals, completeNameAreas = self.saveReportData(report_data, save_path)
-            self.addMapLayers(report_data, completeNameTotals, completeNameAreas)
+                complexResponseData = self.processDataToComplexFeatures(report_data)
+                self.saveReportDataWithYearAttributeFeatures(complexResponseData, save_path)
 
-            complexResponseData = self.processDataToComplexFeatures(report_data)
-            self.saveReportDataWithYearAttributeFeatures(complexResponseData, save_path)
 
     def downloadData(self):
         cmDialog = self.carbonMapDataDownloadDialog
