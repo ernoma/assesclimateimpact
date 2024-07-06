@@ -52,6 +52,7 @@ from .ykr_zones_stats import YKRZonesStats
 from .ykr_tool_upload_layer import YKRToolUploadLayer
 
 from .carbon_map import CarbonMap
+from .carbon_map_co2_emissions import CarbonMapCO2Emissions
 
 class YKRTool:
     """QGIS Plugin Implementation."""
@@ -126,6 +127,7 @@ class YKRTool:
         self.ykrToolDictionaries = YKRToolDictionaries(self.iface, locale)
         self.ykrZonesStats = YKRZonesStats(self.ykrToolDictionaries, self.connParams, self.iface)
         self.carbonMap = CarbonMap(self.ykrToolDictionaries, self.plugin_dir, self.iface)
+        self.carbonMapCO2Emissions = CarbonMapCO2Emissions(self.ykrToolDictionaries, self.plugin_dir, self.iface)
         self.ykrToolUploadLayer = YKRToolUploadLayer(self.iface)
 
         self.investigatedAreaMapLayer = None
@@ -256,6 +258,13 @@ class YKRTool:
             icon_path,
             text=self.tr(u'Import Carbon Map Result(s)'),
             callback=self.carbonMap.importCarbonMapResults,
+            parent=self.iface.mainWindow())
+        
+        icon_path = ':/plugins/ykr_tool/icon.png'
+        self.add_action(
+            icon_path,
+            text=self.tr(u'Combine Carbon Map and CO2 Emissions Result(s)'),
+            callback=self.carbonMapCO2Emissions.combineResults,
             parent=self.iface.mainWindow())
         
         # self.add_action(

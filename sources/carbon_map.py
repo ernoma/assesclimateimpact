@@ -184,8 +184,32 @@ class CarbonMap:
         file1.write(json.dumps(layerData))
         file1.close()
 
+        first_year = 2100
+        features = data["report_data"]["areas"]["features"]
+        if len(features) > 0:
+            for key in features[0]["properties"].keys():
+                if "ground_carbon_total_planned" in key:
+                    parts = key.split("_planned_")
+                    year = int(parts[1])
+                    if year < first_year:
+                        first_year = year
 
         layerData = data["report_data"]["areas"]
+
+        for feature in layerData["features"]:
+            feature['properties']['carbon_total_change_planned_' + str(first_year) + '_' + str(first_year)] = 0
+
+            feature['properties']['carbon_total_planned_' + str(first_year)] = feature['properties']["ground_carbon_total_planned_" + str(first_year)] + feature['properties']["bio_carbon_total_planned_" + str(first_year)]
+            feature['properties']['carbon_total_planned_2030'] = feature['properties']["ground_carbon_total_planned_2030"] + feature['properties']["bio_carbon_total_planned_2030"]
+            feature['properties']['carbon_total_change_planned_' + str(first_year) + '_2030'] = feature['properties']['carbon_total_planned_2030'] - feature['properties']['carbon_total_planned_' + str(first_year)]
+
+            feature['properties']['carbon_ha_change_planned_' + str(first_year) + '_' + str(first_year)] = 0
+
+            feature['properties']['carbon_ha_planned_' + str(first_year)] = feature['properties']["ground_carbon_ha_planned_" + str(first_year)] + feature['properties']["bio_carbon_ha_planned_" + str(first_year)]
+            feature['properties']['carbon_ha_planned_2030'] = feature['properties']["ground_carbon_ha_planned_2030"] + feature['properties']["bio_carbon_ha_planned_2030"]
+            feature['properties']['carbon_ha_change_planned_' + str(first_year) + '_2030'] = feature['properties']['carbon_ha_planned_2030'] - feature['properties']['carbon_ha_planned_' + str(first_year)]
+
+
         file_name = data["name"] + "_areas_" + data["id"]
 
         completeNameAreas = os.path.join(save_path, file_name + ".geojson")
@@ -247,12 +271,12 @@ class CarbonMap:
         
             symbology_path = os.path.join(self.plugin_dir, 'docs', 'carbon_map', 'carbon_total_change.qml')
             layer_area_total.loadNamedStyle(symbology_path)
-            field = QgsField('carbon_total_planned_' + str(first_year), QVariant.Double)
-            layer_area_total.addExpressionField(' ("ground_carbon_total_planned_' + str(first_year) + '" + "bio_carbon_total_planned_' + str(first_year) + '") ', field)
-            field = QgsField('carbon_total_planned_2030', QVariant.Double)
-            layer_area_total.addExpressionField(' ("ground_carbon_total_planned_2030" + "bio_carbon_total_planned_2030") ', field)
-            field = QgsField('carbon_total_change_planned_' + str(first_year) + '_2030', QVariant.Double)
-            layer_area_total.addExpressionField(' ("ground_carbon_total_planned_2030" + "bio_carbon_total_planned_2030") - ("ground_carbon_total_planned_' + str(first_year) + '" + "bio_carbon_total_planned_' + str(first_year) + '")', field)
+            # field = QgsField('Ocarbon_total_planned_' + str(first_year), QVariant.Double)
+            # layer_area_total.addExpressionField(' ("ground_carbon_total_planned_' + str(first_year) + '" + "bio_carbon_total_planned_' + str(first_year) + '") ', field)
+            # field = QgsField('Ocarbon_total_planned_2030', QVariant.Double)
+            # layer_area_total.addExpressionField(' ("ground_carbon_total_planned_2030" + "bio_carbon_total_planned_2030") ', field)
+            # field = QgsField('Ocarbon_total_change_planned_' + str(first_year) + '_2030', QVariant.Double)
+            # layer_area_total.addExpressionField(' ("ground_carbon_total_planned_2030" + "bio_carbon_total_planned_2030") - ("ground_carbon_total_planned_' + str(first_year) + '" + "bio_carbon_total_planned_' + str(first_year) + '")', field)
             layer_area_total.triggerRepaint()  
 
 
@@ -265,12 +289,12 @@ class CarbonMap:
 
             symbology_path = os.path.join(self.plugin_dir, 'docs', 'carbon_map', 'carbon_ha_change.qml')
             layer_area_ha.loadNamedStyle(symbology_path)
-            field = QgsField('carbon_ha_planned_' + str(first_year), QVariant.Double)
-            layer_area_ha.addExpressionField(' ("ground_carbon_ha_planned_' + str(first_year) + '" + "bio_carbon_ha_planned_' + str(first_year) + '") ', field)
-            field = QgsField('carbon_ha_planned_2030', QVariant.Double)
-            layer_area_ha.addExpressionField(' ("ground_carbon_ha_planned_2030" + "bio_carbon_ha_planned_2030") ', field)
-            field = QgsField('carbon_ha_change_planned_' + str(first_year) + '_2030', QVariant.Double)
-            layer_area_ha.addExpressionField(' ("ground_carbon_ha_planned_2030" + "bio_carbon_ha_planned_2030") - ("ground_carbon_ha_planned_' + str(first_year) + '" + "bio_carbon_ha_planned_' + str(first_year) + '") ', field)
+            # field = QgsField('Ocarbon_ha_planned_' + str(first_year), QVariant.Double)
+            # layer_area_ha.addExpressionField(' ("ground_carbon_ha_planned_' + str(first_year) + '" + "bio_carbon_ha_planned_' + str(first_year) + '") ', field)
+            # field = QgsField('Ocarbon_ha_planned_2030', QVariant.Double)
+            # layer_area_ha.addExpressionField(' ("ground_carbon_ha_planned_2030" + "bio_carbon_ha_planned_2030") ', field)
+            # field = QgsField('Ocarbon_ha_change_planned_' + str(first_year) + '_2030', QVariant.Double)
+            # layer_area_ha.addExpressionField(' ("ground_carbon_ha_planned_2030" + "bio_carbon_ha_planned_2030") - ("ground_carbon_ha_planned_' + str(first_year) + '" + "bio_carbon_ha_planned_' + str(first_year) + '") ', field)
             layer_area_ha.triggerRepaint()  
 
         # for name in layerNames:
