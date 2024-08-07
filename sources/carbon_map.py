@@ -102,13 +102,14 @@ class CarbonMap:
         for confType in confTypes:
             for key in json_data["state"][confType].keys():
                 data = json_data["state"][confType][key]
-                simpleResponseData = self.processDataToSimpleFeatures(data)
-                report_data = json.dumps(simpleResponseData)
-                completeNameTotals, completeNameAreas = self.saveReportData(report_data, save_path)
-                self.addMapLayers(report_data, completeNameTotals, completeNameAreas)
+                if data["status"] != "fetching":
+                    simpleResponseData = self.processDataToSimpleFeatures(data)
+                    report_data = json.dumps(simpleResponseData)
+                    completeNameTotals, completeNameAreas = self.saveReportData(report_data, save_path)
+                    self.addMapLayers(report_data, completeNameTotals, completeNameAreas)
 
-                complexResponseData = self.processDataToComplexFeatures(report_data)
-                self.saveReportDataWithYearAttributeFeatures(complexResponseData, save_path)
+                    complexResponseData = self.processDataToComplexFeatures(report_data)
+                    self.saveReportDataWithYearAttributeFeatures(complexResponseData, save_path)
 
 
     def downloadData(self):
