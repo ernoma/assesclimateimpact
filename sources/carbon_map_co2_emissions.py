@@ -105,7 +105,10 @@ class CarbonMapCO2Emissions:
                         for k in attrs.keys():
                             if k == "year" or k == "vuosi":
                                 keyEmissionsYear = k
-                                year = int(featureEmissions[k])
+                                if not isinstance(featureEmissions[k], str):
+                                    year = int(featureEmissions[k].year())
+                                else:
+                                    year = int(featureEmissions[k])
                                 if year not in yearsEmissions:
                                     yearsEmissions.append(year)
                                 break
@@ -156,7 +159,12 @@ class CarbonMapCO2Emissions:
                             featureEmissionsGeometry.transform(xformLayerEmissionsClone)
                             # if year == 2030:
                             #     QgsMessageLog.logMessage("year: " + str(year), 'Carbon Map and USCIAT', Qgis.Info)
-                            if featureEmissions[keyEmissionsYear] == year and featureEmissionsGeometry.intersects(featureStocksGeometry):
+                            tempYear = None
+                            if not isinstance(featureEmissions[k], str):
+                                tempYear = int(featureEmissions[keyEmissionsYear].year())
+                            else:
+                                tempYear = int(featureEmissions[keyEmissionsYear])
+                            if tempYear == year and featureEmissionsGeometry.intersects(featureStocksGeometry):
                                 intersectionArea = featureEmissionsGeometry.intersection(featureStocksGeometry).area()
                                 multiplier = intersectionArea / featureStocksArea
 
