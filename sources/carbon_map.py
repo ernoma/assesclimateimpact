@@ -272,6 +272,10 @@ class CarbonMap:
         
             symbology_path = os.path.join(self.plugin_dir, 'docs', 'carbon_map', 'carbon_total_change.qml')
             layer_area_total.loadNamedStyle(symbology_path)
+            # renderer = layer_area_total.renderer()
+            # # QgsMessageLog.logMessage(str(renderer.type()), 'Carbon Map (YKRTool)', Qgis.Info)
+            # if renderer.type() == 'graduatedSymbol':
+            #     renderer.updateClasses(layer_area_total, renderer.mode(), len(renderer.ranges()))
             # field = QgsField('Ocarbon_total_planned_' + str(first_year), QVariant.Double)
             # layer_area_total.addExpressionField(' ("ground_carbon_total_planned_' + str(first_year) + '" + "bio_carbon_total_planned_' + str(first_year) + '") ', field)
             # field = QgsField('Ocarbon_total_planned_2030', QVariant.Double)
