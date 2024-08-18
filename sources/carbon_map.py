@@ -102,7 +102,7 @@ class CarbonMap:
         for confType in confTypes:
             for key in json_data["state"][confType].keys():
                 data = json_data["state"][confType][key]
-                if data["status"] != "fetching":
+                if ("status" in data and data["status"] != "fetching") or ("calculationState" in data and data["calculationState"] != "fetching"):
                     simpleResponseData = self.processDataToSimpleFeatures(data)
                     report_data = json.dumps(simpleResponseData)
                     completeNameTotals, completeNameAreas = self.saveReportData(report_data, save_path)
