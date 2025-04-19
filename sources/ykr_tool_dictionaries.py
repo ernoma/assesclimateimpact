@@ -96,46 +96,52 @@ class YKRToolDictionaries:
         self.PITKOScenarios = {
             "fi": {
                 "static": "static",
-                "kasvu": "kasvu",
-                "wem": "wem",
-                "eu80": "eu80",
-                "muutos": "muutos",
-                "saasto": "saasto",
-                "pysahdys": "pysahdys"
+                "wemp": "wemp",
+                "wemh": "wemh",
+                "weml": "weml"
+                # "kasvu": "kasvu",
+                # "wem": "wem",
+                # "eu80": "eu80",
+                # "muutos": "muutos",
+                # "saasto": "saasto",
+                # "pysahdys": "pysahdys"
             },
             "en": {
                 "static": "static",
-                "growth": "kasvu",
-                "wem": "wem", 
-                "eu80": "eu80", 
-                "change": "muutos", 
-                "saving": "saasto", 
-                "stagnation": "pysahdys"
+                "wemp": "wemp",
+                "wemh": "wemh",
+                "weml": "weml"
+                # "growth": "kasvu",
+                # "wem": "wem", 
+                # "eu80": "eu80", 
+                # "change": "muutos", 
+                # "saving": "saasto", 
+                # "stagnation": "pysahdys"
             }
         }
 
 
-        self.electricityEmissionClasses = {
-            "fi": {
-                "tuotanto": "tuotanto",
-                "hankinta": "hankinta"
-            },
-            "en": {
-                "production": "tuotanto",
-                "purchase": "hankinta"
-            }
-        }
+        # self.electricityEmissionClasses = {
+        #     "fi": {
+        #         "tuotanto": "tuotanto",
+        #         "hankinta": "hankinta"
+        #     },
+        #     "en": {
+        #         "production": "tuotanto",
+        #         "purchase": "hankinta"
+        #     }
+        # }
 
-        self.emissionAllocationMethod = {
-            "fi": {
-                'Energiamenetelmä': 'em',
-                'Hyödynjakomenetelmä': 'hjm'
-            },
-            "en": {
-                'Energy method': 'em',
-                'Benefits division method': 'hjm'
-            },
-        }
+        # self.emissionAllocationMethod = {
+        #     "fi": {
+        #         'Energiamenetelmä': 'em',
+        #         'Hyödynjakomenetelmä': 'hjm'
+        #     },
+        #     "en": {
+        #         'Energy method': 'em',
+        #         'Benefits division method': 'hjm'
+        #     },
+        # }
 
         # self.electricityEmissionClass = {
         #     'Tuotanto': 'tuotanto',
@@ -387,61 +393,61 @@ class YKRToolDictionaries:
     ##
     ##
             
-    def getEmissionAllocationMethodNames(self):
-        if self.locale not in self.emissionAllocationMethod:
-            return self.emissionAllocationMethod["en"].keys()
-        else:
-            return self.emissionAllocationMethod[self.locale].keys()
+    # def getEmissionAllocationMethodNames(self):
+    #     if self.locale not in self.emissionAllocationMethod:
+    #         return self.emissionAllocationMethod["en"].keys()
+    #     else:
+    #         return self.emissionAllocationMethod[self.locale].keys()
 
 
-    def getEmissionAllocationMethodShortName(self, emissionAllocationMethodUserFriendlyName):
-        if self.locale not in self.emissionAllocationMethod:
-            return self.emissionAllocationMethod["en"][emissionAllocationMethodUserFriendlyName]
-        else:
-            return self.emissionAllocationMethod[self.locale][emissionAllocationMethodUserFriendlyName]
+    # def getEmissionAllocationMethodShortName(self, emissionAllocationMethodUserFriendlyName):
+    #     if self.locale not in self.emissionAllocationMethod:
+    #         return self.emissionAllocationMethod["en"][emissionAllocationMethodUserFriendlyName]
+    #     else:
+    #         return self.emissionAllocationMethod[self.locale][emissionAllocationMethodUserFriendlyName]
 
-    def getPredefinedEmissionAllocationMethodName(self, EmissionAllocationMethodName):
-        if self.locale not in self.emissionAllocationMethod:
-            key_list = list(self.emissionAllocationMethod["en"].keys())
-            val_list = list(self.emissionAllocationMethod["en"].values())
-        else:
-            key_list = list(self.emissionAllocationMethod[self.locale].keys())
-            val_list = list(self.emissionAllocationMethod[self.locale].values())
+    # def getPredefinedEmissionAllocationMethodName(self, EmissionAllocationMethodName):
+    #     if self.locale not in self.emissionAllocationMethod:
+    #         key_list = list(self.emissionAllocationMethod["en"].keys())
+    #         val_list = list(self.emissionAllocationMethod["en"].values())
+    #     else:
+    #         key_list = list(self.emissionAllocationMethod[self.locale].keys())
+    #         val_list = list(self.emissionAllocationMethod[self.locale].values())
 
-        try:
-            position = val_list.index(EmissionAllocationMethodName)
-        except ValueError as e:
-            return EmissionAllocationMethodName
+    #     try:
+    #         position = val_list.index(EmissionAllocationMethodName)
+    #     except ValueError as e:
+    #         return EmissionAllocationMethodName
 
-        return key_list[position]
+    #     return key_list[position]
 
 
-    def getElectricityTypeNames(self):
-        if self.locale not in self.electricityEmissionClasses:
-            return self.electricityEmissionClasses["en"].keys()
-        else:
-            return self.electricityEmissionClasses[self.locale].keys()
+    # def getElectricityTypeNames(self):
+    #     if self.locale not in self.electricityEmissionClasses:
+    #         return self.electricityEmissionClasses["en"].keys()
+    #     else:
+    #         return self.electricityEmissionClasses[self.locale].keys()
 
-    def getElectricityTypeShortName(self, userFriendlyName):
-        if self.locale not in self.electricityEmissionClasses:
-            return self.electricityEmissionClasses["en"][userFriendlyName]
-        else:
-            return self.electricityEmissionClasses[self.locale][userFriendlyName]
+    # def getElectricityTypeShortName(self, userFriendlyName):
+    #     if self.locale not in self.electricityEmissionClasses:
+    #         return self.electricityEmissionClasses["en"][userFriendlyName]
+    #     else:
+    #         return self.electricityEmissionClasses[self.locale][userFriendlyName]
     
-    def getPredefinedElectricityTypeName(self, ElectricityTypeName):
-        if self.locale not in self.electricityEmissionClasses:
-            key_list = list(self.electricityEmissionClasses["en"].keys())
-            val_list = list(self.electricityEmissionClasses["en"].values())
-        else:
-            key_list = list(self.electricityEmissionClasses[self.locale].keys())
-            val_list = list(self.electricityEmissionClasses[self.locale].values())
+    # def getPredefinedElectricityTypeName(self, ElectricityTypeName):
+    #     if self.locale not in self.electricityEmissionClasses:
+    #         key_list = list(self.electricityEmissionClasses["en"].keys())
+    #         val_list = list(self.electricityEmissionClasses["en"].values())
+    #     else:
+    #         key_list = list(self.electricityEmissionClasses[self.locale].keys())
+    #         val_list = list(self.electricityEmissionClasses[self.locale].values())
 
-        try:
-            position = val_list.index(ElectricityTypeName)
-        except ValueError as e:
-            return ElectricityTypeName
+    #     try:
+    #         position = val_list.index(ElectricityTypeName)
+    #     except ValueError as e:
+    #         return ElectricityTypeName
 
-        return key_list[position]
+    #     return key_list[position]
 
     
     def getPredefinedUrbanRuralZoningAreaKeys(self):

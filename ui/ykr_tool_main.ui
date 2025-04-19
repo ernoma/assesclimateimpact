@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1104</width>
-    <height>606</height>
+    <height>1128</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -558,7 +558,7 @@
         <string>Advanced Settings (optional)</string>
        </property>
        <property name="collapsed">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="saveCollapsedState">
         <bool>false</bool>
@@ -569,14 +569,14 @@
           <item row="0" column="0">
            <widget class="QLabel" name="label_5">
             <property name="text">
-             <string>PITKO Scenario:</string>
+             <string>PEIKKO Scenario:</string>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
            <widget class="QComboBox" name="pitkoScenario">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="minimumSize">
              <size>
@@ -619,46 +619,6 @@
            </widget>
           </item>
           <item row="3" column="0">
-           <widget class="QLabel" name="label_6">
-            <property name="text">
-             <string>Allocation Method for Emissions:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QComboBox" name="emissionsAllocation">
-            <property name="minimumSize">
-             <size>
-              <width>180</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>Default: Energy method that divides produced CO2 emissions between produced heating and electricity</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_12">
-            <property name="text">
-             <string>Electricity Emission Class:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QComboBox" name="elecEmissionType">
-            <property name="minimumSize">
-             <size>
-              <width>180</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>Production: use domestic electrcity. Purchase: includes imported electricity in addition to lost electricity and domestically procuduced electricity</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
            <widget class="QCheckBox" name="checkBoxNokianMyllyCO2Zeroed">
             <property name="toolTip">
              <string>The source data is inaccurate causing incorrect CO2 peak</string>
@@ -671,16 +631,16 @@
             </property>
            </widget>
           </item>
-          <item row="6" column="0">
+          <item row="4" column="0">
            <layout class="QFormLayout" name="formLayout_6"/>
           </item>
-          <item row="6" column="1">
+          <item row="4" column="1">
            <layout class="QHBoxLayout" name="horizontalLayout_2"/>
           </item>
-          <item row="7" column="1">
+          <item row="5" column="1">
            <layout class="QHBoxLayout" name="horizontalLayout_3"/>
           </item>
-          <item row="8" column="0">
+          <item row="6" column="0">
            <widget class="QCheckBox" name="checkBoxCalculateEmissionsPerPerson">
             <property name="toolTip">
              <string>QGIS layer will be created where CO2 emissions have been divided with population count</string>
@@ -693,7 +653,7 @@
             </property>
            </widget>
           </item>
-          <item row="9" column="0">
+          <item row="7" column="0">
            <widget class="QCheckBox" name="checkBoxCalculateEmissionsPerJob">
             <property name="toolTip">
              <string>QGIS layer will be created where CO2 emissions have been divided with worker count</string>
@@ -706,7 +666,7 @@
             </property>
            </widget>
           </item>
-          <item row="10" column="0">
+          <item row="8" column="0">
            <widget class="QCheckBox" name="checkBoxCalculateEmissionsPerFloorSpaceSquares">
             <property name="toolTip">
              <string>QGIS layer will be created where CO2 emissions have been divided with floor square meters</string>
@@ -719,7 +679,7 @@
             </property>
            </widget>
           </item>
-          <item row="11" column="0">
+          <item row="9" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeTrafficEmissions">
             <property name="toolTip">
              <string>QGIS layers will be created where total traffic CO2 emissions as well as more detailed traffic CO2 emissions are shown</string>
@@ -732,7 +692,7 @@
             </property>
            </widget>
           </item>
-          <item row="12" column="0">
+          <item row="10" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeThermoEmissions">
             <property name="toolTip">
              <string>QGIS layers will be created where total heating CO2 emissions as well as more detailed heating CO2 emissions are shown</string>
@@ -745,7 +705,7 @@
             </property>
            </widget>
           </item>
-          <item row="13" column="0">
+          <item row="11" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeElectricityConsumptionEmissions">
             <property name="toolTip">
              <string>QGIS layers will be created where total electricity CO2 emissions as well as more detailed electricity CO2 emissions are shown</string>
@@ -758,7 +718,7 @@
             </property>
            </widget>
           </item>
-          <item row="14" column="0">
+          <item row="12" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizePopJobMix">
             <property name="toolTip">
              <string>QGIS layer will be created where division between population and work place count is shown</string>
@@ -771,7 +731,7 @@
             </property>
            </widget>
           </item>
-          <item row="15" column="0">
+          <item row="13" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeGoodZonesForPopJobDensityAndSustainableTransport">
             <property name="toolTip">
              <string>QGIS layer will be created where the most CO2 sustainable urban development zones are shown</string>
@@ -784,7 +744,7 @@
             </property>
            </widget>
           </item>
-          <item row="17" column="0">
+          <item row="15" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeFloorSpaceRatio">
             <property name="toolTip">
              <string>QGIS layer will be created where the UZ squares with building floor space ratio with at least 0,2 are included in same class</string>
@@ -797,7 +757,7 @@
             </property>
            </widget>
           </item>
-          <item row="18" column="0">
+          <item row="16" column="0">
            <widget class="QCheckBox" name="checkBoxVisualizeSustainableUrbanStructure">
             <property name="enabled">
              <bool>false</bool>
@@ -813,7 +773,7 @@
             </property>
            </widget>
           </item>
-          <item row="18" column="1">
+          <item row="16" column="1">
            <widget class="QgsMapLayerComboBox" name="mMapLayerComboBoxYKRCarOwnershipData">
             <property name="enabled">
              <bool>false</bool>
@@ -823,7 +783,7 @@
             </property>
            </widget>
           </item>
-          <item row="19" column="0">
+          <item row="17" column="0">
            <widget class="QCheckBox" name="checkBoxAllowOtherUsersToUseSustainableUrbanStructureTable">
             <property name="enabled">
              <bool>false</bool>
@@ -839,7 +799,20 @@
             </property>
            </widget>
           </item>
-          <item row="21" column="0">
+          <item row="18" column="0">
+           <widget class="QCheckBox" name="checkBoxCreateYKRZoneSummaryStats">
+            <property name="toolTip">
+             <string>If checked a few yearly summary statistics will be calculated for YKR zones and summary table names stored to sessions_v2 table</string>
+            </property>
+            <property name="text">
+             <string>Create YKR Zone Summary statistics</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="19" column="0">
            <widget class="QCheckBox" name="checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone">
             <property name="toolTip">
              <string>Static bar graph will be created (URL)</string>
@@ -852,26 +825,13 @@
             </property>
            </widget>
           </item>
-          <item row="22" column="0">
+          <item row="20" column="0">
            <widget class="QCheckBox" name="checkBoxAddQuickchartIoLinksOfZoneSquaresAndPopJobPercentagesOfTotalByZone">
             <property name="toolTip">
              <string>Static bar graph will be created (URL)</string>
             </property>
             <property name="text">
              <string>Add Quickchart.io Links of Zone Squares and Pop + Job as Percentages of Total By Zone</string>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="20" column="0">
-           <widget class="QCheckBox" name="checkBoxCreateYKRZoneSummaryStats">
-            <property name="toolTip">
-             <string>If checked a few yearly summary statistics will be calculated for YKR zones and summary table names stored to sessions_v2 table</string>
-            </property>
-            <property name="text">
-             <string>Create YKR Zone Summary statistics</string>
             </property>
             <property name="checked">
              <bool>false</bool>

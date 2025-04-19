@@ -375,11 +375,11 @@ class YKRTool:
         names = self.ykrToolDictionaries.getPITKOScenarioNames()
         md.pitkoScenario.addItems(names)
 
-        names = self.ykrToolDictionaries.getEmissionAllocationMethodNames()
-        md.emissionsAllocation.addItems(names)
+        # names = self.ykrToolDictionaries.getEmissionAllocationMethodNames()
+        # md.emissionsAllocation.addItems(names)
 
-        names = self.ykrToolDictionaries.getElectricityTypeNames()
-        md.elecEmissionType.addItems(names)
+        # names = self.ykrToolDictionaries.getElectricityTypeNames()
+        # md.elecEmissionType.addItems(names)
 
         #md.checkBoxOnlySelectedFeats.setEnabled(False)
         md.futureBox.setEnabled(False)
@@ -489,12 +489,12 @@ class YKRTool:
         #
         md.checkBoxIncludeLongDistance.setChecked(True)
         md.checkBoxIncludeBusinessTravel.setChecked(True)
-        md.emissionsAllocation.clear()
-        names = self.ykrToolDictionaries.getEmissionAllocationMethodNames()
-        md.emissionsAllocation.addItems(names)
-        md.elecEmissionType.clear()
-        names = self.ykrToolDictionaries.getElectricityTypeNames()
-        md.elecEmissionType.addItems(names)
+        # md.emissionsAllocation.clear()
+        # names = self.ykrToolDictionaries.getEmissionAllocationMethodNames()
+        # md.emissionsAllocation.addItems(names)
+        # md.elecEmissionType.clear()
+        # names = self.ykrToolDictionaries.getElectricityTypeNames()
+        # md.elecEmissionType.addItems(names)
         md.checkBoxNokianMyllyCO2Zeroed.setChecked(True)
         md.checkBoxCalculateEmissionsPerPerson.setChecked(True)
         md.checkBoxCalculateEmissionsPerJob.setChecked(True)
@@ -637,15 +637,15 @@ class YKRTool:
         md.checkBoxIncludeLongDistance.setChecked(True if QSettings().value("/YKRTool/IncludeLongDistance", "True", type=str).lower() == 'true' else False)
         md.checkBoxIncludeBusinessTravel.setChecked(True if QSettings().value("/YKRTool/IncludeBusinessTravel", "True", type=str).lower() == 'true' else False)
 
-        emissionsAllocationName = QSettings().value("/YKRTool/emissionsAllocationName", "", type=str)
-        if emissionsAllocationName != "":
-            emissionsAllocationPredefinedName = self.ykrToolDictionaries.getPredefinedEmissionAllocationMethodName(emissionsAllocationName)
-            md.emissionsAllocation.setCurrentText(emissionsAllocationPredefinedName)
+        # emissionsAllocationName = QSettings().value("/YKRTool/emissionsAllocationName", "", type=str)
+        # if emissionsAllocationName != "":
+        #     emissionsAllocationPredefinedName = self.ykrToolDictionaries.getPredefinedEmissionAllocationMethodName(emissionsAllocationName)
+        #     md.emissionsAllocation.setCurrentText(emissionsAllocationPredefinedName)
 
-        ElectricityTypeName = QSettings().value("/YKRTool/ElectricityTypeName", "", type=str)
-        if ElectricityTypeName != "":
-            ElectricityTypePredefinedName = self.ykrToolDictionaries.getPredefinedElectricityTypeName(ElectricityTypeName)
-            md.elecEmissionType.setCurrentText(ElectricityTypePredefinedName)
+        # ElectricityTypeName = QSettings().value("/YKRTool/ElectricityTypeName", "", type=str)
+        # if ElectricityTypeName != "":
+        #     ElectricityTypePredefinedName = self.ykrToolDictionaries.getPredefinedElectricityTypeName(ElectricityTypeName)
+        #     md.elecEmissionType.setCurrentText(ElectricityTypePredefinedName)
 
         md.checkBoxNokianMyllyCO2Zeroed.setChecked(True if QSettings().value("/YKRTool/NokianMyllyCO2Zeroed", "False", type=str).lower() == 'true' else False)
         md.checkBoxCalculateEmissionsPerPerson.setChecked(True if QSettings().value("/YKRTool/CalculateEmissionsPerPerson", "False", type=str).lower() == 'true' else False)
@@ -725,8 +725,8 @@ class YKRTool:
         QSettings().setValue("/YKRTool/IncludeLongDistance", 'True' if md.checkBoxIncludeLongDistance.isChecked() else 'False')
         QSettings().setValue("/YKRTool/IncludeBusinessTravel", 'True' if md.checkBoxIncludeBusinessTravel.isChecked() else 'False')
 
-        QSettings().setValue("/YKRTool/emissionsAllocationName", self.ykrToolDictionaries.getEmissionAllocationMethodShortName(md.emissionsAllocation.currentText()))
-        QSettings().setValue("/YKRTool/ElectricityTypeName", self.ykrToolDictionaries.getElectricityTypeShortName(md.elecEmissionType.currentText()))
+        # QSettings().setValue("/YKRTool/emissionsAllocationName", self.ykrToolDictionaries.getEmissionAllocationMethodShortName(md.emissionsAllocation.currentText()))
+        # QSettings().setValue("/YKRTool/ElectricityTypeName", self.ykrToolDictionaries.getElectricityTypeShortName(md.elecEmissionType.currentText()))
 
         QSettings().setValue("/YKRTool/NokianMyllyCO2Zeroed", 'True' if md.checkBoxNokianMyllyCO2Zeroed.isChecked() else 'False')
         QSettings().setValue("/YKRTool/CalculateEmissionsPerPerson", 'True' if md.checkBoxCalculateEmissionsPerPerson.isChecked() else 'False')
@@ -1098,8 +1098,8 @@ class YKRTool:
         # 'includeLongDistance': 'true' if self.includeLongDistance else 'false',
         # 'includeBusinessTravel': 'true' if self.includeBusinessTravel else 'false',
 
-        self.emissionsAllocation = self.ykrToolDictionaries.getEmissionAllocationMethodShortName(md.emissionsAllocation.currentText())
-        self.elecEmissionType = self.ykrToolDictionaries.getElectricityTypeShortName(md.elecEmissionType.currentText())
+        # self.emissionsAllocation = self.ykrToolDictionaries.getEmissionAllocationMethodShortName(md.emissionsAllocation.currentText())
+        # self.elecEmissionType = self.ykrToolDictionaries.getElectricityTypeShortName(md.elecEmissionType.currentText())
 
         if not md.checkBoxCalculateFuture.isChecked():
             self.calculateFuture = False
@@ -1421,8 +1421,8 @@ class YKRTool:
             # 'buildingTable': (self.tableNames[self.ykrBuildingsLayer]).lower(),
             # 'calcYear': 2023, #self.sessionParams['baseYear'],
             'pitkoScenario': self.pitkoScenario,
-            'emissionsAllocation': self.emissionsAllocation,
-            'elecEmissionType': self.elecEmissionType,
+            # 'emissionsAllocation': self.emissionsAllocation,
+            # 'elecEmissionType': self.elecEmissionType,
             'baseYear': self.sessionParams['baseYear'],
             # 'targetYear': 2023, #self.sessionParams['baseYear'],
             'outputTableName': outputTableName,
@@ -1436,7 +1436,7 @@ class YKRTool:
             # }
             # vals.update(presentYearVals)
             
-            query = '''CREATE TABLE user_output."{outputTableName}" AS SELECT * FROM CO2_CalculateEmissionsLoop({municipalities}, '{aoi}', '{pitkoScenario}', '{emissionsAllocation}', '{elecEmissionType}', '{baseYear}', '{baseYear}', NULL, NULL, NULL, {includeLongDistance}, {includeBusinessTravel});'''.format(**vals)
+            query = '''CREATE TABLE user_output."{outputTableName}" AS SELECT * FROM CO2_CalculateEmissionsLoop({municipalities}, '{aoi}', '{pitkoScenario}', '{baseYear}', '{baseYear}', NULL, NULL, NULL, {includeLongDistance}, {includeBusinessTravel});'''.format(**vals)
 
             # query = '''CREATE TABLE user_output."output_{0}" AS SELECT * FROM CO2_CalculateEmissions(array{1}, '{2}', {3}, {4}, array{5}, '{6}', '{7}', '{8}', {9}, {10});'''.format(self.sessionParams['uuid'], [837], self.predefinedAreaDBTableName, 'false' ,'true', [2023, 2023, 2023], self.pitkoScenario, self.emissionsAllocation, self.elecEmissionType, 2023, 2023)
 
@@ -1472,7 +1472,7 @@ class YKRTool:
         vals.update(futureVals)
         
         query = """CREATE TABLE user_output."{outputTableName}" AS
-        SELECT * FROM CO2_CalculateEmissionsLoop({municipalities}, '{aoi}', '{pitkoScenario}', '{emissionsAllocation}', '{elecEmissionType}', '{baseYear}', '{targetYear}', '{fAreas}'""".format(**vals)
+        SELECT * FROM CO2_CalculateEmissionsLoop({municipalities}, '{aoi}', '{pitkoScenario}', '{baseYear}', '{targetYear}', '{fAreas}'""".format(**vals)
         # query = """CREATE TABLE user_output."output_dev_{uuid}" AS
         # SELECT * FROM CO2_CalculateEmissions({municipalities}, '{aoi}', {includeLongDistance}, {includeBusinessTravel}, {calculationYears}, '{pitkoScenario}', '{emissionsAllocation}', '{elecEmissionType}', '{baseYear}', '{targetYear}', '{fAreas}'""".format(**vals)
 
@@ -1571,14 +1571,14 @@ class YKRTool:
             'starttime': self.sessionParams['startTime'],
             'baseyear': self.sessionParams['baseYear'],
             'targetyear': self.targetYear if self.calculateFuture else None,
-            'calculationScenario': self.pitkoScenario,
-            'metodi': self.emissionsAllocation,
-            'paastolaji': self.elecEmissionType
+            'calculationScenario': self.pitkoScenario
+            # 'metodi': self.emissionsAllocation,
+            # 'paastolaji': self.elecEmissionType
         }
 
-        self.cur.execute('''INSERT INTO user_output.sessions_v2(session_name, results_table_name, aoi, municipalities, kt_table_name, kv_table_name, joli_table_name, sid, usr, starttime, baseyear, targetyear, calculationScenario, metodi, paastolaji) VALUES (%s, %s, %s, %s, %s, %s, %s,
-        %s, %s, %s, %s, %s, %s, %s, %s)''', (self.latestSessionInfo['session_name'], self.latestSessionInfo['results_table_name'], self.latestSessionInfo['aoi'], self.latestSessionInfo['municipalities'], self.latestSessionInfo['kt_table_name'], self.latestSessionInfo['kv_table_name'], self.latestSessionInfo['joli_table_name'], self.latestSessionInfo['sid'], self.latestSessionInfo['usr'], self.latestSessionInfo['starttime'], self.latestSessionInfo['baseyear'], self.latestSessionInfo['targetyear'],\
-            self.latestSessionInfo['calculationScenario'], self.latestSessionInfo['metodi'], self.latestSessionInfo['paastolaji'], ))
+        self.cur.execute('''INSERT INTO user_output.sessions_v2(session_name, results_table_name, aoi, municipalities, kt_table_name, kv_table_name, joli_table_name, sid, usr, starttime, baseyear, targetyear, calculationScenario) VALUES (%s, %s, %s, %s, %s, %s, %s,
+        %s, %s, %s, %s, %s, %s)''', (self.latestSessionInfo['session_name'], self.latestSessionInfo['results_table_name'], self.latestSessionInfo['aoi'], self.latestSessionInfo['municipalities'], self.latestSessionInfo['kt_table_name'], self.latestSessionInfo['kv_table_name'], self.latestSessionInfo['joli_table_name'], self.latestSessionInfo['sid'], self.latestSessionInfo['usr'], self.latestSessionInfo['starttime'], self.latestSessionInfo['baseyear'], self.latestSessionInfo['targetyear'],\
+            self.latestSessionInfo['calculationScenario'], ))
         self.conn.commit()
 
 

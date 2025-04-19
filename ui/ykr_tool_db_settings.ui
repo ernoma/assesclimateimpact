@@ -136,7 +136,10 @@
              <string>One of the usernames</string>
             </property>
             <property name="text">
-             <string>hannamerilainen_silvavuopponen_tre_jaakko</string>
+             <string/>
+            </property>
+            <property name="value">
+             <string/>
             </property>
             <property name="qgisRelation" stdset="0">
              <string notr="true"/>
@@ -159,7 +162,7 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>The password provided to you by Ville Koivisto</string>
+             <string>The password provided to you by Ubigu Oy</string>
             </property>
            </widget>
           </item>
