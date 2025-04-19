@@ -10,7 +10,7 @@
 name=Ilmastovaikutusten arviointityökalu
 qgisMinimumVersion=3.0
 description=Tampereen tulevaisuuden yhdyskuntarakenteen ilmastovaikutusten arviointityökalu
-version=0.1
+version=0.3
 author=Gispo Ltd.
 email=mikael@gispo.fi
 

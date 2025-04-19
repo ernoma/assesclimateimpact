@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Database Connection Settings</string>
+   <string>Ihku Infra Build Cost Service Connection</string>
   </property>
   <property name="locale">
    <locale language="English" country="UnitedStates"/>
@@ -22,110 +22,20 @@
      <item>
       <widget class="QgsCollapsibleGroupBox" name="mGroupBox">
        <property name="title">
-        <string>Database Connection</string>
+        <string>Ihku Infra Build Cost Service Connection</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <layout class="QFormLayout" name="formLayout">
           <item row="0" column="0">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Host:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QgsFilterLineEdit" name="dbHost">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>23</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>Please, do not change</string>
-            </property>
-            <property name="text">
-             <string>ilmakaludb.postgres.database.azure.com</string>
-            </property>
-            <property name="qgisRelation" stdset="0">
-             <string notr="true"/>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Port:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QgsFilterLineEdit" name="dbPort">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>23</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>Please, do not change</string>
-            </property>
-            <property name="text">
-             <string>5432</string>
-            </property>
-            <property name="defaultValue">
-             <string/>
-            </property>
-            <property name="qgisRelation" stdset="0">
-             <string notr="true"/>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Database:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QgsFilterLineEdit" name="dbName">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>23</height>
-             </size>
-            </property>
-            <property name="toolTip">
-             <string>Please, do not change</string>
-            </property>
-            <property name="text">
-             <string>ilmakalu</string>
-            </property>
-            <property name="qgisRelation" stdset="0">
-             <string notr="true"/>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
            <widget class="QLabel" name="label_4">
             <property name="text">
              <string>Username:</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="QgsFilterLineEdit" name="dbUser">
+          <item row="0" column="1">
+           <widget class="QgsFilterLineEdit" name="connectionUser">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -136,22 +46,25 @@
              <string>One of the usernames</string>
             </property>
             <property name="text">
-             <string>hannamerilainen_silvavuopponen_tre_jaakko</string>
+             <string>maija</string>
+            </property>
+            <property name="value">
+             <string>maija</string>
             </property>
             <property name="qgisRelation" stdset="0">
              <string notr="true"/>
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="1" column="0">
            <widget class="QLabel" name="label_5">
             <property name="text">
              <string>Password:</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
-           <widget class="QgsPasswordLineEdit" name="dbPass">
+          <item row="1" column="1">
+           <widget class="QgsPasswordLineEdit" name="connectionPass">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -159,7 +72,7 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>The password provided to you by Ville Koivisto</string>
+             <string>The password provided to you</string>
             </property>
            </widget>
           </item>
@@ -187,6 +100,9 @@
             </item>
             <item row="0" column="1">
              <widget class="QgsFileWidget" name="configFileInput">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="minimumSize">
                <size>
                 <width>200</width>
@@ -205,6 +121,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="loadFileButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Load</string>
             </property>

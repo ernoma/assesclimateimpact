@@ -9,6 +9,7 @@ class YKRToolDictionaries:
 
         self.PredefinedAreas = {
             "fi": {
+                'Hervantajärven asuinalueen asemakaava (nro 8192)': 'user_input.ak_hervantajarven_asuinalue_8192',
                 'Nurmi-Sorila - karkea': 'user_input.nurmi_sorila_rajaus_karkea_3067',
                 # 'Tampereen kaupunkiseutu (2021)': 'user_input.tre_seutu_kunnat',
                 'Tampereen kantakaupunki': 'user_input.tre_kantakaupunki',
@@ -18,12 +19,14 @@ class YKRToolDictionaries:
                 'Nokia (2.4.2021)': 'user_input.tre_seutu_kunta_nokia',
                 'Orivesi (2.4.2021)': 'user_input.tre_seutu_kunta_orivesi',
                 'Pirkkala (2.4.2021)': 'user_input.tre_seutu_kunta_pirkkala',
+                'Tampere (1.1.2025)': 'user_input.tre_seutu_kunta_tampere_2025',
                 'Tampere (2.4.2021)': 'user_input.tre_seutu_kunta_tampere',
                 'Vesilahti (2.4.2021)': 'user_input.tre_seutu_kunta_vesilahti',
                 'Ylöjärvi (2.4.2021)': 'user_input.tre_seutu_kunta_ylojarvi',
                 'Tre ksoyk (yk048)': 'user_input.tre_ksoyk'
             },
             "en": {
+                'Hervantajärven asuinalueen asemakaava (nro 8192)': 'user_input.ak_hervantajarven_asuinalue_8192',
                 'Nurmi-Sorila - rough': 'user_input.nurmi_sorila_rajaus_karkea_3067',
                 # 'Tampere City Region (2021)': 'user_input.tre_seutu_kunnat',
                 'Tampere downtown': 'user_input.tre_kantakaupunki',
@@ -33,6 +36,7 @@ class YKRToolDictionaries:
                 'Nokia (2.4.2021)': 'user_input.tre_seutu_kunta_nokia',
                 'Orivesi (2.4.2021)': 'user_input.tre_seutu_kunta_orivesi',
                 'Pirkkala (2.4.2021)': 'user_input.tre_seutu_kunta_pirkkala',
+                'Tampere (1.1.2025)': 'user_input.tre_seutu_kunta_tampere_2025',
                 'Tampere (2.4.2021)': 'user_input.tre_seutu_kunta_tampere',
                 'Vesilahti (2.4.2021)': 'user_input.tre_seutu_kunta_vesilahti',
                 'Ylöjärvi (2.4.2021)': 'user_input.tre_seutu_kunta_ylojarvi',
@@ -73,12 +77,14 @@ class YKRToolDictionaries:
 
         self.PredefinedFutureZoningAreas = {
             "fi": {
+                'Tre asemakaavoitusohjelma 2025-2029 (17.10.2024)': 'user_input.kt_ak_25_29_20241017_dev',
                 'Tre asemakaavoitusohjelma 2024-2028 (20.10.2023)': 'user_input.kt_ak_24_28_20231020_dev',
                 'Tre asemakaavoitusohjelma 2023-2027 (13.12.2022)': 'user_input.kt_ak_23_27_20221213_dev',
                 'Tre kantakaupunki - yk049, valtuustokausi 2017-2021 - kaavaehdotus': 'user_input.kt_bau_kaavaehdotus',
                 'Nurmi-Sorila - yk049, valtuustokausi 2017-2021 - kaavaluonnos': 'user_input.kt_nurmi_sorila'
             },
             "en": {
+                'Tre detailed land use planning program 2025-2029 (17.10.2024)': 'user_input.kt_ak_25_29_20241017_dev',
                 'Tre detailed land use planning program 2024-2028 (20.10.2023)': 'user_input.kt_ak_24_28_20231020_dev',
                 'Tre detailed land use planning program 2023-2027 (13.12.2022)': 'user_input.kt_ak_23_27_20221213_dev',
                 'Tampere downtown - Local master plan, City Council’s term 2017-2021 - plan proposal': 'user_input.kt_bau_kaavaehdotus',
@@ -154,6 +160,7 @@ class YKRToolDictionaries:
 
         self.PredefinedFuturePublicTransportStopsLayers = {
             "fi": {
+                'Raitiotiepysäkki- ja lähijuna-asemaverkko - Tre asemakaavoitusohjelma 2025-2029': 'user_input.joli_lahijuna_ja_raitiotie_ak_25_29',
                 'Pysäkkiverkko kaupunkiseutu, myös runkobussit, 2023/07 tilanne': 'user_input.joli_myos_runkobussit_seutu_2023_07',
                 'Pysäkkiverkko kaupunkiseutu, myös bussit, 2023/07 tilanne': 'user_input.joli_myos_bussit_seutu_2023_07',
                 'Juna-asema- ja raitiotiepysäkkiverkko kaupunkiseutu, myös suunniteltu, 2023/07 tilanne': 'user_input.joli_lahijuna_ja_raitiotie_seutu_myos_suunniteltu_2023_07',
@@ -161,6 +168,7 @@ class YKRToolDictionaries:
                 'Juna-asema- ja raitiotiepysäkkiverkko - Tre asemakaavoitusohjelma 2023-2027': 'user_input.joli_lahijuna_ja_raitiotie_ak_23_27_v2'
             },
             "en": {
+                'Tram and railway station transport stops - Tre detailed land use planning program 2025-2029': 'user_input.joli_lahijuna_ja_raitiotie_ak_25_29',
                 'Public transport stops of Tampere city region, also trunk line buses, 2023/07 situation': 'user_input.joli_myos_runkobussit_seutu_2023_07',
                 'Public transport stops of Tampere city region, also buses, 2023/07 situation': 'user_input.joli_myos_bussit_seutu_2023_07',
                 'Railway and tram station transport stops of Tampere city region, also planned, 2023/07 situation': 'user_input.joli_lahijuna_ja_raitiotie_seutu_myos_suunniteltu_2023_07',

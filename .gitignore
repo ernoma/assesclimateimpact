@@ -12,3 +12,4 @@ ui/ykr_tool_transit_stop_emission_scenarios.ui
 apu.py
 pb_tool.cfg
 muistiinpanoja.txt
+__pycache__

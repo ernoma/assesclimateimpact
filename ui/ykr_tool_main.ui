@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1104</width>
-    <height>1128</height>
+    <height>606</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -37,6 +37,9 @@
           <widget class="QLineEdit" name="lineEditNameOfTheCO2EstimationRun">
            <property name="toolTip">
             <string>Will be stored to the user_output.sessions_v2 table if provided</string>
+           </property>
+           <property name="placeholderText">
+            <string>ilyn_kokeilu1</string>
            </property>
           </widget>
          </item>
@@ -214,7 +217,7 @@
                   <string>Kangasala</string>
                  </property>
                  <property name="checked">
-                  <bool>true</bool>
+                  <bool>false</bool>
                  </property>
                 </widget>
                </item>
@@ -227,7 +230,7 @@
                   <string>Lempäälä</string>
                  </property>
                  <property name="checked">
-                  <bool>true</bool>
+                  <bool>false</bool>
                  </property>
                 </widget>
                </item>
@@ -240,7 +243,7 @@
                   <string>Nokia</string>
                  </property>
                  <property name="checked">
-                  <bool>true</bool>
+                  <bool>false</bool>
                  </property>
                 </widget>
                </item>
@@ -253,7 +256,7 @@
                   <string>Orivesi</string>
                  </property>
                  <property name="checked">
-                  <bool>true</bool>
+                  <bool>false</bool>
                  </property>
                 </widget>
                </item>
@@ -266,7 +269,7 @@
                   <string>Pirkkala</string>
                  </property>
                  <property name="checked">
-                  <bool>true</bool>
+                  <bool>false</bool>
                  </property>
                 </widget>
                </item>
@@ -292,7 +295,7 @@
                   <string>Vesilahti</string>
                  </property>
                  <property name="checked">
-                  <bool>true</bool>
+                  <bool>false</bool>
                  </property>
                 </widget>
                </item>
@@ -305,7 +308,7 @@
                   <string>Ylöjärvi</string>
                  </property>
                  <property name="checked">
-                  <bool>true</bool>
+                  <bool>false</bool>
                  </property>
                 </widget>
                </item>
@@ -555,7 +558,7 @@
         <string>Advanced Settings (optional)</string>
        </property>
        <property name="collapsed">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="saveCollapsedState">
         <bool>false</bool>
@@ -664,7 +667,7 @@
              <string>Allocate Zero Emissions for Nokian Mylly Square</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -686,7 +689,7 @@
              <string>Visualize Emissions Per Capita</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -699,7 +702,7 @@
              <string>Visualize Emissions Per Worker</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -712,7 +715,7 @@
              <string>Visualize Emissions Per Floor Squares (m2)</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -725,7 +728,7 @@
              <string>Visualize Traffic Emissions</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -738,7 +741,7 @@
              <string>Visualize Buildings Thermo Emissions</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -751,7 +754,7 @@
              <string>Visualize Electricity Consumption Emissions</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -764,7 +767,7 @@
              <string>Visualize Mix of Population and Jobs</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -777,7 +780,7 @@
              <string>Visualize Best Zones for New Population and Jobs</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -790,7 +793,7 @@
              <string>Visualize Floor Space Ratio</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -871,7 +874,7 @@
              <string>Create YKR Zone Summary statistics</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>

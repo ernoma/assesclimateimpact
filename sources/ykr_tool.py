@@ -54,6 +54,9 @@ from .ykr_tool_upload_layer import YKRToolUploadLayer
 from .carbon_map import CarbonMap
 from .carbon_map_co2_emissions import CarbonMapCO2Emissions
 
+from .ara_energy_registry import ARAEnergyRegistry
+from .ihku_infra_cost_service import IhkuInfraCostService
+
 class YKRTool:
     """QGIS Plugin Implementation."""
 
@@ -100,7 +103,7 @@ class YKRTool:
 
         self.rememberCalculationSettingsBetweenRuns = True if QSettings().value("/YKRTool/rememberCalculationSettingsBetweenRuns", "True", type=str).lower() == 'true' else False
 
-        self.rememberCalculationSettingsExitingQGIS = True if QSettings().value("/YKRTool/rememberCalculationSettingsExitingQGIS", "False", type=str).lower() == 'true' else False
+        self.rememberCalculationSettingsExitingQGIS = True if QSettings().value("/YKRTool/rememberCalculationSettingsExitingQGIS", "True", type=str).lower() == 'true' else False
         # * if true then store to QSettings and load from QSettings when exiting & starting
         # * if false then do not load  from QSettings and store to QSettings when starting & exiting
 
@@ -128,6 +131,10 @@ class YKRTool:
         self.ykrZonesStats = YKRZonesStats(self.ykrToolDictionaries, self.connParams, self.iface)
         self.carbonMap = CarbonMap(self.ykrToolDictionaries, self.plugin_dir, self.iface)
         self.carbonMapCO2Emissions = CarbonMapCO2Emissions(self.ykrToolDictionaries, self.plugin_dir, self.iface)
+
+        self.ARAEnergyRegistry = ARAEnergyRegistry(self.ykrToolDictionaries, self.plugin_dir, self.iface)
+        self.IhkuInfraCostService = IhkuInfraCostService(self.ykrToolDictionaries, self.plugin_dir, self.iface)
+
         self.ykrToolUploadLayer = YKRToolUploadLayer(self.iface)
 
         self.investigatedAreaMapLayer = None
@@ -265,6 +272,21 @@ class YKRTool:
             icon_path,
             text=self.tr(u'Combine Carbon Map and CO2 Emissions Result(s)'),
             callback=self.carbonMapCO2Emissions.combineResults,
+            parent=self.iface.mainWindow())
+
+        icon_path = ':/plugins/ykr_tool/icon.png'
+        self.add_action(
+            icon_path,
+            text=self.tr(u'Import ARA Energy Certificate Registry Data'),
+            callback=self.ARAEnergyRegistry.importData,
+            parent=self.iface.mainWindow())
+
+
+        icon_path = ':/plugins/ykr_tool/icon.png'
+        self.add_action(
+            icon_path,
+            text=self.tr(u'Import Ihku Infra Cost Management Project Data'),
+            callback=self.IhkuInfraCostService.importData,
             parent=self.iface.mainWindow())
         
         # self.add_action(
@@ -613,7 +635,7 @@ class YKRTool:
         #
 
         md.checkBoxIncludeLongDistance.setChecked(True if QSettings().value("/YKRTool/IncludeLongDistance", "True", type=str).lower() == 'true' else False)
-        md.checkBoxIncludeBusinessTravel.setChecked(True if QSettings().value("/YKRTool/IncludeBusinessTravel", "False", type=str).lower() == 'true' else False)
+        md.checkBoxIncludeBusinessTravel.setChecked(True if QSettings().value("/YKRTool/IncludeBusinessTravel", "True", type=str).lower() == 'true' else False)
 
         emissionsAllocationName = QSettings().value("/YKRTool/emissionsAllocationName", "", type=str)
         if emissionsAllocationName != "":
@@ -625,18 +647,18 @@ class YKRTool:
             ElectricityTypePredefinedName = self.ykrToolDictionaries.getPredefinedElectricityTypeName(ElectricityTypeName)
             md.elecEmissionType.setCurrentText(ElectricityTypePredefinedName)
 
-        md.checkBoxNokianMyllyCO2Zeroed.setChecked(True if QSettings().value("/YKRTool/NokianMyllyCO2Zeroed", "True", type=str).lower() == 'true' else False)
-        md.checkBoxCalculateEmissionsPerPerson.setChecked(True if QSettings().value("/YKRTool/CalculateEmissionsPerPerson", "True", type=str).lower() == 'true' else False)
-        md.checkBoxCalculateEmissionsPerJob.setChecked(True if QSettings().value("/YKRTool/CalculateEmissionsPerJob", "True", type=str).lower() == 'true' else False)
-        md.checkBoxCalculateEmissionsPerFloorSpaceSquares.setChecked(True if QSettings().value("/YKRTool/CalculateEmissionsPerFloorSpaceSquares", "True", type=str).lower() == 'true' else False)
-        md.checkBoxVisualizeTrafficEmissions.setChecked(True if QSettings().value("/YKRTool/VisualizeTrafficEmissions", "True", type=str).lower() == 'true' else False)
+        md.checkBoxNokianMyllyCO2Zeroed.setChecked(True if QSettings().value("/YKRTool/NokianMyllyCO2Zeroed", "False", type=str).lower() == 'true' else False)
+        md.checkBoxCalculateEmissionsPerPerson.setChecked(True if QSettings().value("/YKRTool/CalculateEmissionsPerPerson", "False", type=str).lower() == 'true' else False)
+        md.checkBoxCalculateEmissionsPerJob.setChecked(True if QSettings().value("/YKRTool/CalculateEmissionsPerJob", "False", type=str).lower() == 'true' else False)
+        md.checkBoxCalculateEmissionsPerFloorSpaceSquares.setChecked(True if QSettings().value("/YKRTool/CalculateEmissionsPerFloorSpaceSquares", "False", type=str).lower() == 'true' else False)
+        md.checkBoxVisualizeTrafficEmissions.setChecked(True if QSettings().value("/YKRTool/VisualizeTrafficEmissions", "False", type=str).lower() == 'true' else False)
         md.checkBoxVisualizeThermoEmissions.setChecked(True if QSettings().value("/YKRTool/VisualizeThermoEmissions", "False", type=str).lower() == 'true' else False)
         md.checkBoxVisualizeElectricityConsumptionEmissions.setChecked(True if QSettings().value("/YKRTool/VisualizeElectricityConsumptionEmissions", "False", type=str).lower() == 'true' else False)
-        md.checkBoxVisualizePopJobMix.setChecked(True if QSettings().value("/YKRTool/VisualizePopJobMix", "True", type=str).lower() == 'true' else False)
-        md.checkBoxVisualizeGoodZonesForPopJobDensityAndSustainableTransport.setChecked(True if QSettings().value("/YKRTool/VisualizeGoodZonesForPopJobDensityAndSustainableTransport", "True", type=str).lower() == 'true' else False)
-        md.checkBoxVisualizeFloorSpaceRatio.setChecked(True if QSettings().value("/YKRTool/VisualizeFloorSpaceRatio", "True", type=str).lower() == 'true' else False)
+        md.checkBoxVisualizePopJobMix.setChecked(True if QSettings().value("/YKRTool/VisualizePopJobMix", "False", type=str).lower() == 'true' else False)
+        md.checkBoxVisualizeGoodZonesForPopJobDensityAndSustainableTransport.setChecked(True if QSettings().value("/YKRTool/VisualizeGoodZonesForPopJobDensityAndSustainableTransport", "False", type=str).lower() == 'true' else False)
+        md.checkBoxVisualizeFloorSpaceRatio.setChecked(True if QSettings().value("/YKRTool/VisualizeFloorSpaceRatio", "False", type=str).lower() == 'true' else False)
 
-        md.checkBoxCreateYKRZoneSummaryStats.setChecked(True if QSettings().value("/YKRTool/CreateYKRZoneSummaryStats", "True", type=str).lower() == 'true' else False)
+        md.checkBoxCreateYKRZoneSummaryStats.setChecked(True if QSettings().value("/YKRTool/CreateYKRZoneSummaryStats", "False", type=str).lower() == 'true' else False)
 
         md.checkBoxAddQuickchartIoLinksOfRelativeEmissionsByZone.setChecked(True if QSettings().value("/YKRTool/AddQuickchartIoLinksOfRelativeEmissionsByZone", "False", type=str).lower() == 'true' else False)
         md.checkBoxAddQuickchartIoLinksOfZoneSquaresAndPopJobPercentagesOfTotalByZone.setChecked(True if QSettings().value("/YKRTool/AddQuickchartIoLinksOfZoneSquaresAndPopJobPercentagesOfTotalByZone", "False", type=str).lower() == 'true' else False)
@@ -834,7 +856,7 @@ class YKRTool:
 
         self.userSettingsDialog.checkBoxLoadDatabaseConnectionSettingsAutomatically.setChecked(True if QSettings().value("/YKRTool/loadDatabaseConnectionSettingsAutomatically", "True", type=str).lower() == 'true' else False)
         self.userSettingsDialog.checkBoxRememberCalculationSettingsBetweenRuns.setChecked(True if QSettings().value("/YKRTool/rememberCalculationSettingsBetweenRuns", "True", type=str).lower() == 'true' else False)
-        self.userSettingsDialog.checkBoxRememberCalculationSettingsExitingQGIS.setChecked(True if QSettings().value("/YKRTool/rememberCalculationSettingsExitingQGIS", "False", type=str).lower() == 'true' else False)
+        self.userSettingsDialog.checkBoxRememberCalculationSettingsExitingQGIS.setChecked(True if QSettings().value("/YKRTool/rememberCalculationSettingsExitingQGIS", "True", type=str).lower() == 'true' else False)
 
         result = self.userSettingsDialog.exec_()
         if result:
