@@ -477,3 +477,28 @@ class YKRToolDictionaries:
 
         return key_list[position]
     
+
+    def createMunicipalitiesArrayString(self, kangasala, lempaala, nokia, orivesi, pirkkala, tampere, vesilahti, ylojarvi):
+        municipalitiesArrayString = '' #'array[837]',
+
+        if kangasala:
+            municipalitiesArrayString += self.getMunicipalityCode('Kangasala') + ','
+        if lempaala:
+            municipalitiesArrayString += self.getMunicipalityCode('Lempaala') + ','
+        if nokia:
+            municipalitiesArrayString += self.getMunicipalityCode('Nokia') + ','
+        if orivesi:
+            municipalitiesArrayString += self.getMunicipalityCode('Orivesi') + ','
+        if pirkkala:
+            municipalitiesArrayString += self.getMunicipalityCode('Pirkkala') + ','
+        if tampere:
+            municipalitiesArrayString += self.getMunicipalityCode('Tampere') + ','
+        if vesilahti:
+            municipalitiesArrayString += self.getMunicipalityCode('Vesilahti') + ','
+        if ylojarvi:
+            municipalitiesArrayString += self.getMunicipalityCode('Ylojarvi') + ','
+
+        if municipalitiesArrayString == '':
+            municipalitiesArrayString = '211,418,536,562,604,837,922,980,'
+
+        return 'array[' + municipalitiesArrayString[:-1] + ']'

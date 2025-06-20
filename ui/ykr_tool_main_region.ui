@@ -1,0 +1,713 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DialogRegion</class>
+ <widget class="QDialog" name="DialogRegion">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1096</width>
+    <height>747</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Urban Infrastructure CHG Emission Estimation Tool for Tampere City Region</string>
+  </property>
+  <property name="locale">
+   <locale language="English" country="UnitedStates"/>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_8">
+   <item>
+    <layout class="QVBoxLayout" name="mainLayout">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_9">
+       <item>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="2" column="0">
+          <widget class="QLabel" name="label">
+           <property name="toolTip">
+            <string>Will be stored to the user_output.sessions_v2 table if provided</string>
+           </property>
+           <property name="text">
+            <string>Optional name for the estimation run:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="lineEditNameOfTheCO2EstimationRun">
+           <property name="toolTip">
+            <string>Will be stored to the user_output.sessions_v2 table if provided</string>
+           </property>
+           <property name="placeholderText">
+            <string>2025</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="toolTip">
+            <string>Name of the CO2 calculation results table</string>
+           </property>
+           <property name="text">
+            <string>Output table name in the user_output schema:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="lineEditNameOfTheOutputTable">
+           <property name="toolTip">
+            <string>Spaces are replaced with _ and å, ä and ö are replaced with a and o</string>
+           </property>
+           <property name="text">
+            <string>tks_ilmastovaikutusten_arviointi</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="checkBoxOverwriteExistingOutputTable">
+           <property name="toolTip">
+            <string>If checked, existing table if any will be overwritten without questions</string>
+           </property>
+           <property name="text">
+            <string>Overwrite Existing Output Table</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QgsCollapsibleGroupBox" name="areaBox">
+       <property name="minimumSize">
+        <size>
+         <width>400</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="locale">
+        <locale language="English" country="UnitedStates"/>
+       </property>
+       <property name="title">
+        <string>Investigated Area</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <layout class="QFormLayout" name="formLayout_3">
+            <item row="0" column="0">
+             <widget class="QLabel" name="predefinedAreaLabel">
+              <property name="toolTip">
+               <string>AOI</string>
+              </property>
+              <property name="text">
+               <string>Predefined Area (AOI):</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="comboBoxPredefinedArea">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>23</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Thsese layers already exist in the user_input schema.</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox">
+            <property name="toolTip">
+             <string>The chosen municipalities will be intersected with the AOI. If none selected then all are used.</string>
+            </property>
+            <property name="title">
+             <string>Choose municipalities:</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_3">
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout">
+               <item>
+                <widget class="QCheckBox" name="checkBoxMunicipalitiesKangasala">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="toolTip">
+                  <string>The chosen municipalities will be intersected with the AOI.</string>
+                 </property>
+                 <property name="text">
+                  <string>Kangasala</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxMunicipalitiesLempaala">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="toolTip">
+                  <string>The chosen municipalities will be intersected with the AOI.</string>
+                 </property>
+                 <property name="text">
+                  <string>Lempäälä</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxMunicipalitiesNokia">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="toolTip">
+                  <string>The chosen municipalities will be intersected with the AOI.</string>
+                 </property>
+                 <property name="text">
+                  <string>Nokia</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxMunicipalitiesOrivesi">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="toolTip">
+                  <string>The chosen municipalities will be intersected with the AOI.</string>
+                 </property>
+                 <property name="text">
+                  <string>Orivesi</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxMunicipalitiesPirkkala">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="toolTip">
+                  <string>The chosen municipalities will be intersected with the AOI.</string>
+                 </property>
+                 <property name="text">
+                  <string>Pirkkala</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxMunicipalitiesTampere">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="toolTip">
+                  <string>The chosen municipalities will be intersected with the AOI.</string>
+                 </property>
+                 <property name="text">
+                  <string>Tampere</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxMunicipalitiesVesilahti">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="toolTip">
+                  <string>The chosen municipalities will be intersected with the AOI.</string>
+                 </property>
+                 <property name="text">
+                  <string>Vesilahti</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkBoxMunicipalitiesYlojarvi">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="toolTip">
+                  <string>The chosen municipalities will be intersected with the AOI.</string>
+                 </property>
+                 <property name="text">
+                  <string>Ylöjärvi</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="checkBoxCalculateFuture">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Calculate future emissions estimation to the chose target year</string>
+       </property>
+       <property name="locale">
+        <locale language="English" country="UnitedStates"/>
+       </property>
+       <property name="text">
+        <string>Estimate Future Emissions</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QgsCollapsibleGroupBox" name="futureBox">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>The format of the future zoning data, urban center data and public transit stop data as defined in the technical report</string>
+       </property>
+       <property name="title">
+        <string>User Input Data for the Future Estimation</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QgsCollapsibleGroupBox" name="futureRequired">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="title">
+           <string>Required</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <item>
+            <layout class="QFormLayout" name="formLayout_5">
+             <item row="0" column="0">
+              <widget class="QLabel" name="futureAreasLabel">
+               <property name="text">
+                <string>Future Zoning data:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="targetYearLabel">
+               <property name="toolTip">
+                <string>The emissions will be calculated from the current year to the target year (each year gets own results)</string>
+               </property>
+               <property name="text">
+                <string>Target year:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QgsSpinBox" name="targetYear">
+               <property name="toolTip">
+                <string>The emissions will be calculated from the current year to the target year (each year gets own results)</string>
+               </property>
+               <property name="minimum">
+                <number>2017</number>
+               </property>
+               <property name="maximum">
+                <number>2050</number>
+               </property>
+               <property name="value">
+                <number>2040</number>
+               </property>
+               <property name="showClearButton">
+                <bool>false</bool>
+               </property>
+               <property name="clearValue">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <layout class="QHBoxLayout" name="futureAreasLayout">
+               <item>
+                <widget class="QComboBox" name="comboBoxPredefinedFutureAreas">
+                 <property name="toolTip">
+                  <string>The format of the future zoning data is defined in the technical report</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QgsMapLayerComboBox" name="futureAreasLayerList">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="toolTip">
+                  <string>The format of the future zoning data is defined in the technical report</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="futureAreasLoadLayer">
+                 <property name="text">
+                  <string>Use a Map Layer (already in the ilmakaludb user_input schema)</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QgsCollapsibleGroupBox" name="futureOptional">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="title">
+           <string>Optional</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <item>
+            <layout class="QFormLayout" name="formLayout_4">
+             <item row="0" column="0">
+              <widget class="QLabel" name="futureNetworkLabel">
+               <property name="text">
+                <string>Urban centre data:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="futureStopsLabel">
+               <property name="text">
+                <string>Public transit stops data:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <layout class="QHBoxLayout" name="futureNetworkLayout">
+               <item>
+                <widget class="QComboBox" name="comboBoxPredefinedFutureNetwork">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="toolTip">
+                  <string>The format of the urban center data is defined in the technical report</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QgsMapLayerComboBox" name="futureNetworkLayerList">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="toolTip">
+                  <string>The format of the urban center data is defined in the technical report</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="futureNetworkLoadLayer">
+                 <property name="text">
+                  <string>Use a Map Layer (already in the ilmakaludb user_input schema)</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="1" column="1">
+              <layout class="QHBoxLayout" name="futureStopsLayout">
+               <item>
+                <widget class="QComboBox" name="comboBoxPredefinedFutureStops">
+                 <property name="toolTip">
+                  <string>The format of the public transport stops data is defined in the technical report</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QgsMapLayerComboBox" name="futureStopsLayerList">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="toolTip">
+                  <string>The format of the public transport stops data is defined in the technical report</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="futureStopsLoadLayer">
+                 <property name="text">
+                  <string>Use a Map Layer (already in the ilmakaludb user_input schema)</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QgsCollapsibleGroupBox" name="advancedBox">
+       <property name="toolTip">
+        <string>All the advanced settings affect both the present day and future emissions calculation. None of the available options slows the calculation significantly.</string>
+       </property>
+       <property name="title">
+        <string>Advanced Settings (optional)</string>
+       </property>
+       <property name="collapsed">
+        <bool>false</bool>
+       </property>
+       <property name="saveCollapsedState">
+        <bool>false</bool>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <layout class="QFormLayout" name="formLayout_2">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>PEIKKO Scenario:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="pitkoScenario">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>180</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Affects CO2 emissions. Static scenario fixes some calculation parameters to the base year. See method reports for more details.</string>
+            </property>
+            <property name="editable">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="checkBoxIncludeBusinessTravel">
+            <property name="toolTip">
+             <string>Affects CO2 emissions</string>
+            </property>
+            <property name="text">
+             <string>Allocate business errand trips (commuting trips included in any case)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="checkBoxIncludeLongDistance">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>Affects CO2 emissions</string>
+            </property>
+            <property name="text">
+             <string>include over 100 km domestic trips to traffic calculation</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="menuLayout">
+       <item>
+        <widget class="QPushButton" name="buttonDatabaseSettings">
+         <property name="toolTip">
+          <string>The main part of the calculation is done in the database and the results table is saved in the database.</string>
+         </property>
+         <property name="text">
+          <string>Database connection settings...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="buttonUserSettings">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="toolTip">
+          <string>Settings aimed to improve usage of the plugin.</string>
+         </property>
+         <property name="text">
+          <string>User settings...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButtonRestoreDefaultCalculationSettings">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="toolTip">
+          <string>This will reset settings in this window but it will leave user settings and database connection settings intact.</string>
+         </property>
+         <property name="text">
+          <string>Restore default calculation settings</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="infoButton">
+         <property name="text">
+          <string>Info...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDialogButtonBox" name="buttonBox">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="standardButtons">
+          <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsCollapsibleGroupBox</class>
+   <extends>QGroupBox</extends>
+   <header>qgscollapsiblegroupbox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QgsMapLayerComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qgsmaplayercombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QgsSpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>qgsspinbox.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>DialogRegion</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>DialogRegion</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

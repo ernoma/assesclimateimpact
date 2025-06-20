@@ -10,7 +10,7 @@ from qgis.core import (
     QgsDataSourceUri, QgsVectorLayer,
     QgsProject, QgsFeature)
 
-from .createdbconnection import createDbConnection
+from .database_connection import createDbConnection
 
 
 class YKRToolUploadLayer:

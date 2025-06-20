@@ -4,19 +4,15 @@ from PyQt5.QtCore import QCoreApplication, QVariant
 from qgis.core import (Qgis, QgsVectorLayer, QgsDataSourceUri, QgsMessageLog)
 # from qgis.core import (QgsTemporalNavigationObject, QgsVectorLayerTemporalProperties)
 
-from .createdbconnection import createDbConnection
-from .ykr_tool_dictionaries import YKRToolDictionaries
+# from .ykr_tool_dictionaries import YKRToolDictionaries
 
 
 class YKRZonesStats:
-    def __init__(self, ykrToolDictionaries, connParams, iface):
+    def __init__(self, ykrToolDictionaries, databaseConnection, iface):
         self.ykrToolDictionaries = ykrToolDictionaries
-        self.connParams = connParams
+        self.databaseConnection = databaseConnection
         self.iface = iface
 
-
-    def setConnectionParams(self, connParams):
-        self.connParams = connParams
 
 
     def calculateYKRZoneEmissions(self, uuid, outputSchemaName, outputBaseTableName):
@@ -40,8 +36,8 @@ class YKRZonesStats:
         queries = []
 
         uri = QgsDataSourceUri()
-        uri.setConnection(self.connParams['host'], self.connParams['port'],\
-            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+        uri.setConnection(self.databaseConnection.getConnParams()['host'], self.databaseConnection.getConnParams()['port'],\
+            self.databaseConnection.getConnParams()['database'], self.databaseConnection.getConnParams()['user'], self.databaseConnection.getConnParams()['password'])
         uri.setDataSource(outputSchemaName, outputBaseTableName, 'geom')
 
         ykrLayer = QgsVectorLayer(uri.uri(False), "UZ-urban-rural layer", 'postgres')
@@ -169,25 +165,24 @@ class YKRZonesStats:
 
 
     def addQueriesToDatabase(self, queries):
-        if len(queries) > 0 and self.connParams is not None:
-            conn = None
-            conn = createDbConnection(self.connParams)
+        if len(queries) > 0 and self.databaseConnection.getConnParams() is not None:
+            self.databaseConnection.createDbConnection(self.databaseConnection.getConnParams())
 
             try:
-                cur = conn.cursor()
+                cur = self.databaseConnection.cursor()
                 for query in queries:
                     cur.execute(query)
-                    conn.commit()
+                    self.databaseConnection.commit()
             except Exception as e:
                 self.iface.messageBar().pushMessage(
                     self.tr('Error in adding the summary statistics to the database ') + "{}".format(query),
                     str(e), Qgis.Warning, duration=0)
-                conn.rollback()
-                conn.close()
+                self.databaseConnection.rollback()
+                self.databaseConnection.close()
 
                 return False
 
-            conn.commit()
+            self.databaseConnection.commit()
 
             return True
 

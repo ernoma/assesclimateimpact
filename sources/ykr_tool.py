@@ -44,12 +44,13 @@ import psycopg2
 import datetime, getpass
 import re
 import traceback
-from configparser import ConfigParser
 from .ykr_tool_dictionaries import YKRToolDictionaries
 from .ykr_tool_tasks import QueryTask
-from .createdbconnection import createDbConnection
+from .database_connection import YKRDatabaseConnection
 from .ykr_zones_stats import YKRZonesStats
 from .ykr_tool_upload_layer import YKRToolUploadLayer
+
+from .ykr_tool_region import YKRToolRegion
 
 from .carbon_map import CarbonMap
 from .carbon_map_co2_emissions import CarbonMapCO2Emissions
@@ -92,14 +93,6 @@ class YKRTool:
         self.actions = []
         self.menu = self.tr(u'&CO2 Emissions Tool')
 
-        self.conn = None
-        self.connParams = None
-
-        self.loadDatabaseConnectionSettingsAutomatically = True if QSettings().value("/YKRTool/loadDatabaseConnectionSettingsAutomatically", "True", type=str).lower() == 'true' else False
-        if self.loadDatabaseConnectionSettingsAutomatically:
-            configFilePath = QSettings().value("/YKRTool/configFilePath", "", type=str)
-            if configFilePath != "":
-                self.connParams = self.parseConfigFile(configFilePath)
 
         self.rememberCalculationSettingsBetweenRuns = True if QSettings().value("/YKRTool/rememberCalculationSettingsBetweenRuns", "True", type=str).lower() == 'true' else False
 
@@ -115,7 +108,7 @@ class YKRTool:
 
         self.mainDialog = uic.loadUi(os.path.join(self.plugin_dir, 'ui', 'ykr_tool_main.ui'))
         self.userSettingsDialog = uic.loadUi(os.path.join(self.plugin_dir, 'ui', 'ykr_tool_user_settings.ui'))
-        self.databaseSettingsDialog = uic.loadUi(os.path.join(self.plugin_dir, 'ui', 'ykr_tool_db_settings.ui'))
+        # self.databaseSettingsDialog = uic.loadUi(os.path.join(self.plugin_dir, 'ui', 'ykr_tool_db_settings.ui'))
         self.infoDialog = uic.loadUi(os.path.join(self.plugin_dir, 'ui', 'ykr_tool_info.ui'))
 
         self.NameOfTheCO2EstimationRun = None
@@ -128,7 +121,13 @@ class YKRTool:
         self.ykrJobsLayer = None
 
         self.ykrToolDictionaries = YKRToolDictionaries(self.iface, locale)
-        self.ykrZonesStats = YKRZonesStats(self.ykrToolDictionaries, self.connParams, self.iface)
+
+        self.databaseConnection = YKRDatabaseConnection(self.iface)
+
+        self.ykrZonesStats = YKRZonesStats(self.ykrToolDictionaries, self.databaseConnection, self.iface)
+
+        self.ykrToolRegion = YKRToolRegion(self.iface, self.databaseConnection, self.ykrToolDictionaries, self.infoDialog)
+
         self.carbonMap = CarbonMap(self.ykrToolDictionaries, self.plugin_dir, self.iface)
         self.carbonMapCO2Emissions = CarbonMapCO2Emissions(self.ykrToolDictionaries, self.plugin_dir, self.iface)
 
@@ -263,6 +262,14 @@ class YKRTool:
         icon_path = ':/plugins/ykr_tool/icon.png'
         self.add_action(
             icon_path,
+            text=self.tr(u'Tampere City Region CO2 calculation'),
+            callback=self.ykrToolRegion.runCityRegion,
+            parent=self.iface.mainWindow())
+
+        
+        icon_path = ':/plugins/ykr_tool/icon.png'
+        self.add_action(
+            icon_path,
             text=self.tr(u'Import Carbon Map Result(s)'),
             callback=self.carbonMap.importCarbonMapResults,
             parent=self.iface.mainWindow())
@@ -308,6 +315,8 @@ class YKRTool:
                 action)
             self.iface.removeToolBarIcon(action)
 
+        self.databaseConnection.close()
+
 
     def run(self):
         """Run method that performs all the real work"""
@@ -348,13 +357,10 @@ class YKRTool:
     def preProcess(self):
         self.resultLayers = []
         '''Starts calculation'''
-        if not self.connParams:
+        if not self.databaseConnection.getConnParams():
             self.iface.messageBar().pushMessage(self.tr('Database connection not setup'), Qgis.Critical, duration=0)
             return False
-            # configFilePath = QSettings().value("/YKRTool/configFilePath", "", type=str)
-            # self.connParams = self.parseConfigFile(configFilePath)
-        self.conn = createDbConnection(self.connParams)
-        self.cur = self.conn.cursor()
+        self.databaseConnection.createDbConnection(self.databaseConnection.getConnParams())
         self.sessionParams = self.generateSessionParameters()
         self.readProcessingInput()
         return True
@@ -399,7 +405,7 @@ class YKRTool:
 
         md.pushButtonRestoreDefaultCalculationSettings.clicked.connect(self.restoreDefaultCalculationSettings)
         md.buttonUserSettings.clicked.connect(self.displayUserSettingsDialog)
-        md.buttonDatabaseSettings.clicked.connect(self.displayDatabaseSettingsDialog)
+        md.buttonDatabaseSettings.clicked.connect(self.databaseConnection.displayDatabaseSettingsDialog)
         md.infoButton.clicked.connect(lambda: self.infoDialog.show())
 
         # md.mapLayerComboBoxYkrPop.hide()
@@ -864,8 +870,8 @@ class YKRTool:
 
 
     def handleUserSettingsDialogData(self):
-        self.loadDatabaseConnectionSettingsAutomatically = True if self.userSettingsDialog.checkBoxLoadDatabaseConnectionSettingsAutomatically.isChecked() else False
-        QSettings().setValue("/YKRTool/loadDatabaseConnectionSettingsAutomatically", 'True' if self.loadDatabaseConnectionSettingsAutomatically else 'False')
+        loadDatabaseConnectionSettingsAutomatically = True if self.userSettingsDialog.checkBoxLoadDatabaseConnectionSettingsAutomatically.isChecked() else False
+        self.databaseConnection.setLoadDatabaseConnectionSettingsAutomatically(loadDatabaseConnectionSettingsAutomatically)
 
         self.rememberCalculationSettingsBetweenRuns = True if self.userSettingsDialog.checkBoxRememberCalculationSettingsBetweenRuns.isChecked() else False
         QSettings().setValue("/YKRTool/rememberCalculationSettingsBetweenRuns", 'True' if self.rememberCalculationSettingsBetweenRuns else 'False')
@@ -877,83 +883,6 @@ class YKRTool:
             self.saveCalculationSettings()
 
 
-    def displayDatabaseSettingsDialog(self):
-        '''Sets up and displays the settings dialog'''
-        self.databaseSettingsDialog.show()
-        self.databaseSettingsDialog.configFileInput.setStorageMode(QgsFileWidget.GetFile)
-        configFilePath = QSettings().value("/YKRTool/configFilePath", "", type=str)
-        self.databaseSettingsDialog.configFileInput.setFilePath(configFilePath)
-        
-        if self.loadDatabaseConnectionSettingsAutomatically:
-            if configFilePath != "":
-                self.setConnectionParamsFromFile()
-                self.ykrZonesStats.setConnectionParams(self.connParams)
-
-        self.databaseSettingsDialog.loadFileButton.clicked.connect(self.setConnectionParamsFromFile)
-
-        result = self.databaseSettingsDialog.exec_()
-        if result:
-            self.connParams = self.readConnectionParamsFromInput()
-            self.ykrZonesStats.setConnectionParams(self.connParams)
-
-
-    def setConnectionParamsFromFile(self):
-        '''Reads connection parameters from file and sets them to the input fields'''
-        filePath = self.databaseSettingsDialog.configFileInput.filePath()
-        QSettings().setValue("/YKRTool/configFilePath", filePath)
-
-        try:
-            dbParams = self.parseConfigFile(filePath)
-        except Exception as e:
-            self.iface.messageBar().pushMessage(self.tr('Error in reading a file'),\
-                str(e), Qgis.Warning, duration=10)
-
-        self.setConnectionParamsFromInput(dbParams)
-
-
-    def parseConfigFile(self, filePath):
-        '''Reads configuration file and returns parameters as a dict'''
-        # Setup an empty dict with correct keys to avoid keyerrors
-        dbParams = {
-            'host': '',
-            'port': '',
-            'database': '',
-            'user': '',
-            'password': ''
-        }
-        if not os.path.exists(filePath):
-            self.iface.messageBar().pushMessage(self.tr('Error'), self.tr('File could not be read'),\
-                Qgis.Warning)
-            return dbParams
-
-        parser = ConfigParser()
-        parser.read(filePath)
-        if parser.has_section('postgresql'):
-            params = parser.items('postgresql')
-            for param in params:
-                dbParams[param[0]] = param[1]
-        else:
-            self.iface.messageBar().pushMessage(self.tr('Error'), self.tr('File does not contain database connection parameters'), Qgis.Warning)
-
-        return dbParams
-
-    def setConnectionParamsFromInput(self, params):
-        '''Sets connection parameters to input fields'''
-        self.databaseSettingsDialog.dbHost.setValue(params['host'])
-        self.databaseSettingsDialog.dbPort.setValue(params['port'])
-        self.databaseSettingsDialog.dbName.setValue(params['database'])
-        self.databaseSettingsDialog.dbUser.setValue(params['user'])
-        self.databaseSettingsDialog.dbPass.setText(params['password'])
-
-    def readConnectionParamsFromInput(self):
-        '''Reads connection parameters from user input and returns a dictionary'''
-        params = {}
-        params['host'] = self.databaseSettingsDialog.dbHost.value()
-        params['port'] = self.databaseSettingsDialog.dbPort.value()
-        params['database'] = self.databaseSettingsDialog.dbName.value()
-        params['user'] = self.databaseSettingsDialog.dbUser.value()
-        params['password'] = self.databaseSettingsDialog.dbPass.text()
-        return params
 
 
     # def handlePopLayerToggle(self):
@@ -1075,9 +1004,9 @@ class YKRTool:
             # QgsMessageLog.logMessage("database: {}".format(uri.database()) , 'YKRTool', Qgis.Info)
             # if uri.database() == "":
                 # QgsMessageLog.logMessage("database = \"\"", 'YKRTool', Qgis.Info)
-            if uri.host() == "" or uri.host() != self.connParams['host'] or uri.database() == "" or uri.database() != self.connParams['database']:
+            if uri.host() == "" or uri.host() != self.databaseConnection.getConnParams()['host'] or uri.database() == "" or uri.database() != self.databaseConnection.getConnParams()['database']:
                 self.predefinedAreaDBTableName = 'user_input.' + '"' + self.investigatedAreaMapLayer.name()[:YKRTool.MAX_TABLE_NAME_LENGTH] + '"'
-                self.ykrToolUploadLayer.copySourceLayerFeaturesToTargetTable(self.connParams, self.investigatedAreaMapLayer, self.predefinedAreaDBTableName, md.checkBoxAllowOtherUsersToUseUploadedMapLayer.isChecked(), md.checkBoxUploadOnlySelectedFeatures.isChecked())
+                self.ykrToolUploadLayer.copySourceLayerFeaturesToTargetTable(self.databaseConnection.getConnParams(), self.investigatedAreaMapLayer, self.predefinedAreaDBTableName, md.checkBoxAllowOtherUsersToUseUploadedMapLayer.isChecked(), md.checkBoxUploadOnlySelectedFeatures.isChecked())
             else:
                 self.investigatedAreaMapLayer = None
                 QgsMessageLog.logMessage("schema: {}".format(uri.schema()) , 'YKRTool', Qgis.Info)
@@ -1087,7 +1016,7 @@ class YKRTool:
             self.investigatedAreaMapLayer = None
             self.predefinedAreaDBTableName = self.ykrToolDictionaries.getPredefinedAreaDatabaseTableName(md.comboBoxPredefinedArea.currentText())
 
-        self.municipalitiesArrayString = self.createMunicipalitiesArrayString()
+        self.municipalitiesArrayString = self.ykrToolDictionaries.createMunicipalitiesArrayString(self.mainDialog.checkBoxMunicipalitiesKangasala.isChecked(), self.mainDialog.checkBoxMunicipalitiesLempaala.isChecked(),  self.mainDialog.checkBoxMunicipalitiesNokia.isChecked(), self.mainDialog.checkBoxMunicipalitiesOrivesi.isChecked(), self.mainDialog.checkBoxMunicipalitiesPirkkala.isChecked(), self.mainDialog.checkBoxMunicipalitiesTampere.isChecked(), self.mainDialog.checkBoxMunicipalitiesVesilahti.isChecked(), self.mainDialog.checkBoxMunicipalitiesYlojarvi.isChecked())
 
         # self.onlySelectedFeats = md.checkBoxUploadOnlySelectedFeatures.isChecked()
         self.pitkoScenario = self.ykrToolDictionaries.getPITKOScenarioShortName(md.pitkoScenario.currentText())
@@ -1125,8 +1054,8 @@ class YKRTool:
             self.futureZoningAreasTableName = self.ykrToolDictionaries.getPredefinedFutureZoningAreasDatabaseTableName(md.comboBoxPredefinedFutureAreas.currentText())
             schemaName, tableName = self.futureZoningAreasTableName.split('.')
             uri = QgsDataSourceUri()
-            uri.setConnection(self.connParams['host'], self.connParams['port'],\
-                self.connParams['database'], self.connParams['user'], self.connParams['password'])
+            uri.setConnection(self.databaseConnection.getConnParams()['host'], self.databaseConnection.getConnParams()['port'],\
+                self.databaseConnection.getConnParams()['database'], self.databaseConnection.getConnParams()['user'], self.databaseConnection.getConnParams()['password'])
             uri.setDataSource(schemaName, tableName, 'geom')
             self.futureAreasLayer = QgsVectorLayer(uri.uri(False), "aluevaraus_tulevaisuus", 'postgres')
             # QgsMessageLog.logMessage("futureAreasLayer: " +  str(self.futureAreasLayer), 'YKRTool', Qgis.Info)
@@ -1151,9 +1080,9 @@ class YKRTool:
                 # QgsMessageLog.logMessage("database: {}".format(uri.database()) , 'YKRTool', Qgis.Info)
                 # if uri.database() == "":
                 # QgsMessageLog.logMessage("database = \"\"", 'YKRTool', Qgis.Info)
-                if uri.host() == "" or uri.host() != self.connParams['host'] or uri.database() == "" or uri.database() != self.connParams['database']:
+                if uri.host() == "" or uri.host() != self.databaseConnection.getConnParams()['host'] or uri.database() == "" or uri.database() != self.databaseConnection.getConnParams()['database']:
                     self.futureNetworkLayerDBTableName = 'user_input.' + '"' + self.futureNetworkLayer.name()[:YKRTool.MAX_TABLE_NAME_LENGTH] + '"'
-                    self.ykrToolUploadLayer.copyFutureNetworkSourceLayerFeaturesToTargetTable(self.connParams, self.futureNetworkLayer, self.futureNetworkLayerDBTableName)
+                    self.ykrToolUploadLayer.copyFutureNetworkSourceLayerFeaturesToTargetTable(self.databaseConnection.getConnParams(), self.futureNetworkLayer, self.futureNetworkLayerDBTableName)
                 else:
                     self.futureNetworkLayer = None
                     QgsMessageLog.logMessage("schema: {}".format(uri.schema()) , 'YKRTool', Qgis.Info)
@@ -1164,8 +1093,8 @@ class YKRTool:
             self.futureNetworkLayerDBTableName = self.ykrToolDictionaries.getPredefinedUrbanCenterLayersDatabaseTableName(md.comboBoxPredefinedFutureNetwork.currentText())
             schemaName, tableName = self.futureNetworkLayerDBTableName.split('.')
             uri = QgsDataSourceUri()
-            uri.setConnection(self.connParams['host'], self.connParams['port'],\
-            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+            uri.setConnection(self.databaseConnection.getConnParams()['host'], self.databaseConnection.getConnParams()['port'],\
+            self.databaseConnection.getConnParams()['database'], self.databaseConnection.getConnParams()['user'], self.databaseConnection.getConnParams()['password'])
             uri.setDataSource(schemaName, tableName, 'geom')
             self.futureNetworkLayer = QgsVectorLayer(uri.uri(False), "keskusverkko_tulevaisuus", 'postgres')
 
@@ -1188,9 +1117,9 @@ class YKRTool:
                 # QgsMessageLog.logMessage("database: {}".format(uri.database()) , 'YKRTool', Qgis.Info)
                 # if uri.database() == "":
                 # QgsMessageLog.logMessage("database = \"\"", 'YKRTool', Qgis.Info)
-                if uri.host() == "" or uri.host() != self.connParams['host'] or uri.database() == "" or uri.database() != self.connParams['database']:
+                if uri.host() == "" or uri.host() != self.databaseConnection.getConnParams()['host'] or uri.database() == "" or uri.database() != self.databaseConnection.getConnParams()['database']:
                     self.futureStopsLayerDBTableName = 'user_input.' + '"' + self.futureStopsLayer.name()[:YKRTool.MAX_TABLE_NAME_LENGTH] + '"'
-                    self.ykrToolUploadLayer.copyFutureStopsSourceLayerFeaturesToTargetTable(self.connParams, self.futureStopsLayer, self.futureStopsLayerDBTableName)
+                    self.ykrToolUploadLayer.copyFutureStopsSourceLayerFeaturesToTargetTable(self.databaseConnection.getConnParams(), self.futureStopsLayer, self.futureStopsLayerDBTableName)
                 else:
                     self.futureStopsLayer = None
                     QgsMessageLog.logMessage("schema: {}".format(uri.schema()) , 'YKRTool', Qgis.Info)
@@ -1200,8 +1129,8 @@ class YKRTool:
             self.futureStopsLayerDBTableName = self.ykrToolDictionaries.getPredefinedFuturePublicTransportStopsDatabaseTableName(md.comboBoxPredefinedFutureStops.currentText())
             schemaName, tableName = self.futureStopsLayerDBTableName.split('.')
             uri = QgsDataSourceUri()
-            uri.setConnection(self.connParams['host'], self.connParams['port'],\
-            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+            uri.setConnection(self.databaseConnection.getConnParams()['host'], self.databaseConnection.getConnParams()['port'],\
+            self.databaseConnection.getConnParams()['database'], self.databaseConnection.getConnParams()['user'], self.databaseConnection.getConnParams()['password'])
             uri.setDataSource(schemaName, tableName, 'geom')
             self.futureStopsLayer = QgsVectorLayer(uri.uri(False), "pysakkiverkko_tulevaisuus", 'postgres')
 
@@ -1240,11 +1169,11 @@ class YKRTool:
     #         'A_SRS': QgsCoordinateReferenceSystem('EPSG:3067'),
     #         'T_SRS': None,
     #         'S_SRS': None,
-    #         'HOST': self.connParams['host'],
-    #         'PORT': self.connParams['port'],
-    #         'USER': self.connParams['user'],
-    #         'DBNAME': self.connParams['database'],
-    #         'PASSWORD': self.connParams['password'],
+    #         'HOST': self.databaseConnection.getConnParams()['host'],
+    #         'PORT': self.databaseConnection.getConnParams()['port'],
+    #         'USER': self.databaseConnection.getConnParams()['user'],
+    #         'DBNAME': self.databaseConnection.getConnParams()['database'],
+    #         'PASSWORD': self.databaseConnection.getConnParams()['password'],
     #         'SCHEMA': 'user_input',
     #         'PK': 'fid',
     #         'PRIMARY_KEY': None,
@@ -1288,11 +1217,11 @@ class YKRTool:
             'A_SRS': QgsCoordinateReferenceSystem('EPSG:3067'),
             'T_SRS': None,
             'S_SRS': None,
-            'HOST': self.connParams['host'],
-            'PORT': self.connParams['port'],
-            'USER': self.connParams['user'],
-            'DBNAME': self.connParams['database'],
-            'PASSWORD': self.connParams['password'],
+            'HOST': self.databaseConnection.getConnParams()['host'],
+            'PORT': self.databaseConnection.getConnParams()['port'],
+            'USER': self.databaseConnection.getConnParams()['user'],
+            'DBNAME': self.databaseConnection.getConnParams()['database'],
+            'PASSWORD': self.databaseConnection.getConnParams()['password'],
             'SCHEMA': 'user_input',
             'PK': 'fid',
             'PRIMARY_KEY': None,
@@ -1343,11 +1272,11 @@ class YKRTool:
         except Exception as e:
             self.iface.messageBar().pushMessage(self.tr('Error in storing session data to the database: '),\
                 str(e), Qgis.Warning, duration=0)
-            self.conn.rollback()
+            self.databaseConnection.rollback()
 
         try:
             queries = self.getCalculationQueries()
-            queryTask = QueryTask(self.connParams, queries)
+            queryTask = QueryTask(self.databaseConnection.getConnParams(), queries)
             queryTask.taskCompleted.connect(self.postCalculation)
             queryTask.taskTerminated.connect(self.postError)
             QgsApplication.taskManager().addTask(queryTask)
@@ -1365,8 +1294,8 @@ class YKRTool:
         # outputTableName = 'z_'
         outputTableName = 'n_'
 
-        if self.connParams != None and self.connParams['user'] != None and self.connParams['user'] != '':
-            outputTableName += self.connParams['user'][:13] + '_'
+        if self.databaseConnection.getConnParams() != None and self.databaseConnection.getConnParams()['user'] != None and self.databaseConnection.getConnParams()['user'] != '':
+            outputTableName += self.databaseConnection.getConnParams()['user'][:13] + '_'
         else:
             usr_getpass = getpass.getuser()
             if usr_getpass != None and usr_getpass != '':
@@ -1493,32 +1422,6 @@ class YKRTool:
         QgsMessageLog.logMessage(query, 'YKRTool', Qgis.Info)
         return query
 
-
-
-    def createMunicipalitiesArrayString(self):
-        municipalitiesArrayString = '' #'array[837]',
-
-        if self.mainDialog.checkBoxMunicipalitiesKangasala.isChecked():
-            municipalitiesArrayString += self.ykrToolDictionaries.getMunicipalityCode('Kangasala') + ','
-        if self.mainDialog.checkBoxMunicipalitiesLempaala.isChecked():
-            municipalitiesArrayString += self.ykrToolDictionaries.getMunicipalityCode('Lempaala') + ','
-        if self.mainDialog.checkBoxMunicipalitiesNokia.isChecked():
-            municipalitiesArrayString += self.ykrToolDictionaries.getMunicipalityCode('Nokia') + ','
-        if self.mainDialog.checkBoxMunicipalitiesOrivesi.isChecked():
-            municipalitiesArrayString += self.ykrToolDictionaries.getMunicipalityCode('Orivesi') + ','
-        if self.mainDialog.checkBoxMunicipalitiesPirkkala.isChecked():
-            municipalitiesArrayString += self.ykrToolDictionaries.getMunicipalityCode('Pirkkala') + ','
-        if self.mainDialog.checkBoxMunicipalitiesTampere.isChecked():
-            municipalitiesArrayString += self.ykrToolDictionaries.getMunicipalityCode('Tampere') + ','
-        if self.mainDialog.checkBoxMunicipalitiesVesilahti.isChecked():
-            municipalitiesArrayString += self.ykrToolDictionaries.getMunicipalityCode('Vesilahti') + ','
-        if self.mainDialog.checkBoxMunicipalitiesYlojarvi.isChecked():
-            municipalitiesArrayString += self.ykrToolDictionaries.getMunicipalityCode('Ylojarvi') + ','
-
-        if municipalitiesArrayString == '':
-            municipalitiesArrayString = '211,418,536,562,604,837,922,980,'
-
-        return 'array[' + municipalitiesArrayString[:-1] + ']'
     
 
 
@@ -1528,13 +1431,14 @@ class YKRTool:
         try:
             now = datetime.datetime.now()
             endtime = now.strftime("%Y%m%d_%H%M%S")
-            self.cur.execute('UPDATE user_output.sessions_v2 SET endtime = %s WHERE sid = %s', (endtime, self.sessionParams['uuid'],))
-            self.conn.commit()
+            cursor = self.databaseConnection.cursor()
+            cursor.execute('UPDATE user_output.sessions_v2 SET endtime = %s WHERE sid = %s', (endtime, self.sessionParams['uuid'],))
+            self.databaseConnection.commit()
         except Exception as e:
             self.iface.messageBar().pushMessage(
                 self.tr('Error in adding endtime to sessions_v2 table ') + '{}'.format(self.sessionParams['uuid']),
                 str(e), Qgis.Warning, duration=0)
-            self.conn.rollback()
+            self.databaseConnection.rollback()
 
         self.iface.messageBar().pushMessage(self.tr('Ready'), self.tr('Emission calculation ') +\
                 str(self.getOutputTableName()) + self.tr(' is ready'), Qgis.Success, duration=0)
@@ -1576,10 +1480,15 @@ class YKRTool:
             # 'paastolaji': self.elecEmissionType
         }
 
-        self.cur.execute('''INSERT INTO user_output.sessions_v2(session_name, results_table_name, aoi, municipalities, kt_table_name, kv_table_name, joli_table_name, sid, usr, starttime, baseyear, targetyear, calculationScenario) VALUES (%s, %s, %s, %s, %s, %s, %s,
+        # query = "INSERT INTO user_output.sessions_v2(session_name, results_table_name, aoi, municipalities, kt_table_name, kv_table_name, joli_table_name, sid, usr, starttime, baseyear, targetyear, calculationScenario) VALUES ('{}', '{}','{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(self.latestSessionInfo['session_name'], self.latestSessionInfo['results_table_name'], self.latestSessionInfo['aoi'], self.latestSessionInfo['municipalities'], self.latestSessionInfo['kt_table_name'], self.latestSessionInfo['kv_table_name'], self.latestSessionInfo['joli_table_name'], self.latestSessionInfo['sid'], self.latestSessionInfo['usr'], self.latestSessionInfo['starttime'], self.latestSessionInfo['baseyear'], self.latestSessionInfo['targetyear'],\
+        #     self.latestSessionInfo['calculationScenario'])
+        # self.databaseConnection.execute(query)
+        cursor = self.databaseConnection.cursor()
+        cursor.execute('''INSERT INTO user_output.sessions_v2(session_name, results_table_name, aoi, municipalities, kt_table_name, kv_table_name, joli_table_name, sid, usr, starttime, baseyear, targetyear, calculationScenario) VALUES (%s, %s, %s, %s, %s, %s, %s,
         %s, %s, %s, %s, %s, %s)''', (self.latestSessionInfo['session_name'], self.latestSessionInfo['results_table_name'], self.latestSessionInfo['aoi'], self.latestSessionInfo['municipalities'], self.latestSessionInfo['kt_table_name'], self.latestSessionInfo['kv_table_name'], self.latestSessionInfo['joli_table_name'], self.latestSessionInfo['sid'], self.latestSessionInfo['usr'], self.latestSessionInfo['starttime'], self.latestSessionInfo['baseyear'], self.latestSessionInfo['targetyear'],\
             self.latestSessionInfo['calculationScenario'], ))
-        self.conn.commit()
+        self.databaseConnection.commit()
+
 
 
     def addResultAsLayers(self):
@@ -1634,8 +1543,8 @@ class YKRTool:
         self.createQuickchartIoLinks(uid, outputSchemaName, outputTableName)
 
         uri = QgsDataSourceUri()
-        uri.setConnection(self.connParams['host'], self.connParams['port'],\
-            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+        uri.setConnection(self.databaseConnection.getConnParams()['host'], self.databaseConnection.getConnParams()['port'],\
+            self.databaseConnection.getConnParams()['database'], self.databaseConnection.getConnParams()['user'], self.databaseConnection.getConnParams()['password'])
         uri.setDataSource(outputSchemaName, outputTableName, 'geom')
 
 
@@ -1670,10 +1579,9 @@ class YKRTool:
             queries.extend(self.createQuickchartIoPopJobPercentagesOfTotalByZone(uid, outputSchemaName, outputTableName))
 
         if len(queries) > 0:
-            conn = None
 
             try:
-                conn = createDbConnection(self.connParams)
+                self.databaseConnection.createDbConnection(self.databaseConnection.getConnParams())
             except Exception as e:
                 if retriesLeft > 0:
                     return self.createQuickchartIoLinks(uid, outputSchemaName, outputTableName, retriesLeft - 1)
@@ -1684,20 +1592,20 @@ class YKRTool:
                     return False
 
             try:
-                cur = conn.cursor()
+                cur = self.databaseConnection.cursor()
                 for query in queries:
                     cur.execute(query)
-                    conn.commit()
+                    self.databaseConnection.commit()
             except Exception as e:
                 self.iface.messageBar().pushMessage(
                     self.tr('Error in modifying the results table ') + "{}".format(query),
                     str(e), Qgis.Warning, duration=0)
-                conn.rollback()
-                conn.close()
+                self.databaseConnection.rollback()
+                self.databaseConnection.close()
 
                 return False
 
-            conn.commit()
+            self.databaseConnection.commit()
 
             return True
 
@@ -1730,8 +1638,8 @@ class YKRTool:
         good_zones = [1, 2, 3, 10, 837101]
 
         uri = QgsDataSourceUri()
-        uri.setConnection(self.connParams['host'], self.connParams['port'],\
-            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+        uri.setConnection(self.databaseConnection.getConnParams()['host'], self.databaseConnection.getConnParams()['port'],\
+            self.databaseConnection.getConnParams()['database'], self.databaseConnection.getConnParams()['user'], self.databaseConnection.getConnParams()['password'])
         uri.setDataSource(outputSchemaName, outputTableName, 'geom')
 
         targetLayer = QgsVectorLayer(uri.uri(False), "emissions target layer", 'postgres')
@@ -1975,8 +1883,8 @@ class YKRTool:
         good_zones = [1, 2, 3, 10, 837101]
 
         uri = QgsDataSourceUri()
-        uri.setConnection(self.connParams['host'], self.connParams['port'],\
-            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+        uri.setConnection(self.databaseConnection.getConnParams()['host'], self.databaseConnection.getConnParams()['port'],\
+            self.databaseConnection.getConnParams()['database'], self.databaseConnection.getConnParams()['user'], self.databaseConnection.getConnParams()['password'])
         uri.setDataSource(outputSchemaName, outputTableName, 'geom')
 
         targetLayer = QgsVectorLayer(uri.uri(False), "emissions target layer", 'postgres')
@@ -2202,8 +2110,8 @@ class YKRTool:
         sum_all_squares_sum_yhteensa_tco2_per_kem_zone_87 = 0
 
         uri = QgsDataSourceUri()
-        uri.setConnection(self.connParams['host'], self.connParams['port'],\
-            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+        uri.setConnection(self.databaseConnection.getConnParams()['host'], self.databaseConnection.getConnParams()['port'],\
+            self.databaseConnection.getConnParams()['database'], self.databaseConnection.getConnParams()['user'], self.databaseConnection.getConnParams()['password'])
         uri.setDataSource(outputSchemaName, outputTableName, 'geom')
 
         targetLayer = QgsVectorLayer(uri.uri(False), "emissions target layer", 'postgres')
@@ -2382,8 +2290,8 @@ class YKRTool:
         sum_all_squares_sum_yhteensa_tco2_per_pop_job_zone_87 = 0
 
         uri = QgsDataSourceUri()
-        uri.setConnection(self.connParams['host'], self.connParams['port'],\
-            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+        uri.setConnection(self.databaseConnection.getConnParams()['host'], self.databaseConnection.getConnParams()['port'],\
+            self.databaseConnection.getConnParams()['database'], self.databaseConnection.getConnParams()['user'], self.databaseConnection.getConnParams()['password'])
         uri.setDataSource(outputSchemaName, outputTableName, 'geom')
 
         targetLayer = QgsVectorLayer(uri.uri(False), "emissions target layer", 'postgres')
@@ -2576,8 +2484,8 @@ class YKRTool:
         sum_all_squares_liikenne_hlo_tco2_per_pop_job_zone_87 = 0
 
         uri = QgsDataSourceUri()
-        uri.setConnection(self.connParams['host'], self.connParams['port'],\
-            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+        uri.setConnection(self.databaseConnection.getConnParams()['host'], self.databaseConnection.getConnParams()['port'],\
+            self.databaseConnection.getConnParams()['database'], self.databaseConnection.getConnParams()['user'], self.databaseConnection.getConnParams()['password'])
         uri.setDataSource(outputSchemaName, outputTableName, 'geom')
 
         targetLayer = QgsVectorLayer(uri.uri(False), "emissions target layer", 'postgres')
@@ -2735,10 +2643,9 @@ class YKRTool:
     #         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
     #         queries.append(query)
 
-    #     conn = None
 
     #     try:
-    #         conn = createDbConnection(self.connParams)
+    #         self.databaseConnection.createDbConnection(self.databaseConnection.getConnParams())
     #     except Exception as e:
     #         if retriesLeft > 0:
     #             return self.addPopulationToResultsTableIfNeeded(outputSchemaName, outputTableName, retriesLeft - 1)
@@ -2785,10 +2692,9 @@ class YKRTool:
     #         # calculate change in workplaces for each square and update tp_yht accordingly
     #         queries.extend(self.createCalculateFutureJobsQueries(uid, outputSchemaName, outputTableName))
         
-    #     conn = None
 
     #     try:
-    #         conn = createDbConnection(self.connParams)
+    #         self.databaseConnection.createDbConnection(self.databaseConnection.getConnParams())
     #     except Exception as e:
     #         if retriesLeft > 0:
     #             return self.addJobsToResultsTable(outputSchemaName, outputTableName, retriesLeft - 1)
@@ -2846,8 +2752,8 @@ class YKRTool:
             #     layerNames.append((self.tr('Sustainable Urban Structure, Sufficient Density of Population and Jobs for Public Transport') + ' {}'.format(uid), os.path.join(self.plugin_dir, 'docs/urban_development/sust_urb_struct_sufficient_pop_job_density_pub_transport.qml')))
 
         uri = QgsDataSourceUri()
-        uri.setConnection(self.connParams['host'], self.connParams['port'],\
-            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+        uri.setConnection(self.databaseConnection.getConnParams()['host'], self.databaseConnection.getConnParams()['port'],\
+            self.databaseConnection.getConnParams()['database'], self.databaseConnection.getConnParams()['user'], self.databaseConnection.getConnParams()['password'])
         uri.setDataSource(outputSchemaName, outputTableName, 'geom')
 
         for name in layerNames:
@@ -2895,10 +2801,9 @@ class YKRTool:
         if self.mainDialog.checkBoxAllowOtherUsersToUseSustainableUrbanStructureTable.isChecked():
             query = "GRANT SELECT ON \"{}\".\"{}\" TO public".format(outputSchemaName.replace('"', ''), tableName)
 
-        conn = None
 
         try:
-            conn = createDbConnection(self.connParams)
+            self.databaseConnection.createDbConnection(self.databaseConnection.getConnParams())
         except Exception as e:
             if retriesLeft > 0:
                 self.createSustainableUrbanStructureResultLayer(uid, outputSchemaName, outputTableName, retriesLeft - 1)
@@ -2908,21 +2813,21 @@ class YKRTool:
                     str(e), Qgis.Warning, duration=0)
 
         try:
-            cur = conn.cursor()
+            cur = self.databaseConnection.cursor()
             for query in queries:
                 cur.execute(query)
-                conn.commit()
+                self.databaseConnection.commit()
         except Exception as e:
             self.iface.messageBar().pushMessage(
                 self.tr('Error in modifying the results table ') + "{}".format(query),
                 str(e), Qgis.Warning, duration=0)
-            conn.rollback()
-            conn.close()
+            self.databaseConnection.rollback()
+            self.databaseConnection.close()
 
 
         uri = QgsDataSourceUri()
-        uri.setConnection(self.connParams['host'], self.connParams['port'],\
-            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+        uri.setConnection(self.databaseConnection.getConnParams()['host'], self.databaseConnection.getConnParams()['port'],\
+            self.databaseConnection.getConnParams()['database'], self.databaseConnection.getConnParams()['user'], self.databaseConnection.getConnParams()['password'])
         
         uri.setDataSource(outputSchemaName.replace('"', ''), tableName, 'geom')
         layer = QgsVectorLayer(uri.uri(False), tableName, 'postgres')
@@ -3014,8 +2919,8 @@ class YKRTool:
 
         # Get result layer (to calculate only for xyind sqaures on the investigation area)
         uri = QgsDataSourceUri()
-        uri.setConnection(self.connParams['host'], self.connParams['port'],\
-            self.connParams['database'], self.connParams['user'], self.connParams['password'])
+        uri.setConnection(self.databaseConnection.getConnParams()['host'], self.databaseConnection.getConnParams()['port'],\
+            self.databaseConnection.getConnParams()['database'], self.databaseConnection.getConnParams()['user'], self.databaseConnection.getConnParams()['password'])
         uri.setDataSource(outputSchemaName, outputTableName, 'geom')
 
         targetLayer = QgsVectorLayer(uri.uri(False), "emissions target layer", 'postgres')
@@ -3215,10 +3120,9 @@ class YKRTool:
 
         return True
 
-        # conn = None
 
         # try:
-        #     conn = createDbConnection(self.connParams)
+        #     self.databaseConnection.createDbConnection(self.databaseConnection.getConnParams())
         # except Exception as e:
         #     if retriesLeft > 0:
         #         return self.calculateElectricityEmissionsPerPerson(outputSchemaName, outputTableName, retriesLeft - 1)
@@ -3262,8 +3166,8 @@ class YKRTool:
             group = rootGroup.addGroup(groupName)
 
             uri = QgsDataSourceUri()
-            uri.setConnection(self.connParams['host'], self.connParams['port'],\
-                self.connParams['database'], self.connParams['user'], self.connParams['password'])
+            uri.setConnection(self.databaseConnection.getConnParams()['host'], self.databaseConnection.getConnParams()['port'],\
+                self.databaseConnection.getConnParams()['database'], self.databaseConnection.getConnParams()['user'], self.databaseConnection.getConnParams()['password'])
             uri.setDataSource(outputSchemaName, outputTableName, 'geom')
 
             for name in layerNames:
@@ -3302,8 +3206,8 @@ class YKRTool:
             group = rootGroup.addGroup(groupName)
 
             uri = QgsDataSourceUri()
-            uri.setConnection(self.connParams['host'], self.connParams['port'],\
-                self.connParams['database'], self.connParams['user'], self.connParams['password'])
+            uri.setConnection(self.databaseConnection.getConnParams()['host'], self.databaseConnection.getConnParams()['port'],\
+                self.databaseConnection.getConnParams()['database'], self.databaseConnection.getConnParams()['user'], self.databaseConnection.getConnParams()['password'])
             uri.setDataSource(outputSchemaName, outputTableName, 'geom')
 
             for name in layerNames:
@@ -3346,8 +3250,8 @@ class YKRTool:
                 group = rootGroup.addGroup(groupName)
 
                 uri = QgsDataSourceUri()
-                uri.setConnection(self.connParams['host'], self.connParams['port'],\
-                    self.connParams['database'], self.connParams['user'], self.connParams['password'])
+                uri.setConnection(self.databaseConnection.getConnParams()['host'], self.databaseConnection.getConnParams()['port'],\
+                    self.databaseConnection.getConnParams()['database'], self.databaseConnection.getConnParams()['user'], self.databaseConnection.getConnParams()['password'])
                 uri.setDataSource(outputSchemaName, outputTableName, 'geom')
 
                 for name in layerNames:
@@ -3418,10 +3322,9 @@ class YKRTool:
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
-        conn = None
 
         try:
-            conn = createDbConnection(self.connParams)
+            self.databaseConnection.createDbConnection(self.databaseConnection.getConnParams())
         except Exception as e:
             if retriesLeft > 0:
                 return self.calculateElectricityEmissionsPerPerson(outputSchemaName, outputTableName, retriesLeft - 1)
@@ -3432,16 +3335,16 @@ class YKRTool:
                 return False
 
         try:
-            cur = conn.cursor()
+            cur = self.databaseConnection.cursor()
             for query in queries:
                 cur.execute(query)
-                conn.commit()
+                self.databaseConnection.commit()
         except Exception as e:
             self.iface.messageBar().pushMessage(
                 self.tr('Error in modifying the results table ') + "{}".format(query),
                 str(e), Qgis.Warning, duration=0)
-            conn.rollback()
-            conn.close()
+            self.databaseConnection.rollback()
+            self.databaseConnection.close()
 
             return False
 
@@ -3468,10 +3371,8 @@ class YKRTool:
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
-        conn = None
-
         try:
-            conn = createDbConnection(self.connParams)
+            self.databaseConnection.createDbConnection(self.databaseConnection.getConnParams())
         except Exception as e:
             if retriesLeft > 0:
                 return self.calculateThermoEmissionsPerPerson(outputSchemaName, outputTableName, retriesLeft - 1)
@@ -3482,16 +3383,16 @@ class YKRTool:
                 return False
 
         try:
-            cur = conn.cursor()
+            cur = self.databaseConnection.cursor()
             for query in queries:
                 cur.execute(query)
-                conn.commit()
+                self.databaseConnection.commit()
         except Exception as e:
             self.iface.messageBar().pushMessage(
                 self.tr('Error in modifying the results table ') + "{}".format(query),
                 str(e), Qgis.Warning, duration=0)
-            conn.rollback()
-            conn.close()
+            self.databaseConnection.rollback()
+            self.databaseConnection.close()
 
             return False
 
@@ -3554,10 +3455,8 @@ class YKRTool:
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
-        conn = None
-
         try:
-            conn = createDbConnection(self.connParams)
+            self.databaseConnection.createDbConnection(self.databaseConnection.getConnParams())
         except Exception as e:
             if retriesLeft > 0:
                 return self.calculateRelativeTrafficEmissionsToDatabase(outputSchemaName, outputTableName, retriesLeft - 1)
@@ -3568,16 +3467,16 @@ class YKRTool:
                 return False
 
         try:
-            cur = conn.cursor()
+            cur = self.databaseConnection.cursor()
             for query in queries:
                 cur.execute(query)
-                conn.commit()
+                self.databaseConnection.commit()
         except Exception as e:
             self.iface.messageBar().pushMessage(
                 self.tr('Error in modifying the results table ') + "{}".format(query),
                 str(e), Qgis.Warning, duration=0)
-            conn.rollback()
-            conn.close()
+            self.databaseConnection.rollback()
+            self.databaseConnection.close()
 
             return False
 
@@ -3596,10 +3495,8 @@ class YKRTool:
         queries.append(query)
 
 
-        conn = None
-
         try:
-            conn = createDbConnection(self.connParams)
+            self.databaseConnection.createDbConnection(self.databaseConnection.getConnParams())
         except Exception as e:
             if retriesLeft > 0:
                 return self.calculatePopJobMix(outputSchemaName, outputTableName, retriesLeft - 1)
@@ -3610,16 +3507,16 @@ class YKRTool:
                 return False
 
         try:
-            cur = conn.cursor()
+            cur = self.databaseConnection.cursor()
             for query in queries:
                 cur.execute(query)
-                conn.commit()
+                self.databaseConnection.commit()
         except Exception as e:
             self.iface.messageBar().pushMessage(
                 self.tr('Error in modifying the results table ') + "{}".format(query),
                 str(e), Qgis.Warning, duration=0)
-            conn.rollback()
-            conn.close()
+            self.databaseConnection.rollback()
+            self.databaseConnection.close()
 
             return False
 
@@ -3639,10 +3536,9 @@ class YKRTool:
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
-        conn = None
 
         try:
-            conn = createDbConnection(self.connParams)
+            self.databaseConnection.createDbConnection(self.databaseConnection.getConnParams())
         except Exception as e:
             if retriesLeft > 0:
                 return self.calculateEmissionsPerFloorSpaceSquares(outputSchemaName, outputTableName, retriesLeft - 1)
@@ -3653,16 +3549,16 @@ class YKRTool:
                 return False
 
         try:
-            cur = conn.cursor()
+            cur = self.databaseConnection.cursor()
             for query in queries:
                 cur.execute(query)
-                conn.commit()
+                self.databaseConnection.commit()
         except Exception as e:
             self.iface.messageBar().pushMessage(
                 self.tr('Error in modifying the results table ') + "{}".format(query),
                 str(e), Qgis.Warning, duration=0)
-            conn.rollback()
-            conn.close()
+            self.databaseConnection.rollback()
+            self.databaseConnection.close()
 
             return False
 
@@ -3681,10 +3577,9 @@ class YKRTool:
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
         
-        conn = None
 
         try:
-            conn = createDbConnection(self.connParams)
+            self.databaseConnection.createDbConnection(self.databaseConnection.getConnParams())
         except Exception as e:
             if retriesLeft > 0:
                 return self.calculateEmissionsPerPersonJob(outputSchemaName, outputTableName, retriesLeft - 1)
@@ -3695,16 +3590,16 @@ class YKRTool:
                 return False
 
         try:
-            cur = conn.cursor()
+            cur = self.databaseConnection.cursor()
             for query in queries:
                 cur.execute(query)
-                conn.commit()
+                self.databaseConnection.commit()
         except Exception as e:
             self.iface.messageBar().pushMessage(
                 self.tr('Error in modifying the results table ') + "{}".format(query),
                 str(e), Qgis.Warning, duration=0)
-            conn.rollback()
-            conn.close()
+            self.databaseConnection.rollback()
+            self.databaseConnection.close()
 
             return False
 
@@ -3722,10 +3617,9 @@ class YKRTool:
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
-        conn = None
 
         try:
-            conn = createDbConnection(self.connParams)
+            self.databaseConnection.createDbConnection(self.databaseConnection.getConnParams())
         except Exception as e:
             if retriesLeft > 0:
                 return self.calculateEmissionsPerPerson(outputSchemaName, outputTableName, retriesLeft - 1)
@@ -3736,16 +3630,16 @@ class YKRTool:
                 return False
 
         try:
-            cur = conn.cursor()
+            cur = self.databaseConnection.cursor()
             for query in queries:
                 cur.execute(query)
-                conn.commit()
+                self.databaseConnection.commit()
         except Exception as e:
             self.iface.messageBar().pushMessage(
                 self.tr('Error in modifying the results table ') + "{}".format(query),
                 str(e), Qgis.Warning, duration=0)
-            conn.rollback()
-            conn.close()
+            self.databaseConnection.rollback()
+            self.databaseConnection.close()
 
             return False
 
@@ -3764,10 +3658,9 @@ class YKRTool:
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
-        conn = None
 
         try:
-            conn = createDbConnection(self.connParams)
+            self.databaseConnection.createDbConnection(self.databaseConnection.getConnParams())
         except Exception as e:
             if retriesLeft > 0:
                 return self.calculateEmissionsPerJob(outputSchemaName, outputTableName, retriesLeft - 1)
@@ -3778,20 +3671,20 @@ class YKRTool:
                 return False
 
         try:
-            cur = conn.cursor()
+            cur = self.databaseConnection.cursor()
             for query in queries:
                 cur.execute(query)
-                conn.commit()
+                self.databaseConnection.commit()
         except Exception as e:
             self.iface.messageBar().pushMessage(
                 self.tr('Error in modifying the results table ') + "{}".format(query),
                 str(e), Qgis.Warning, duration=0)
-            conn.rollback()
-            conn.close()
+            self.databaseConnection.rollback()
+            self.databaseConnection.close()
 
             return False
 
-        conn.commit()
+        self.databaseConnection.commit()
 
         return True
 
@@ -3951,10 +3844,9 @@ class YKRTool:
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
-        conn = None
 
         try:
-            conn = createDbConnection(self.connParams)
+            self.databaseConnection.createDbConnection(self.databaseConnection.getConnParams())
         except Exception as e:
             if retriesLeft > 0:
                 return self.zeroCO2inNokianMyllySquare(outputSchemaName, outputTableName, retriesLeft - 1)
@@ -3965,19 +3857,19 @@ class YKRTool:
                 return False
 
         try:
-            cur = conn.cursor()
+            cur = self.databaseConnection.cursor()
             for query in queries:
                 cur.execute(query)
         except Exception as e:
             self.iface.messageBar().pushMessage(
                 self.tr('Error in modifying the results table ') + "{}".format(query),
                 str(e), Qgis.Warning, duration=0)
-            conn.rollback()
-            conn.close()
+            self.databaseConnection.rollback()
+            self.databaseConnection.close()
 
             return False
 
-        conn.commit()
+        self.databaseConnection.commit()
 
         return True
 
@@ -3994,10 +3886,8 @@ class YKRTool:
         # QgsMessageLog.logMessage("query: " + query, 'YKRTool', Qgis.Info)
         queries.append(query)
 
-        conn = None
-
         try:
-            conn = createDbConnection(self.connParams)
+            self.databaseConnection.createDbConnection(self.databaseConnection.getConnParams())
         except Exception as e:
             if retriesLeft > 0:
                 return self.calculateSumOfPersonalTraffic(outputSchemaName, outputTableName, retriesLeft - 1)
@@ -4008,16 +3898,16 @@ class YKRTool:
                 return False
 
         try:
-            cur = conn.cursor()
+            cur = self.databaseConnection.cursor()
             for query in queries:
                 cur.execute(query)
-                conn.commit()
+                self.databaseConnection.commit()
         except Exception as e:
             self.iface.messageBar().pushMessage(
                 self.tr('Error in modifying the results table ') + "{}".format(query),
                 str(e), Qgis.Warning, duration=0)
-            conn.rollback()
-            conn.close()
+            self.databaseConnection.rollback()
+            self.databaseConnection.close()
 
             return False
 
@@ -4037,27 +3927,27 @@ class YKRTool:
         #     if not table: continue
         #     try:
         #         self.cur.execute('DROP TABLE user_input."{}"'.format(table.lower()))
-        #         self.conn.commit()
+        #         self.databaseConnection.commit()
         #     except Exception as e:
         #         self.iface.messageBar().pushMessage(
         #              self.tr('Error in removing temporary table ') + '{}'.format(table),
         #             str(e), Qgis.Warning, duration=0)
-        #         self.conn.rollback()
+        #         self.databaseConnection.rollback()
 
-        if self.conn != None:
-            self.conn.close()
+        # self.databaseConnection.close()
 
     def postError(self):
         '''Called after querytask is terminated. Closes session'''
         try:
-            self.cur.execute('UPDATE user_output.sessions_v2 SET results_table_name = NULL WHERE sid = %s', (self.sessionParams['uuid'],))
-            self.conn.commit()
-            self.cur.execute('DROP TABLE IF EXISTS user_input."ykr_{}"'.format(self.sessionParams['uuid']))
+            cursor = self.databaseConnection.cursor()
+            cursor.execute('UPDATE user_output.sessions_v2 SET results_table_name = NULL WHERE sid = %s', (self.sessionParams['uuid'],))
+            self.databaseConnection.commit()
+            cursor.execute('DROP TABLE IF EXISTS user_input."ykr_{}"'.format(self.sessionParams['uuid']))
         except Exception as e:
             self.iface.messageBar().pushMessage(
                 self.tr('Error in cleaning up session after error ') + '{}'.format(self.sessionParams['uuid']),
                 str(e), Qgis.Warning, duration=0)
-            self.conn.rollback()
+            self.databaseConnection.rollback()
         self.cleanUpSession()
         self.iface.messageBar().pushMessage(self.tr('Error in performing calculation'),\
             self.tr('See further info in the error log'), Qgis.Critical, duration=0)

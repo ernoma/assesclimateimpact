@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QCoreApplication
 
 from qgis.core import (QgsTask, QgsMessageLog, Qgis)
-from .createdbconnection import createDbConnection
+from .database_connection import createDbConnection
 
 class QueryTask(QgsTask):
     def __init__(self, connParams, queries):
