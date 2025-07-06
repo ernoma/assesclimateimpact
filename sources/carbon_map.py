@@ -99,10 +99,12 @@ class CarbonMap:
 
         confTypes = ["planConfs", "externalPlanConfs"]
 
+        shouldStop = False
+
         for confType in confTypes:
             for key in json_data["state"][confType].keys():
                 data = json_data["state"][confType][key]
-                if data["status"] != "fetching":
+                if "state" in data and data["state"] == "idle":
                     simpleResponseData = self.processDataToSimpleFeatures(data)
                     report_data = json.dumps(simpleResponseData)
                     completeNameTotals, completeNameAreas = self.saveReportData(report_data, save_path)
@@ -110,6 +112,11 @@ class CarbonMap:
 
                     complexResponseData = self.processDataToComplexFeatures(report_data)
                     self.saveReportDataWithYearAttributeFeatures(complexResponseData, save_path)
+                    
+                    shouldStop = True
+                    break
+            if shouldStop:
+                break
 
 
     def downloadData(self):
